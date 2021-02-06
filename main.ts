@@ -1,112 +1,84 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Plugin } from "obsidian";
+import { Editor } from "codemirror";
+var CodeMirror: any = window.CodeMirror;
+import "./show-hint";
+import TinySegmenter from "./tiny-segmenter";
+// @ts-ignore
+const segmenter = new TinySegmenter();
 
-interface MyPluginSettings {
-	mySetting: string;
+function pickTokens(cmEditor: Editor): string[] {
+  return cmEditor
+    .getValue()
+    .split(`\n`)
+    .flatMap<string>((x) => segmenter.segment(x))
+    .map((x) => x.replace(/[\[\]()<>]/, ""));
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+const lowerIncludes = (a: string, b: string): boolean =>
+  a.toLowerCase().includes(b.toLowerCase());
+
+const lowerStartsWith = (a: string, b: string): boolean =>
+  a.toLowerCase().startsWith(b.toLowerCase());
+
+function selectSuggestedTokens(tokens: string[], word: string) {
+  return Array.from(new Set(tokens))
+    .filter((x) => x !== word)
+    .filter((x) => lowerIncludes(x, word))
+    .sort((a, b) => a.length - b.length)
+    .sort(
+      (a, b) =>
+        Number(lowerStartsWith(b, word)) - Number(lowerStartsWith(a, word))
+    )
+    .slice(0, 5);
 }
 
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+  private execAutoComplete() {
+    const currentView = this.app.workspace.activeLeaf.view;
+    const cmEditor: Editor = (currentView as any).sourceMode.cmEditor;
 
-	async onload() {
-		console.log('loading plugin');
+    CodeMirror.showHint(
+      cmEditor,
+      () => {
+        const cursor = cmEditor.getCursor();
+        const token = cmEditor.getTokenAt(cursor);
+        if (!token.string) {
+          return;
+        }
 
-		await this.loadSettings();
+        const words = segmenter.segment(token.string);
+        const word = words.pop();
+        const restWordsLength = words.reduce(
+          (t: number, x: string) => t + x.length,
+          0
+        );
 
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
+        const tokens = pickTokens(cmEditor);
+        const suggestedTokens = selectSuggestedTokens(tokens, word);
+        if (suggestedTokens.length === 0) {
+          return;
+        }
 
-		this.addStatusBarItem().setText('Status Bar Text');
+        return {
+          list: suggestedTokens,
+          from: CodeMirror.Pos(cursor.line, token.start + restWordsLength),
+          to: CodeMirror.Pos(cursor.line, cursor.ch),
+        };
+      },
+      {
+        completeSingle: true,
+      }
+    );
+  }
 
-		this.addCommand({
-			id: 'open-sample-modal',
-			name: 'Open Sample Modal',
-			// callback: () => {
-			// 	console.log('Simple Callback');
-			// },
-			checkCallback: (checking: boolean) => {
-				let leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			console.log('codemirror', cm);
-		});
-
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-		console.log('unloading plugin');
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		let {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		let {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+  async onload() {
+    this.addCommand({
+      id: "auto-complete",
+      name: "Auto Complete",
+      hotkeys: [{ modifiers: ["Ctrl"], key: " " }],
+      callback: () => {
+        this.execAutoComplete();
+      },
+    });
+  }
 }
