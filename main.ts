@@ -11,7 +11,7 @@ function pickTokens(cmEditor: Editor): string[] {
     .getValue()
     .split(`\n`)
     .flatMap<string>((x) => segmenter.segment(x))
-    .map((x) => x.replace(/[\[\]()<>]/, ""));
+    .map((x) => x.replace(/[\[\]()<>"'`]/, ""));
 }
 
 const lowerIncludes = (a: string, b: string): boolean =>
