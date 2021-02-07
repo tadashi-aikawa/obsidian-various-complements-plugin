@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { MarkdownView, Plugin } from "obsidian";
 import { Editor } from "codemirror";
 var CodeMirror: any = window.CodeMirror;
 import "./show-hint";
@@ -34,8 +34,13 @@ function selectSuggestedTokens(tokens: string[], word: string) {
 
 export default class MyPlugin extends Plugin {
   private execAutoComplete() {
-    const currentView = this.app.workspace.activeLeaf.view;
-    const cmEditor: Editor = (currentView as any).sourceMode.cmEditor;
+    const currentView = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!currentView) {
+      // Do nothing if the command is triggered outside a MarkdownView
+      return;
+    }
+
+    const cmEditor: Editor = currentView.sourceMode.cmEditor;
 
     CodeMirror.showHint(
       cmEditor,
@@ -76,8 +81,13 @@ export default class MyPlugin extends Plugin {
       id: "auto-complete",
       name: "Auto Complete",
       hotkeys: [{ modifiers: ["Ctrl"], key: " " }],
-      callback: () => {
+      checkCallback: (checking: boolean) => {
+        if (checking && !this.app.workspace.getActiveViewOfType(MarkdownView)) {
+          return false;
+        }
+
         this.execAutoComplete();
+        return true;
       },
     });
   }
