@@ -25,6 +25,8 @@ release: guard-version ## [Required: $version. ex. 0.5.1]
 	@echo '1. Update versions'
 	@npm version $(version)
 	@sed -i -r 's/\"version\": \".+\"/\"version\": \"$(version)\"/g' manifest.json
+	@git add manifest.json
+	@git commit --amend
 
 	@echo '2. Build'
 	@npm run build
