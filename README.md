@@ -32,4 +32,12 @@ Settings
 
 Add settings if needed in the future.
 
+
+Release
+-------
+
+```
+make release version=x.y.z
+```
+
 [Obsidian]: https://obsidian.md/
