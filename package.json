@@ -1,6 +1,6 @@
 {
   "name": "various-complements",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Various complements plugin for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
