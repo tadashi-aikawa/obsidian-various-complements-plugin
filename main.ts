@@ -82,12 +82,11 @@ export default class VariousComponentsPlugin extends Plugin {
       name: "Auto Complete",
       hotkeys: [{ modifiers: ["Ctrl"], key: " " }],
       checkCallback: (checking: boolean) => {
-        if (checking && !this.app.workspace.getActiveViewOfType(MarkdownView)) {
-          return false;
+        if (checking) {
+          return !!this.app.workspace.getActiveViewOfType(MarkdownView);
         }
 
         this.execAutoComplete();
-        return true;
       },
     });
   }
