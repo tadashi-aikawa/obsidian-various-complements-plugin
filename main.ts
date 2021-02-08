@@ -32,7 +32,7 @@ function selectSuggestedTokens(tokens: string[], word: string) {
     .slice(0, 5);
 }
 
-export default class MyPlugin extends Plugin {
+export default class VariousComponentsPlugin extends Plugin {
   private execAutoComplete() {
     const currentView = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!currentView) {
