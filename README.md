@@ -37,6 +37,10 @@ Add settings if needed in the future.
 For Developers
 -------------
 
+### Todo
+
+- [ ] [Use WebWorker to improve performance](https://github.com/obsidianmd/obsidian-releases/pull/155#issuecomment-774930410)
+
 ### Build
 
 ```
