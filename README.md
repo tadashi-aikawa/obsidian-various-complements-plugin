@@ -1,7 +1,7 @@
 obsidian-various-complements-plugin
 ===================================
 
-This plugin for [Obsidian] enables you to complements input in markdown files.
+This plugin for [Obsidian] enables you to complement input in markdown files.
 
 Features
 --------
