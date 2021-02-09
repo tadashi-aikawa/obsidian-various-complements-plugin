@@ -23,7 +23,7 @@ I would like to add any other languages if anyone needs them.😉
 
 #### Demo
 
-![Basic demo](demo/demo.gif)
+![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
 
 
 ## Settings
