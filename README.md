@@ -1,10 +1,8 @@
-obsidian-various-complements-plugin
-===================================
+# obsidian-various-complements-plugin
 
 This plugin for [Obsidian] enables you to complement input in markdown files.
 
-Features
---------
+## Features
 
 ### Auto Complete
 
@@ -25,17 +23,15 @@ I would like to add any other languages if anyone needs them.😉
 
 #### Demo
 
-![](demo/demo.gif)
+![Basic demo](demo/demo.gif)
 
 
-Settings
---------
+## Settings
 
 Add settings if needed in the future.
 
 
-For Developers
--------------
+## For Developers
 
 ### Todo
 
