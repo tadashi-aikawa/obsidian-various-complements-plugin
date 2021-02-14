@@ -14,8 +14,15 @@ function pickTokens(cmEditor: Editor): string[] {
     .map((x) => x.replace(/[\[\]()<>"'`]/, ""));
 }
 
-const lowerIncludes = (a: string, b: string): boolean =>
-  a.toLowerCase().includes(b.toLowerCase());
+/**
+ * This function uses case-sensitive logic if a second argument has an upper case. Otherwise, uses case-insensitive logic.
+ */
+const caseIncludes = (one: string, other: string): boolean => {
+  const lowerOther = other.toLowerCase();
+  return lowerOther === other
+    ? one.toLowerCase().includes(lowerOther)
+    : one.includes(other);
+};
 
 const lowerStartsWith = (a: string, b: string): boolean =>
   a.toLowerCase().startsWith(b.toLowerCase());
@@ -23,7 +30,7 @@ const lowerStartsWith = (a: string, b: string): boolean =>
 function selectSuggestedTokens(tokens: string[], word: string) {
   return Array.from(new Set(tokens))
     .filter((x) => x !== word)
-    .filter((x) => lowerIncludes(x, word))
+    .filter((x) => caseIncludes(x, word))
     .sort((a, b) => a.length - b.length)
     .sort(
       (a, b) =>
