@@ -1,18 +1,9 @@
 import { MarkdownView, Plugin } from "obsidian";
 import { Editor } from "codemirror";
-var CodeMirror: any = window.CodeMirror;
 import "./show-hint";
-import TinySegmenter from "./tiny-segmenter";
-// @ts-ignore
-const segmenter = new TinySegmenter();
+import { createTokenizer, TokenizeStrategy } from "./tokenizer";
 
-function pickTokens(cmEditor: Editor): string[] {
-  return cmEditor
-    .getValue()
-    .split(`\n`)
-    .flatMap<string>((x) => segmenter.segment(x))
-    .map((x) => x.replace(/[\[\]()<>"'`]/, ""));
-}
+var CodeMirror: any = window.CodeMirror;
 
 /**
  * This function uses case-sensitive logic if a second argument has an upper case. Otherwise, uses case-insensitive logic.
@@ -40,7 +31,7 @@ function selectSuggestedTokens(tokens: string[], word: string) {
 }
 
 export default class VariousComponentsPlugin extends Plugin {
-  private execAutoComplete() {
+  private execAutoComplete(strategy: TokenizeStrategy) {
     const currentView = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!currentView) {
       // Do nothing if the command is triggered outside a MarkdownView
@@ -52,28 +43,23 @@ export default class VariousComponentsPlugin extends Plugin {
     CodeMirror.showHint(
       cmEditor,
       () => {
-        const cursor = cmEditor.getCursor();
-        const token = cmEditor.getTokenAt(cursor);
-        if (!token.string) {
+        const tokenized = createTokenizer(cmEditor, strategy).tokenize();
+        if (!tokenized) {
           return;
         }
 
-        const words = segmenter.segment(token.string);
-        const word = words.pop();
-        const restWordsLength = words.reduce(
-          (t: number, x: string) => t + x.length,
-          0
+        const suggestedTokens = selectSuggestedTokens(
+          tokenized.tokens,
+          tokenized.currentToken
         );
-
-        const tokens = pickTokens(cmEditor);
-        const suggestedTokens = selectSuggestedTokens(tokens, word);
         if (suggestedTokens.length === 0) {
           return;
         }
 
+        const cursor = cmEditor.getCursor();
         return {
           list: suggestedTokens,
-          from: CodeMirror.Pos(cursor.line, token.start + restWordsLength),
+          from: CodeMirror.Pos(cursor.line, tokenized.currentTokenStart),
           to: CodeMirror.Pos(cursor.line, cursor.ch),
         };
       },
@@ -93,7 +79,18 @@ export default class VariousComponentsPlugin extends Plugin {
           return !!this.app.workspace.getActiveViewOfType(MarkdownView);
         }
 
-        this.execAutoComplete();
+        this.execAutoComplete("default");
+      },
+    });
+    this.addCommand({
+      id: "auto-complete-as-japanese",
+      name: "Auto Complete as Japanese",
+      checkCallback: (checking: boolean) => {
+        if (checking) {
+          return !!this.app.workspace.getActiveViewOfType(MarkdownView);
+        }
+
+        this.execAutoComplete("japanese");
       },
     });
   }

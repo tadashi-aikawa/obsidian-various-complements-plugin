@@ -10,25 +10,24 @@ It complements the text with tokens that exists in a current file.
 
 #### Commands
 
-| Name          | Default Shortcut Key |
-| ------------- | -------------------- |
-| Auto Complete | `Ctrl + Space`       |
-
-#### Support languages
-
-- English
-- Japanese
+| Name                      | Default Shortcut Key | Support Languages                        |
+| ------------------------- | -------------------- | ---------------------------------------- |
+| Auto Complete             | `Ctrl + Space`       | Languages whose word break is whitespace |
+| Auto Complete as Japanese |                      | Japanese                                 |
 
 I would like to add any other languages if anyone needs them.😉
 
 #### Demo
 
-![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
+##### Auto Complete
 
 
-## Settings
 
-Add settings if needed in the future.
+##### Auto Complete as Japanese
+
+![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo2.gif)
+
+![Basic demo japanese](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
 
 
 ## For Developers
