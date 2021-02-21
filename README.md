@@ -21,11 +21,9 @@ I would like to add any other languages if anyone needs them.😉
 
 ##### Auto Complete
 
-
+![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo2.gif)
 
 ##### Auto Complete as Japanese
-
-![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo2.gif)
 
 ![Basic demo japanese](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
 
