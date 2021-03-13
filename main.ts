@@ -83,6 +83,17 @@ export default class VariousComponentsPlugin extends Plugin {
       },
     });
     this.addCommand({
+      id: "auto-complete-as-arabic",
+      name: "Auto Complete as Arabic",
+      checkCallback: (checking: boolean) => {
+        if (checking) {
+          return !!this.app.workspace.getActiveViewOfType(MarkdownView);
+        }
+
+        this.execAutoComplete("arabic");
+      },
+    });
+    this.addCommand({
       id: "auto-complete-as-japanese",
       name: "Auto Complete as Japanese",
       checkCallback: (checking: boolean) => {

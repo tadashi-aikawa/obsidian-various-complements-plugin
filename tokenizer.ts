@@ -3,9 +3,15 @@ import CodeMirror from "codemirror";
 // @ts-ignore
 const segmenter = new TinySegmenter();
 
-export type TokenizeStrategy = "default" | "japanese";
+export type TokenizeStrategy = "default" | "japanese" | "arabic";
 
-function pickTokens(cmEditor: CodeMirror.Editor): string[] {
+const TRIM_CHAR_PATTERN = /[\[\]()<>"'.,|; `]/g;
+const ARABIC_TRIM_CHAR_PATTERN = /[\[\]()<>"'.,|; `،؛]/g;
+
+function pickTokens(
+  cmEditor: CodeMirror.Editor,
+  trimPattern: RegExp
+): string[] {
   const maxLineIndex = cmEditor.getDoc().lineCount();
   return [...Array(maxLineIndex).keys()]
     .flatMap((x) =>
@@ -15,7 +21,7 @@ function pickTokens(cmEditor: CodeMirror.Editor): string[] {
           x.type?.includes("hmd-codeblock") ? x.string.split(" ") : [x.string]
         )
     )
-    .map((x) => x.replace(/[\[\]()<>"'.,|; `]/g, ""))
+    .map((x) => x.replace(trimPattern, ""))
     .filter((x) => x !== "");
 }
 
@@ -24,7 +30,7 @@ function pickTokensAsJapanese(cmEditor: CodeMirror.Editor): string[] {
     .getValue()
     .split(`\n`)
     .flatMap<string>((x) => segmenter.segment(x))
-    .map((x) => x.replace(/[\[\]()<>"'.,|; `]/, ""));
+    .map((x) => x.replace(TRIM_CHAR_PATTERN, ""));
 }
 
 interface TokenizedResult {
@@ -42,6 +48,7 @@ interface Tokenizer {
 
 class DefaultTokenizer implements Tokenizer {
   private readonly cmEditor: CodeMirror.Editor;
+  protected readonly trimPattern: RegExp = TRIM_CHAR_PATTERN;
 
   constructor(cmEditor: CodeMirror.Editor) {
     this.cmEditor = cmEditor;
@@ -54,15 +61,21 @@ class DefaultTokenizer implements Tokenizer {
       return undefined;
     }
 
-    console.log(pickTokens(this.cmEditor));
     return {
       currentToken: token.string,
       currentTokenStart: token.start,
-      tokens: pickTokens(this.cmEditor),
+      tokens: pickTokens(this.cmEditor, this.trimPattern),
     };
   }
 }
 
+class ArabicTokenizer extends DefaultTokenizer {
+  protected trimPattern: RegExp = ARABIC_TRIM_CHAR_PATTERN;
+}
+
+/**
+ * Japanese needs original logic.
+ */
 class JapaneseTokenizer implements Tokenizer {
   private readonly cmEditor: CodeMirror.Editor;
 
@@ -98,6 +111,8 @@ export function createTokenizer(
   switch (strategy) {
     case "default":
       return new DefaultTokenizer(cmEditor);
+    case "arabic":
+      return new ArabicTokenizer(cmEditor);
     case "japanese":
       return new JapaneseTokenizer(cmEditor);
     default:
