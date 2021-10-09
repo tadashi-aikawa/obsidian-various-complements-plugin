@@ -1,5 +1,8 @@
 # obsidian-various-complements-plugin
 
+[![release](https://img.shields.io/github/release/tadashi-aikawa/obsidian-various-complements-plugin.svg)](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/releases/latest)
+![downloads](https://img.shields.io/github/downloads/tadashi-aikawa/obsidian-various-complements-plugin/total)
+
 This plugin for [Obsidian] enables you to complement input in markdown files.
 
 ## Features
