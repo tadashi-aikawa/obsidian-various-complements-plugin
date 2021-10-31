@@ -38,7 +38,7 @@ export default class VariousComponentsPlugin extends Plugin {
       return;
     }
 
-    const cmEditor: Editor = currentView.sourceMode.cmEditor;
+    const cmEditor = currentView.editor;
 
     CodeMirror.showHint(
       cmEditor,

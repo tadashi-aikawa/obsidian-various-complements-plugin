@@ -5,7 +5,7 @@
 
 This plugin for [Obsidian] enables you to complement input in markdown files.
 
-## Features
+## ⌨️Features
 
 ### Auto Complete
 
@@ -32,28 +32,27 @@ I would like to add any other languages if anyone needs them.😉
 ![Basic demo japanese](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
 
 
-## For Developers
+## 🖥️ For developers
+
+- Requirements
+    - [Task]
 
 ### Todo
 
 - [ ] [Use WebWorker to improve performance](https://github.com/obsidianmd/obsidian-releases/pull/155#issuecomment-774930410)
 
-### Build
+### Development
 
-```
-npm run dev
-```
-
-or
-
-```
-npm run build
+```console
+task init
+task dev
 ```
 
 ### Release
 
 ```
-make release version=x.y.z
+task release VERSION=1.2.3
 ```
 
 [Obsidian]: https://obsidian.md/
+[Task]: https://github.com/go-task/task

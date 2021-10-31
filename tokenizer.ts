@@ -1,5 +1,6 @@
 import TinySegmenter from "./tiny-segmenter";
 import CodeMirror from "codemirror";
+import { Editor } from "obsidian";
 // @ts-ignore
 const segmenter = new TinySegmenter();
 
@@ -8,10 +9,7 @@ export type TokenizeStrategy = "default" | "japanese" | "arabic";
 const TRIM_CHAR_PATTERN = /[\[\]()<>"'.,|; `]/g;
 const ARABIC_TRIM_CHAR_PATTERN = /[\[\]()<>"'.,|; `،؛]/g;
 
-function pickTokens(
-  cmEditor: CodeMirror.Editor,
-  trimPattern: RegExp
-): string[] {
+function pickTokens(cmEditor: Editor, trimPattern: RegExp): string[] {
   const maxLineIndex = cmEditor.getDoc().lineCount();
   return [...Array(maxLineIndex).keys()]
     .flatMap((x) =>
@@ -25,7 +23,7 @@ function pickTokens(
     .filter((x) => x !== "");
 }
 
-function pickTokensAsJapanese(cmEditor: CodeMirror.Editor): string[] {
+function pickTokensAsJapanese(cmEditor: Editor): string[] {
   return cmEditor
     .getValue()
     .split(`\n`)
@@ -47,10 +45,10 @@ interface Tokenizer {
 }
 
 class DefaultTokenizer implements Tokenizer {
-  private readonly cmEditor: CodeMirror.Editor;
+  private readonly cmEditor: Editor;
   protected readonly trimPattern: RegExp = TRIM_CHAR_PATTERN;
 
-  constructor(cmEditor: CodeMirror.Editor) {
+  constructor(cmEditor: Editor) {
     this.cmEditor = cmEditor;
   }
 
@@ -77,9 +75,9 @@ class ArabicTokenizer extends DefaultTokenizer {
  * Japanese needs original logic.
  */
 class JapaneseTokenizer implements Tokenizer {
-  private readonly cmEditor: CodeMirror.Editor;
+  private readonly cmEditor: Editor;
 
-  constructor(cmEditor: CodeMirror.Editor) {
+  constructor(cmEditor: Editor) {
     this.cmEditor = cmEditor;
   }
 
@@ -105,7 +103,7 @@ class JapaneseTokenizer implements Tokenizer {
 }
 
 export function createTokenizer(
-  cmEditor: CodeMirror.Editor,
+  cmEditor: Editor,
   strategy: TokenizeStrategy
 ): Tokenizer {
   switch (strategy) {

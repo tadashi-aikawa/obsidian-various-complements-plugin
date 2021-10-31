@@ -1,0 +1,52 @@
+# Required powershell
+version: "3"
+
+tasks:
+  default:
+    - task: help
+
+  help:
+    silent: true
+    cmds:
+      - task -l
+
+  build:dev: npm run dev
+  build: npm run build
+  test: npm test
+  watch: watchexec --exts "js,json,css" cp main.js styles.css manifest.json $USERPROFILE/work/minerva/.obsidian/plugins/various-complements/
+
+  init:
+    desc: Install dependencies
+    cmds:
+      - npm install
+
+  dev:
+    desc: Build and copy files when they are updated.
+    deps:
+      - build:dev
+      - watch
+
+  ci:
+    desc: For CI
+    cmds:
+      - task: init
+      - task: build
+
+  release:
+    desc: |
+      Build
+          ∟ [Ex] task release VERSION=1.2.3
+    deps:
+      - ci
+    cmds:
+      - |
+        sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest.json
+      - git add manifest.json
+      - git commit -m "Update manifest"
+      - npm version {{.VERSION}}
+      - task: ci
+      - git push --tags
+      - git push
+    preconditions:
+      - sh: "[ {{.VERSION}} != '' ]"
+        msg: "VERSION is required."
