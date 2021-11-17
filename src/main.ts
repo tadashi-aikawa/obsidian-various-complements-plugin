@@ -17,7 +17,8 @@ export default class VariousComponents extends Plugin {
 
     this.suggester = await AutoCompleteSuggest.new(
       this.app,
-      TokenizeStrategy.fromName(this.settings.strategy)
+      TokenizeStrategy.fromName(this.settings.strategy),
+      this.settings.maxNumberOfSuggestions
     );
     this.registerEditorSuggest(this.suggester);
   }
@@ -32,5 +33,9 @@ export default class VariousComponents extends Plugin {
 
   async updateStrategy(strategy: TokenizeStrategy) {
     await this.suggester.setStrategy(strategy);
+  }
+
+  async updateMaxNumberOfSuggestions(num: number) {
+    this.suggester.setMaxNumberOfSuggestions(num);
   }
 }

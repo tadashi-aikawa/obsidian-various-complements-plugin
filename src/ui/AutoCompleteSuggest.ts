@@ -12,7 +12,7 @@ import { caseIncludes, lowerStartsWith } from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 
-function suggestTokens(tokens: string[], word: string) {
+function suggestTokens(tokens: string[], word: string, max: number) {
   return Array.from(new Set(tokens))
     .filter((x) => x !== word)
     .filter((x) => caseIncludes(x, word))
@@ -21,7 +21,7 @@ function suggestTokens(tokens: string[], word: string) {
       (a, b) =>
         Number(lowerStartsWith(b, word)) - Number(lowerStartsWith(a, word))
     )
-    .slice(0, 5);
+    .slice(0, max);
 }
 
 export class AutoCompleteSuggest extends EditorSuggest<string> {
@@ -29,6 +29,7 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
   app: App;
   strategy: TokenizeStrategy;
   tokenizer: Tokenizer;
+  maxNumberOfSuggestions: number;
 
   private constructor(app: App) {
     super(app);
@@ -36,10 +37,12 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
 
   static async new(
     app: App,
-    strategy: TokenizeStrategy
+    strategy: TokenizeStrategy,
+    maxNumberOfSuggestions: number
   ): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app);
     await ins.setStrategy(strategy);
+    ins.setMaxNumberOfSuggestions(maxNumberOfSuggestions);
 
     app.vault.on("modify", async (_) => {
       ins.tokens = await ins.pickTokens();
@@ -55,6 +58,10 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     this.strategy = strategy;
     this.tokenizer = createTokenizer(strategy);
     this.tokens = await this.pickTokens();
+  }
+
+  setMaxNumberOfSuggestions(num: number) {
+    this.maxNumberOfSuggestions = num;
   }
 
   async pickTokens(): Promise<string[]> {
@@ -94,7 +101,11 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
   }
 
   getSuggestions(context: EditorSuggestContext): string[] | Promise<string[]> {
-    return suggestTokens(this.tokens, context.query);
+    return suggestTokens(
+      this.tokens,
+      context.query,
+      this.maxNumberOfSuggestions
+    );
   }
 
   renderSuggestion(value: string, el: HTMLElement): void {

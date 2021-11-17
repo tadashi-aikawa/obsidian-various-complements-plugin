@@ -4,10 +4,12 @@ import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 
 export interface Settings {
   strategy: string;
+  maxNumberOfSuggestions: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   strategy: "default",
+  maxNumberOfSuggestions: 5,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -40,5 +42,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           await this.plugin.updateStrategy(TokenizeStrategy.fromName(value));
         })
     );
+
+    new Setting(containerEl)
+      .setName("Max number of suggestions")
+      .addSlider((sc) =>
+        sc
+          .setLimits(5, 50, 1)
+          .setValue(this.plugin.settings.maxNumberOfSuggestions)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.maxNumberOfSuggestions = value;
+            await this.plugin.saveSettings();
+            await this.plugin.updateMaxNumberOfSuggestions(value);
+          })
+          .showTooltip()
+      );
   }
 }
