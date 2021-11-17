@@ -23,8 +23,7 @@ You can set a strategy if the separator of your language is not only whitespace.
 
 #### Japanese
 
-#### Arabic
-
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/japanese.gif)
 
 ## 🖥️ For developers
 
