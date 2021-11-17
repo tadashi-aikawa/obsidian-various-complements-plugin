@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
+    "strict": true,
     "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
     "target": "es6",
     "allowJs": true,
-    "noImplicitAny": true,
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "importHelpers": true,
     "lib": ["dom", "es5", "scripthost", "es2019"],
