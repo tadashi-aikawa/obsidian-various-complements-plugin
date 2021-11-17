@@ -1,6 +1,6 @@
 {
   "name": "various-complements",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "This plugin for Obsidian enables you to complement input in markdown files",
   "main": "main.js",
   "scripts": {
