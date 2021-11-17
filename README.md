@@ -25,8 +25,20 @@ You can set a strategy if the separator of your language is not only whitespace.
 
 ![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/japanese.gif)
 
-## 🖥️ For developers
+## 👁 Live preview support
 
+It supports Live Preview mode for now.
+
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/livepreview.gif)
+
+## 📱 Mobile support
+
+It supports on mobile.
+
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/mobile.gif)
+
+## 🖥️ For developers
+~~~~
 - Requirements
     - [Task]
 
