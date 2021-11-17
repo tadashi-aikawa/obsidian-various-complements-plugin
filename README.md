@@ -5,55 +5,47 @@
 
 This plugin for [Obsidian] enables you to complement input in markdown files.
 
-## Features
+## ⌨️Features
 
 ### Auto Complete
 
 It complements the text with tokens that exists in a current file.
 
-#### Commands
+You can set a strategy if the separator of your language is not only whitespace.
 
-| Name                      | Default Shortcut Key | Support Languages                         |
-| ------------------------- | -------------------- | ----------------------------------------- |
-| Auto Complete             | `Ctrl + Space`       | Languages whose word break is whitespace  |
-| Auto Complete as Arabic   |                      | Arabic (Trim `،؛` in addition to default) |
-| Auto Complete as Japanese |                      | Japanese                                  |
+![settings](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/settings.png)
 
-I would like to add any other languages if anyone needs them.😉
+### Demo
 
-#### Demo
+#### Default
 
-##### Auto Complete
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/default.gif)
 
-![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo2.gif)
+#### Japanese
 
-##### Auto Complete as Japanese
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/japanese.gif)
 
-![Basic demo japanese](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
+## 🖥️ For developers
 
-
-## For Developers
+- Requirements
+    - [Task]
 
 ### Todo
 
 - [ ] [Use WebWorker to improve performance](https://github.com/obsidianmd/obsidian-releases/pull/155#issuecomment-774930410)
 
-### Build
+### Development
 
-```
-npm run dev
-```
-
-or
-
-```
-npm run build
+```console
+task init
+task dev
 ```
 
 ### Release
 
 ```
-make release version=x.y.z
+task release VERSION=1.2.3
 ```
 
 [Obsidian]: https://obsidian.md/
+[Task]: https://github.com/go-task/task

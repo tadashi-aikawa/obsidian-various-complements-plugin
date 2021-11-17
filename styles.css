@@ -1,15 +1,1 @@
 /* Sets all the text color to red! */
-.CodeMirror-hints {
-  position: absolute;
-  background-color: var(--background-primary);
-  border: 2px solid var(--background-primary-alt);
-  list-style: none;
-  padding-left: 0;
-}
-
-.CodeMirror-hint {
-  padding: 5px;
-}
-.CodeMirror-hint-active {
-  background-color: var(--tooltip-bg);
-}

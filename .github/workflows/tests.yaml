@@ -1,0 +1,49 @@
+name: "Tests"
+
+on:
+  push:
+    paths:
+      - ".github/**/*"
+      - "src/*"
+      - "src/**/*"
+      - "*.js"
+      - "*.json"
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: arduino/setup-task@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - run: task ci
+
+      - name: "Discord notification (not success)"
+        uses: rjstone/discord-webhook-notify@v1
+        if: "! success()"
+        with:
+          description: "⚠ Various Complements Tests failed!"
+          footer: "Node.js v16"
+          severity: error
+          avatarUrl: https://cdn.otamart.com/item-picture/26205822/0-1574353123758.jpg
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+
+  notify:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Discord notification (success)"
+        uses: rjstone/discord-webhook-notify@v1
+        if: always()
+        with:
+          description: "✅ Various Complements Tests passed!"
+          footer: "Node.js v16"
+          severity: info
+          avatarUrl: https://cdn.otamart.com/item-picture/26205822/0-1574353123758.jpg
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
