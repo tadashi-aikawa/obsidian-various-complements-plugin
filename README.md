@@ -38,7 +38,7 @@ It supports on mobile.
 ![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/mobile.gif)
 
 ## 🖥️ For developers
-~~~~
+
 - Requirements
     - [Task]
 
