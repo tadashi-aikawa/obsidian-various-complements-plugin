@@ -11,15 +11,19 @@ This plugin for [Obsidian] enables you to complement input in markdown files.
 
 It complements the text with tokens that exists in a current file.
 
-#### Demo
+You can set a strategy if the separator of your language is not only whitespace.
 
-##### Auto Complete
+![settings](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/settings.png)
 
-![Basic demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo2.gif)
+### Demo
 
-##### Auto Complete as Japanese
+#### Default
 
-![Basic demo japanese](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/demo.gif)
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/default.gif)
+
+#### Japanese
+
+#### Arabic
 
 
 ## 🖥️ For developers
