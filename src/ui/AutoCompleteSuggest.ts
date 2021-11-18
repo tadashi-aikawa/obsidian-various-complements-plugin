@@ -1,5 +1,7 @@
 import {
   App,
+  debounce,
+  Debouncer,
   Editor,
   EditorPosition,
   EditorSuggest,
@@ -13,7 +15,7 @@ import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 
-function suggestTokens(tokens: string[], word: string, max: number) {
+function suggestTokens(tokens: string[], word: string, max: number): string[] {
   return Array.from(new Set(tokens))
     .filter((x) => x !== word)
     .filter((x) => caseIncludes(x, word))
@@ -31,6 +33,9 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
 
   tokens: string[] = [];
   tokenizer: Tokenizer;
+  debounceGetSuggestions: Debouncer<
+    [EditorSuggestContext, (tokens: string[]) => void]
+  >;
 
   private constructor(app: App) {
     super(app);
@@ -46,6 +51,7 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     app.workspace.on("active-leaf-change", async (_) => {
       ins.tokens = await ins.pickTokens();
     });
+
     return ins;
   }
 
@@ -64,6 +70,20 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     this.settings = settings;
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
     this.tokens = await this.pickTokens();
+
+    this.debounceGetSuggestions = debounce(
+      (context: EditorSuggestContext, cb: (tokens: string[]) => void) => {
+        cb(
+          suggestTokens(
+            this.tokens,
+            context.query,
+            this.settings.maxNumberOfSuggestions
+          )
+        );
+      },
+      this.settings.delayMilliSeconds,
+      true
+    );
   }
 
   async pickTokens(): Promise<string[]> {
@@ -103,11 +123,11 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
   }
 
   getSuggestions(context: EditorSuggestContext): string[] | Promise<string[]> {
-    return suggestTokens(
-      this.tokens,
-      context.query,
-      this.settings.maxNumberOfSuggestions
-    );
+    return new Promise((resolve) => {
+      this.debounceGetSuggestions(context, (tokens) => {
+        resolve(tokens);
+      });
+    });
   }
 
   renderSuggestion(value: string, el: HTMLElement): void {
@@ -123,6 +143,7 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
         this.context.start,
         this.context.end
       );
+      this.close();
     }
   }
 }
