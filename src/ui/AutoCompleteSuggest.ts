@@ -46,12 +46,18 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     app.workspace.on("active-leaf-change", async (_) => {
       ins.tokens = await ins.pickTokens();
     });
-
     return ins;
   }
 
   get tokenizerStrategy(): TokenizeStrategy {
     return TokenizeStrategy.fromName(this.settings.strategy);
+  }
+
+  get minNumberTriggered(): number {
+    return (
+      this.settings.minNumberOfCharactersTriggered ||
+      this.tokenizerStrategy.triggerThreshold
+    );
   }
 
   async updateSettings(settings: Settings) {
@@ -82,10 +88,7 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     const currentToken = this.tokenizer
       .tokenize(editor.getLine(cursor.line))
       .last();
-    if (
-      !currentToken ||
-      currentToken.length < this.tokenizerStrategy.triggerThreshold
-    ) {
+    if (!currentToken || currentToken.length < this.minNumberTriggered) {
       return null;
     }
 

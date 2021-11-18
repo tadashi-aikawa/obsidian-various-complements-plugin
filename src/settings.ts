@@ -5,11 +5,13 @@ import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 export interface Settings {
   strategy: string;
   maxNumberOfSuggestions: number;
+  minNumberOfCharactersTriggered: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   strategy: "default",
   maxNumberOfSuggestions: 5,
+  minNumberOfCharactersTriggered: 0,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -53,7 +55,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.maxNumberOfSuggestions = value;
             await this.plugin.saveSettings();
           })
-          .showTooltip()
+      );
+
+    new Setting(containerEl)
+      .setName("Min number of characters for trigger")
+      .setDesc("It uses a default value of Strategy if set 0.")
+      .addSlider((sc) =>
+        sc
+          .setLimits(0, 10, 1)
+          .setValue(this.plugin.settings.minNumberOfCharactersTriggered)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.minNumberOfCharactersTriggered = value;
+            await this.plugin.saveSettings();
+          })
       );
   }
 }
