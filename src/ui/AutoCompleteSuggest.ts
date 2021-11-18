@@ -7,7 +7,9 @@ import {
   EditorSuggest,
   EditorSuggestContext,
   EditorSuggestTriggerInfo,
+  FileSystemAdapter,
   MarkdownView,
+  Notice,
   TFile,
 } from "obsidian";
 import { caseIncludes, lowerStartsWith } from "../util/strings";
@@ -31,7 +33,8 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
   app: App;
   settings: Settings;
 
-  tokens: string[] = [];
+  currentFileTokens: string[] = [];
+  customTokens: string[] = [];
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
     [EditorSuggestContext, (tokens: string[]) => void]
@@ -44,12 +47,13 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
   static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app);
     await ins.updateSettings(settings);
+    await ins.refreshCustomTokens();
 
     app.vault.on("modify", async (_) => {
-      ins.tokens = await ins.pickTokens();
+      ins.currentFileTokens = await ins.pickTokens();
     });
     app.workspace.on("active-leaf-change", async (_) => {
-      ins.tokens = await ins.pickTokens();
+      ins.currentFileTokens = await ins.pickTokens();
     });
 
     return ins;
@@ -66,10 +70,15 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     );
   }
 
+  get tokens(): string[] {
+    return [...this.currentFileTokens, ...this.customTokens];
+  }
+
   async updateSettings(settings: Settings) {
     this.settings = settings;
+
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
-    this.tokens = await this.pickTokens();
+    this.currentFileTokens = await this.pickTokens();
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (tokens: string[]) => void) => {
@@ -84,6 +93,25 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
       this.settings.delayMilliSeconds,
       true
     );
+  }
+
+  async refreshCustomTokens() {
+    this.customTokens = [];
+    const paths = this.settings.customDictionaryPaths
+      .split("\n")
+      .filter((x) => x);
+    for (const path of paths) {
+      try {
+        const buf = await FileSystemAdapter.readLocalFile(path);
+        const str = new TextDecoder().decode(buf);
+        this.customTokens.push(
+          ...str.split(/(\r\n|\n)/).filter((x) => x !== "")
+        );
+      } catch {
+        // noinspection ObjectAllocationIgnored
+        new Notice(`⚠ Fail to load ${path} -- Various Complements Plugin`);
+      }
+    }
   }
 
   async pickTokens(): Promise<string[]> {
@@ -105,6 +133,14 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     editor: Editor,
     file: TFile
   ): EditorSuggestTriggerInfo | null {
+    const currentChar = editor.getRange(
+      { line: cursor.line, ch: cursor.ch - 1 },
+      cursor
+    );
+    if (currentChar === " ") {
+      return null;
+    }
+
     const currentToken = this.tokenizer
       .tokenize(editor.getLine(cursor.line))
       .last();

@@ -7,6 +7,7 @@ export interface Settings {
   maxNumberOfSuggestions: number;
   minNumberOfCharactersTriggered: number;
   delayMilliSeconds: number;
+  customDictionaryPaths: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -14,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
   maxNumberOfSuggestions: 5,
   minNumberOfCharactersTriggered: 0,
   delayMilliSeconds: 0,
+  customDictionaryPaths: "",
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -82,6 +84,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .setDynamicTooltip()
           .onChange(async (value) => {
             this.plugin.settings.delayMilliSeconds = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Custom dictionary paths")
+      .addTextArea((tac) =>
+        tac
+          .setValue(this.plugin.settings.customDictionaryPaths)
+          .onChange(async (value) => {
+            this.plugin.settings.customDictionaryPaths = value;
             await this.plugin.saveSettings();
           })
       );
