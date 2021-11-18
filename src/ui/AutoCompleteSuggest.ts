@@ -11,6 +11,7 @@ import {
 import { caseIncludes, lowerStartsWith } from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
+import { Settings } from "../settings";
 
 function suggestTokens(tokens: string[], word: string, max: number) {
   return Array.from(new Set(tokens))
@@ -25,24 +26,19 @@ function suggestTokens(tokens: string[], word: string, max: number) {
 }
 
 export class AutoCompleteSuggest extends EditorSuggest<string> {
-  tokens: string[] = [];
   app: App;
-  strategy: TokenizeStrategy;
+  settings: Settings;
+
+  tokens: string[] = [];
   tokenizer: Tokenizer;
-  maxNumberOfSuggestions: number;
 
   private constructor(app: App) {
     super(app);
   }
 
-  static async new(
-    app: App,
-    strategy: TokenizeStrategy,
-    maxNumberOfSuggestions: number
-  ): Promise<AutoCompleteSuggest> {
+  static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app);
-    await ins.setStrategy(strategy);
-    ins.setMaxNumberOfSuggestions(maxNumberOfSuggestions);
+    await ins.updateSettings(settings);
 
     app.vault.on("modify", async (_) => {
       ins.tokens = await ins.pickTokens();
@@ -54,14 +50,14 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     return ins;
   }
 
-  async setStrategy(strategy: TokenizeStrategy) {
-    this.strategy = strategy;
-    this.tokenizer = createTokenizer(strategy);
-    this.tokens = await this.pickTokens();
+  get tokenizerStrategy(): TokenizeStrategy {
+    return TokenizeStrategy.fromName(this.settings.strategy);
   }
 
-  setMaxNumberOfSuggestions(num: number) {
-    this.maxNumberOfSuggestions = num;
+  async updateSettings(settings: Settings) {
+    this.settings = settings;
+    this.tokenizer = createTokenizer(this.tokenizerStrategy);
+    this.tokens = await this.pickTokens();
   }
 
   async pickTokens(): Promise<string[]> {
@@ -86,7 +82,10 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     const currentToken = this.tokenizer
       .tokenize(editor.getLine(cursor.line))
       .last();
-    if (!currentToken || currentToken.length < this.strategy.triggerThreshold) {
+    if (
+      !currentToken ||
+      currentToken.length < this.tokenizerStrategy.triggerThreshold
+    ) {
       return null;
     }
 
@@ -104,7 +103,7 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     return suggestTokens(
       this.tokens,
       context.query,
-      this.maxNumberOfSuggestions
+      this.settings.maxNumberOfSuggestions
     );
   }
 

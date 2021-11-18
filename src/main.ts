@@ -1,6 +1,5 @@
 import { Plugin } from "obsidian";
 import { AutoCompleteSuggest } from "./ui/AutoCompleteSuggest";
-import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 import {
   DEFAULT_SETTINGS,
   Settings,
@@ -15,11 +14,7 @@ export default class VariousComponents extends Plugin {
     await this.loadSettings();
     this.addSettingTab(new VariousComplementsSettingTab(this.app, this));
 
-    this.suggester = await AutoCompleteSuggest.new(
-      this.app,
-      TokenizeStrategy.fromName(this.settings.strategy),
-      this.settings.maxNumberOfSuggestions
-    );
+    this.suggester = await AutoCompleteSuggest.new(this.app, this.settings);
     this.registerEditorSuggest(this.suggester);
   }
 
@@ -29,13 +24,6 @@ export default class VariousComponents extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
-  }
-
-  async updateStrategy(strategy: TokenizeStrategy) {
-    await this.suggester.setStrategy(strategy);
-  }
-
-  async updateMaxNumberOfSuggestions(num: number) {
-    this.suggester.setMaxNumberOfSuggestions(num);
+    await this.suggester.updateSettings(this.settings);
   }
 }

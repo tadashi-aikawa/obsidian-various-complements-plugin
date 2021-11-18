@@ -39,7 +39,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .onChange(async (value) => {
           this.plugin.settings.strategy = value;
           await this.plugin.saveSettings();
-          await this.plugin.updateStrategy(TokenizeStrategy.fromName(value));
         })
     );
 
@@ -53,7 +52,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.maxNumberOfSuggestions = value;
             await this.plugin.saveSettings();
-            await this.plugin.updateMaxNumberOfSuggestions(value);
           })
           .showTooltip()
       );
