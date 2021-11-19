@@ -40,6 +40,8 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     [EditorSuggestContext, (tokens: string[]) => void]
   >;
 
+  disabled: boolean;
+
   private constructor(app: App) {
     super(app);
   }
@@ -72,6 +74,10 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
 
   get tokens(): string[] {
     return [...this.currentFileTokens, ...this.customTokens];
+  }
+
+  toggleEnabled(): void {
+    this.disabled = !this.disabled;
   }
 
   async updateSettings(settings: Settings) {
@@ -133,6 +139,10 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     editor: Editor,
     file: TFile
   ): EditorSuggestTriggerInfo | null {
+    if (this.disabled) {
+      return null;
+    }
+
     const currentChar = editor.getRange(
       { line: cursor.line, ch: cursor.ch - 1 },
       cursor

@@ -27,6 +27,15 @@ export default class VariousComponents extends Plugin {
         new Notice(`Finish reload custom dictionaries`);
       },
     });
+
+    this.addCommand({
+      id: "toggle-auto-complete",
+      name: "Toggle Auto-complete",
+      hotkeys: [{ modifiers: ["Mod"], key: " " }],
+      callback: async () => {
+        await this.suggester.toggleEnabled();
+      },
+    });
   }
 
   async loadSettings() {
