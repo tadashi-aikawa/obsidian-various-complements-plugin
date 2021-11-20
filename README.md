@@ -19,7 +19,7 @@ You can set a strategy if the separator of your language is not only whitespace.
 
 You can add custom dictionaries from settings as follows.
 
-![settings](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/settings-custom-directories.png)
+![settings](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/setting-custom-directories.png)
 
 You can define a word for each line in dictionary files.
 
