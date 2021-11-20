@@ -7,9 +7,7 @@ import {
   EditorSuggest,
   EditorSuggestContext,
   EditorSuggestTriggerInfo,
-  FileSystemAdapter,
   MarkdownView,
-  Notice,
   Scope,
   TFile,
 } from "obsidian";
@@ -17,6 +15,7 @@ import { caseIncludes, lowerStartsWith } from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
+import { CustomDictionaryService } from "../CustomDictionaryService";
 
 function suggestTokens(tokens: string[], word: string, max: number): string[] {
   return Array.from(new Set(tokens))
@@ -45,9 +44,9 @@ export class AutoCompleteSuggest
 {
   app: App;
   settings: Settings;
+  customDictionaryService: CustomDictionaryService;
 
   currentFileTokens: string[] = [];
-  customTokens: string[] = [];
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
     [EditorSuggestContext, (tokens: string[]) => void]
@@ -66,7 +65,11 @@ export class AutoCompleteSuggest
   static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app);
     await ins.updateSettings(settings);
-    await ins.refreshCustomTokens();
+
+    ins.customDictionaryService = new CustomDictionaryService(
+      settings.customDictionaryPaths.split("\n").filter((x) => x)
+    );
+    await ins.refreshCustomToken();
 
     app.vault.on("modify", async (_) => {
       ins.currentFileTokens = await ins.pickTokens();
@@ -96,8 +99,8 @@ export class AutoCompleteSuggest
 
   get tokens(): string[] {
     return this.settings.onlySuggestFromCustomDictionaries
-      ? this.customTokens
-      : [...this.currentFileTokens, ...this.customTokens];
+      ? this.customDictionaryService.tokens
+      : [...this.currentFileTokens, ...this.customDictionaryService.tokens];
   }
 
   toggleEnabled(): void {
@@ -125,28 +128,8 @@ export class AutoCompleteSuggest
     );
   }
 
-  async refreshCustomTokens() {
-    this.customTokens = [];
-    const paths = this.settings.customDictionaryPaths
-      .split("\n")
-      .filter((x) => x);
-    for (const path of paths) {
-      try {
-        const buf = await FileSystemAdapter.readLocalFile(path);
-        const str = new TextDecoder().decode(buf);
-        for (const line of str.split(/(\r\n|\n)/)) {
-          if (line !== "") {
-            this.customTokens.push(line);
-          }
-        }
-      } catch (e) {
-        // noinspection ObjectAllocationIgnored
-        new Notice(
-          `⚠ Fail to load ${path} -- Various Complements Plugin -- \n ${e}`,
-          0
-        );
-      }
-    }
+  refreshCustomToken(): Promise<void> {
+    return this.customDictionaryService.refreshCustomTokens();
   }
 
   async pickTokens(): Promise<string[]> {

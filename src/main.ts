@@ -38,16 +38,16 @@ export default class VariousComponents extends Plugin {
     });
   }
 
-  async loadSettings() {
+  async loadSettings(): Promise<void> {
     this.settings = { ...DEFAULT_SETTINGS, ...(await this.loadData()) };
   }
 
-  async saveSettings() {
+  async saveSettings(): Promise<void> {
     await this.saveData(this.settings);
     await this.suggester.updateSettings(this.settings);
   }
 
-  async reloadCustomDictionaries() {
-    await this.suggester.refreshCustomTokens();
+  async reloadCustomDictionaries(): Promise<void> {
+    await this.suggester.refreshCustomToken();
   }
 }
