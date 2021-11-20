@@ -1,5 +1,11 @@
 import { FileSystemAdapter, Notice } from "obsidian";
 
+async function loadTokens(path: string): Promise<string[]> {
+  const buf = await FileSystemAdapter.readLocalFile(path);
+  const str = new TextDecoder().decode(buf);
+  return str.split(/(\r\n|\n)/).filter((x) => x);
+}
+
 export class CustomDictionaryService {
   tokens: string[] = [];
   paths: string[];
@@ -12,13 +18,7 @@ export class CustomDictionaryService {
     this.tokens = [];
     for (const path of this.paths) {
       try {
-        const buf = await FileSystemAdapter.readLocalFile(path);
-        const str = new TextDecoder().decode(buf);
-        for (const line of str.split(/(\r\n|\n)/)) {
-          if (line !== "") {
-            this.tokens.push(line);
-          }
-        }
+        (await loadTokens(path)).forEach((x) => this.tokens.push(x));
       } catch (e) {
         // noinspection ObjectAllocationIgnored
         new Notice(

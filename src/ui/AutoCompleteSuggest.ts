@@ -16,9 +16,10 @@ import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 import { CustomDictionaryService } from "../CustomDictionaryService";
+import { uniq } from "../util/collection-helper";
 
 function suggestTokens(tokens: string[], word: string, max: number): string[] {
-  return Array.from(new Set(tokens))
+  return Array.from(uniq(tokens))
     .filter((x) => x !== word)
     .filter((x) => caseIncludes(x, word))
     .sort((a, b) => a.length - b.length)
