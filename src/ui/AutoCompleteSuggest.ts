@@ -95,7 +95,9 @@ export class AutoCompleteSuggest
   }
 
   get tokens(): string[] {
-    return [...this.currentFileTokens, ...this.customTokens];
+    return this.settings.onlySuggestFromCustomDictionaries
+      ? this.customTokens
+      : [...this.currentFileTokens, ...this.customTokens];
   }
 
   toggleEnabled(): void {

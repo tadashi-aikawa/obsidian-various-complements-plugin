@@ -8,6 +8,7 @@ export interface Settings {
   minNumberOfCharactersTriggered: number;
   delayMilliSeconds: number;
   customDictionaryPaths: string;
+  onlySuggestFromCustomDictionaries: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -16,6 +17,7 @@ export const DEFAULT_SETTINGS: Settings = {
   minNumberOfCharactersTriggered: 0,
   delayMilliSeconds: 0,
   customDictionaryPaths: "",
+  onlySuggestFromCustomDictionaries: false,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -98,5 +100,16 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Only suggest from custom dictionaries")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.onlySuggestFromCustomDictionaries
+        ).onChange(async (value) => {
+          this.plugin.settings.onlySuggestFromCustomDictionaries = value;
+          await this.plugin.saveSettings();
+        });
+      });
   }
 }
