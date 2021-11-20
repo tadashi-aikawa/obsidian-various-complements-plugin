@@ -30,6 +30,8 @@ orange
 grape
 ```
 
+**After you update settings about custom dictionaries, please execute a `Reload custom dictionaries` command.**
+
 ### Demo
 
 #### Default
