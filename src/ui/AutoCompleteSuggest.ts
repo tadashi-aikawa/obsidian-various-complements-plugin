@@ -59,17 +59,24 @@ export class AutoCompleteSuggest
   scope: UnsafeEditorSuggestInterface["scope"];
   suggestions: UnsafeEditorSuggestInterface["suggestions"];
 
-  private constructor(app: App) {
+  private constructor(
+    app: App,
+    customDictionaryService: CustomDictionaryService
+  ) {
     super(app);
+    this.customDictionaryService = customDictionaryService;
   }
 
   static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
-    const ins = new AutoCompleteSuggest(app);
-    await ins.updateSettings(settings);
-
-    ins.customDictionaryService = new CustomDictionaryService(
-      settings.customDictionaryPaths.split("\n").filter((x) => x)
+    const ins = new AutoCompleteSuggest(
+      app,
+      new CustomDictionaryService(
+        app,
+        settings.customDictionaryPaths.split("\n").filter((x) => x)
+      )
     );
+
+    await ins.updateSettings(settings);
     await ins.refreshCustomToken();
 
     app.vault.on("modify", async (_) => {
@@ -110,6 +117,9 @@ export class AutoCompleteSuggest
 
   async updateSettings(settings: Settings) {
     this.settings = settings;
+    this.customDictionaryService.updatePaths(
+      settings.customDictionaryPaths.split("\n").filter((x) => x)
+    );
 
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
     this.currentFileTokens = await this.pickTokens();
