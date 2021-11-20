@@ -10,6 +10,7 @@ import {
   FileSystemAdapter,
   MarkdownView,
   Notice,
+  Scope,
   TFile,
 } from "obsidian";
 import { caseIncludes, lowerStartsWith } from "../util/strings";
@@ -29,7 +30,19 @@ function suggestTokens(tokens: string[], word: string, max: number): string[] {
     .slice(0, max);
 }
 
-export class AutoCompleteSuggest extends EditorSuggest<string> {
+// This is an unsafe code..!!
+interface UnsafeEditorSuggestInterface {
+  scope: Scope;
+  suggestions: {
+    selectedItem: number;
+    useSelectedItem(ev: Partial<KeyboardEvent>): void;
+  };
+}
+
+export class AutoCompleteSuggest
+  extends EditorSuggest<string>
+  implements UnsafeEditorSuggestInterface
+{
   app: App;
   settings: Settings;
 
@@ -41,6 +54,10 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
   >;
 
   disabled: boolean;
+
+  // unsafe!!
+  scope: UnsafeEditorSuggestInterface["scope"];
+  suggestions: UnsafeEditorSuggestInterface["suggestions"];
 
   private constructor(app: App) {
     super(app);
@@ -56,6 +73,11 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     });
     app.workspace.on("active-leaf-change", async (_) => {
       ins.currentFileTokens = await ins.pickTokens();
+    });
+
+    ins.scope.register([], "Tab", () => {
+      ins.suggestions.useSelectedItem({});
+      return false;
     });
 
     return ins;
