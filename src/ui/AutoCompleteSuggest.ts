@@ -110,12 +110,17 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
       try {
         const buf = await FileSystemAdapter.readLocalFile(path);
         const str = new TextDecoder().decode(buf);
-        this.customTokens.push(
-          ...str.split(/(\r\n|\n)/).filter((x) => x !== "")
-        );
-      } catch {
+        for (const line of str.split(/(\r\n|\n)/)) {
+          if (line !== "") {
+            this.customTokens.push(line);
+          }
+        }
+      } catch (e) {
         // noinspection ObjectAllocationIgnored
-        new Notice(`⚠ Fail to load ${path} -- Various Complements Plugin`);
+        new Notice(
+          `⚠ Fail to load ${path} -- Various Complements Plugin -- \n ${e}`,
+          0
+        );
       }
     }
   }
