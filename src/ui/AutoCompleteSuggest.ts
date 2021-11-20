@@ -152,7 +152,7 @@ export class AutoCompleteSuggest extends EditorSuggest<string> {
     }
 
     const currentToken = this.tokenizer
-      .tokenize(editor.getLine(cursor.line))
+      .tokenize(editor.getLine(cursor.line).slice(0, cursor.ch))
       .last();
     if (!currentToken || currentToken.length < this.minNumberTriggered) {
       return null;
