@@ -92,13 +92,11 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Custom dictionary paths")
-      .setDesc(
-        "If paths start with './' or '.\\', it loads paths as a relative path from Vault root. Otherwise, it loads as an absolute path."
-      )
+      .setDesc("For each line, specify a relative path from Vault root.")
       .addTextArea((tac) => {
         const el = tac
           .setValue(this.plugin.settings.customDictionaryPaths)
-          .setPlaceholder("./dictionary.md")
+          .setPlaceholder("dictionary.md")
           .onChange(async (value) => {
             this.plugin.settings.customDictionaryPaths = value;
             await this.plugin.saveSettings();

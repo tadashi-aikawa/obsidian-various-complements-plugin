@@ -16,23 +16,16 @@ function lineToWord(line: string): Word {
   };
 }
 
-async function loadWords(path: string): Promise<Word[]> {
-  const buf = await FileSystemAdapter.readLocalFile(path);
-  const str = new TextDecoder().decode(buf);
-  return str
-    .split(/(\r\n|\n)/)
-    .filter((x) => x)
-    .map(lineToWord);
-}
-
 export class CustomDictionaryService {
   words: Word[] = [];
 
   private app: App;
+  private fileSystemAdapter: FileSystemAdapter;
   private paths: string[];
 
   constructor(app: App, paths: string[]) {
     this.app = app;
+    this.fileSystemAdapter = app.vault.adapter as FileSystemAdapter;
     this.paths = paths;
   }
 
@@ -44,18 +37,18 @@ export class CustomDictionaryService {
     this.paths = paths;
   }
 
-  async refreshCustomTokens(): Promise<void> {
-    const fileSystemAdapter = this.app.vault.adapter as FileSystemAdapter;
+  async loadWords(path: string): Promise<Word[]> {
+    return (await this.fileSystemAdapter.read(path))
+      .split(/(\r\n|\n)/)
+      .filter((x) => x)
+      .map(lineToWord);
+  }
 
+  async refreshCustomTokens(): Promise<void> {
     this.words = [];
     for (const path of this.paths) {
       try {
-        const isRelative = path.startsWith("./") || path.startsWith(".\\");
-        const absolutePath = isRelative
-          ? fileSystemAdapter.getFullPath(path)
-          : path;
-
-        const words = await loadWords(absolutePath);
+        const words = await this.loadWords(path);
         words.forEach((x) => this.words.push(x));
       } catch (e) {
         // noinspection ObjectAllocationIgnored

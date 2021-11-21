@@ -35,7 +35,7 @@ You can add custom dictionaries from settings as follows.
 
 #### Definitions of a dictionary file
 
-You can define a word for each line in dictionary files.
+You can define a word for each line in dictionary files~~~~.
 
 | Col1 | Col2        | Col3 and later |
 | ---- | ----------- | -------------- |
