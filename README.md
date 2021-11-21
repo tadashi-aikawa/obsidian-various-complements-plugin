@@ -7,32 +7,13 @@ This plugin for [Obsidian] enables you to complement input in markdown files.
 
 ## ⌨️Features
 
-### Auto Complete
+### Auto Complete in current file
 
 It complements the text with tokens that exists in a current file.
 
 You can set a strategy if the separator of your language is not only whitespace.
 
 ![settings](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/settings.png)
-
-#### Custom dictionaries
-
-You can add custom dictionaries from settings as follows.
-
-![settings](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/blob/main/demo/setting-custom-directories.png?raw=true)
-
-You can define a word for each line in dictionary files.
-
-Ex.
-```
-apple
-orange
-grape
-```
-
-**After you update settings about custom dictionaries, please execute a `Reload custom dictionaries` command.**
-
-### Demo
 
 #### Default
 
@@ -41,6 +22,43 @@ grape
 #### Japanese
 
 ![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/japanese.gif)
+
+### Auto Complete from custom dictionaries
+
+You can also use custom dictionaries to show suggestions on auto-complete.
+
+![custom-dictionary-demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/custom-dictionary-demo.gif)
+
+You can add custom dictionaries from settings as follows.
+
+![settings](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/blob/main/demo/setting-custom-directories.png?raw=true)
+
+#### Definitions of a dictionary file
+
+You can define a word for each line in dictionary files.
+
+| Col1 | Col2        | Col3 and later |
+| ---- | ----------- | -------------- |
+| word | description | aliases        |
+
+It uses `<TAB>` as a separator.
+
+Ex.
+```
+Looks good to me		LGTM
+As far as I know	spoken used to say that you think that something is true, although it is possible that you do not know all the facts or cannot remember completely	AFAIK
+red	🔴	color
+blue	🔵	color
+green	🟢	color
+😄		@smile @laugh @good
+```
+
+It is more straightforward to edit on Google Spread Sheet.
+
+![custom-dictionary-in-spread-sheet](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/custom-dictionary-in-spread-sheet.png)
+
+**After you update settings about custom dictionaries, please execute a `Reload custom dictionaries` command.**
+
 
 ## 👁 Live preview support
 
