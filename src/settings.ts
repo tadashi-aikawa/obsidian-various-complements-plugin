@@ -108,8 +108,8 @@ C:\\tmp\\dictionary.txt
             this.plugin.settings.customDictionaryPaths = value;
             await this.plugin.saveSettings();
           });
-        el.inputEl.style.minHeight = "120px";
-        el.inputEl.style.minWidth = "500px";
+        el.inputEl.className =
+          "various-complements__settings__custom-dictionary-paths";
         return el;
       });
 

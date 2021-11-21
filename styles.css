@@ -5,3 +5,7 @@
     color: var(--text-muted);
 }
 
+.various-complements__settings__custom-dictionary-paths {
+    height: 120px;
+    width: 500px;
+}
