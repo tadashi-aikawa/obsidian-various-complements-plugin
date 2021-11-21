@@ -16,6 +16,10 @@ function pickTokensAsJapanese(content: string, trimPattern: RegExp): string[] {
  */
 export class JapaneseTokenizer implements Tokenizer {
   tokenize(content: string): string[] {
-    return pickTokensAsJapanese(content, TRIM_CHAR_PATTERN);
+    return pickTokensAsJapanese(content, this.getTrimPattern());
+  }
+
+  getTrimPattern(): RegExp {
+    return TRIM_CHAR_PATTERN;
   }
 }

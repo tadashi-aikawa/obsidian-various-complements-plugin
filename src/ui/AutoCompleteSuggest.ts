@@ -186,7 +186,7 @@ export class AutoCompleteSuggest
       { line: cursor.line, ch: cursor.ch - 1 },
       cursor
     );
-    if (currentChar === " ") {
+    if (currentChar.match(this.tokenizer.getTrimPattern())) {
       return null;
     }
 
