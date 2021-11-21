@@ -16,6 +16,7 @@ import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 import { CustomDictionaryService, Word } from "../CustomDictionaryService";
+import { uniq } from "../util/collection-helper";
 
 function suggestWords(words: Word[], query: string, max: number): Word[] {
   return Array.from(words)
@@ -170,7 +171,7 @@ export class AutoCompleteSuggest
     }
 
     const content = await this.app.vault.cachedRead(file);
-    return this.tokenizer.tokenize(content);
+    return uniq(this.tokenizer.tokenize(content));
   }
 
   onTrigger(
