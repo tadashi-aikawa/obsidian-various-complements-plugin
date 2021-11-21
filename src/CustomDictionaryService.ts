@@ -1,13 +1,32 @@
 import { App, FileSystemAdapter, Notice } from "obsidian";
+import { keyBy } from "./util/collection-helper";
 
-async function loadTokens(path: string): Promise<string[]> {
+export interface Word {
+  value: string;
+  description?: string;
+  aliases?: string[];
+}
+
+function lineToWord(line: string): Word {
+  const [value, description, ...aliases] = line.split("\t");
+  return {
+    value,
+    description,
+    aliases,
+  };
+}
+
+async function loadWords(path: string): Promise<Word[]> {
   const buf = await FileSystemAdapter.readLocalFile(path);
   const str = new TextDecoder().decode(buf);
-  return str.split(/(\r\n|\n)/).filter((x) => x);
+  return str
+    .split(/(\r\n|\n)/)
+    .filter((x) => x)
+    .map(lineToWord);
 }
 
 export class CustomDictionaryService {
-  tokens: string[] = [];
+  words: Word[] = [];
 
   private app: App;
   private paths: string[];
@@ -17,6 +36,10 @@ export class CustomDictionaryService {
     this.paths = paths;
   }
 
+  get wordsByValue(): { [value: string]: Word } {
+    return keyBy(this.words, (x) => x.value);
+  }
+
   updatePaths(paths: string[]): void {
     this.paths = paths;
   }
@@ -24,7 +47,7 @@ export class CustomDictionaryService {
   async refreshCustomTokens(): Promise<void> {
     const fileSystemAdapter = this.app.vault.adapter as FileSystemAdapter;
 
-    this.tokens = [];
+    this.words = [];
     for (const path of this.paths) {
       try {
         const isRelative = path.startsWith("./") || path.startsWith(".\\");
@@ -32,8 +55,8 @@ export class CustomDictionaryService {
           ? fileSystemAdapter.getFullPath(path)
           : path;
 
-        const tokens = await loadTokens(absolutePath);
-        tokens.forEach((x) => this.tokens.push(x));
+        const words = await loadWords(absolutePath);
+        words.forEach((x) => this.words.push(x));
       } catch (e) {
         // noinspection ObjectAllocationIgnored
         new Notice(

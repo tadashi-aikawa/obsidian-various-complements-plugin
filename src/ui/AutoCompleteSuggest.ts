@@ -15,17 +15,21 @@ import { caseIncludes, lowerStartsWith } from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
-import { CustomDictionaryService } from "../CustomDictionaryService";
-import { uniq } from "../util/collection-helper";
+import { CustomDictionaryService, Word } from "../CustomDictionaryService";
 
-function suggestTokens(tokens: string[], word: string, max: number): string[] {
-  return Array.from(uniq(tokens))
-    .filter((x) => x !== word)
-    .filter((x) => caseIncludes(x, word))
-    .sort((a, b) => a.length - b.length)
+function suggestWords(words: Word[], query: string, max: number): Word[] {
+  return Array.from(words)
+    .filter((x) => x.value !== query)
+    .filter(
+      (x) =>
+        caseIncludes(x.value, query) ||
+        x.aliases?.some((a) => caseIncludes(a, query))
+    )
+    .sort((a, b) => a.value.length - b.value.length)
     .sort(
       (a, b) =>
-        Number(lowerStartsWith(b, word)) - Number(lowerStartsWith(a, word))
+        Number(lowerStartsWith(b.value, query)) -
+        Number(lowerStartsWith(a.value, query))
     )
     .slice(0, max);
 }
@@ -40,7 +44,7 @@ interface UnsafeEditorSuggestInterface {
 }
 
 export class AutoCompleteSuggest
-  extends EditorSuggest<string>
+  extends EditorSuggest<Word>
   implements UnsafeEditorSuggestInterface
 {
   app: App;
@@ -50,7 +54,7 @@ export class AutoCompleteSuggest
   currentFileTokens: string[] = [];
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
-    [EditorSuggestContext, (tokens: string[]) => void]
+    [EditorSuggestContext, (tokens: Word[]) => void]
   >;
 
   disabled: boolean;
@@ -105,10 +109,17 @@ export class AutoCompleteSuggest
     );
   }
 
-  get tokens(): string[] {
-    return this.settings.onlySuggestFromCustomDictionaries
-      ? this.customDictionaryService.tokens
-      : [...this.currentFileTokens, ...this.customDictionaryService.tokens];
+  get words(): Word[] {
+    if (this.settings.onlySuggestFromCustomDictionaries) {
+      return this.customDictionaryService.words;
+    }
+
+    return [
+      ...this.currentFileTokens
+        .filter((x) => !this.customDictionaryService.wordsByValue[x])
+        .map((x) => ({ value: x })),
+      ...this.customDictionaryService.words,
+    ];
   }
 
   toggleEnabled(): void {
@@ -125,10 +136,10 @@ export class AutoCompleteSuggest
     this.currentFileTokens = await this.pickTokens();
 
     this.debounceGetSuggestions = debounce(
-      (context: EditorSuggestContext, cb: (tokens: string[]) => void) => {
+      (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
         cb(
-          suggestTokens(
-            this.tokens,
+          suggestWords(
+            this.words,
             context.query,
             this.settings.maxNumberOfSuggestions
           )
@@ -191,24 +202,32 @@ export class AutoCompleteSuggest
     };
   }
 
-  getSuggestions(context: EditorSuggestContext): string[] | Promise<string[]> {
+  getSuggestions(context: EditorSuggestContext): Word[] | Promise<Word[]> {
     return new Promise((resolve) => {
-      this.debounceGetSuggestions(context, (tokens) => {
-        resolve(tokens);
+      this.debounceGetSuggestions(context, (words) => {
+        resolve(words);
       });
     });
   }
 
-  renderSuggestion(value: string, el: HTMLElement): void {
+  renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
-    base.createDiv().setText(value);
+    base.createDiv({ text: word.value });
+
+    if (word.description) {
+      base.createDiv({
+        cls: "various-complements__suggest__description",
+        text: word.description,
+      });
+    }
+
     el.appendChild(base);
   }
 
-  selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent): void {
+  selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {
     if (this.context) {
       this.context.editor.replaceRange(
-        value,
+        word.value,
         this.context.start,
         this.context.end
       );

@@ -109,6 +109,7 @@ C:\\tmp\\dictionary.txt
             await this.plugin.saveSettings();
           });
         el.inputEl.style.minHeight = "120px";
+        el.inputEl.style.minWidth = "500px";
         return el;
       });
 
