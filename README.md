@@ -55,7 +55,7 @@ green	🟢	color
 
 It is more straightforward to edit on Google Spread Sheet.
 
-![custom-dictionary-in-spread-sheet](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/custom-dictionary-in-spread-sheet.png)
+![custom-dictionary-spreadsheet](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/custom-dictionary-spreadsheet.png)
 
 **After you update settings about custom dictionaries, please execute a `Reload custom dictionaries` command.**
 
