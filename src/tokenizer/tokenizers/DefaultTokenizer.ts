@@ -7,7 +7,7 @@ function pickTokens(content: string, trimPattern: RegExp): string[] {
     .filter((x) => x !== "");
 }
 
-export const TRIM_CHAR_PATTERN = /[\n\[\]()<>"'.,|;: `]/g;
+export const TRIM_CHAR_PATTERN = /[\n\[\]()<>"'.,|;:*~ `]/g;
 export class DefaultTokenizer implements Tokenizer {
   tokenize(content: string): string[] {
     return pickTokens(content, this.getTrimPattern());
