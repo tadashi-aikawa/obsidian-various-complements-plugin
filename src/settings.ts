@@ -98,12 +98,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .addTextArea((tac) => {
         const el = tac
           .setValue(this.plugin.settings.customDictionaryPaths)
-          .setPlaceholder(
-            `./Home.md
-.\\Home.md
-C:\\tmp\\dictionary.txt
-/user/local/dicts`
-          )
+          .setPlaceholder("./dictionary.md")
           .onChange(async (value) => {
             this.plugin.settings.customDictionaryPaths = value;
             await this.plugin.saveSettings();
