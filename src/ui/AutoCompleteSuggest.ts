@@ -56,6 +56,7 @@ export class AutoCompleteSuggest
   debounceGetSuggestions: Debouncer<
     [EditorSuggestContext, (tokens: Word[]) => void]
   >;
+  debounceClose: Debouncer<[]>;
 
   disabled: boolean;
 
@@ -148,6 +149,10 @@ export class AutoCompleteSuggest
       this.settings.delayMilliSeconds,
       true
     );
+
+    this.debounceClose = debounce(() => {
+      this.close();
+    }, this.settings.delayMilliSeconds + 50);
   }
 
   refreshCustomToken(): Promise<void> {
@@ -232,6 +237,7 @@ export class AutoCompleteSuggest
         this.context.end
       );
       this.close();
+      this.debounceClose();
     }
   }
 }
