@@ -8,8 +8,11 @@ export interface Settings {
   minNumberOfCharactersTriggered: number;
   delayMilliSeconds: number;
   customDictionaryPaths: string;
-  onlySuggestFromCustomDictionaries: boolean;
   propagateEsc: boolean;
+  enableCurrentFileComplement: boolean;
+  enableCustomDictionaryComplement: boolean;
+  enableInternalLinkComplement: boolean;
+  showLogAboutPerformanceInConsole: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -18,8 +21,11 @@ export const DEFAULT_SETTINGS: Settings = {
   minNumberOfCharactersTriggered: 0,
   delayMilliSeconds: 0,
   customDictionaryPaths: "",
-  onlySuggestFromCustomDictionaries: false,
   propagateEsc: false,
+  enableCurrentFileComplement: true,
+  enableCustomDictionaryComplement: false,
+  enableInternalLinkComplement: true,
+  showLogAboutPerformanceInConsole: false,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -50,7 +56,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.strategy)
         .onChange(async (value) => {
           this.plugin.settings.strategy = value;
-          await this.plugin.saveSettings();
+          await this.plugin.saveSettings({ currentFile: true });
         })
     );
 
@@ -58,7 +64,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setName("Max number of suggestions")
       .addSlider((sc) =>
         sc
-          .setLimits(5, 50, 1)
+          .setLimits(1, 255, 1)
           .setValue(this.plugin.settings.maxNumberOfSuggestions)
           .setDynamicTooltip()
           .onChange(async (value) => {
@@ -108,35 +114,73 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         );
       });
 
-    containerEl.createEl("h3", { text: "Current file completion" });
-
-    containerEl.createEl("h3", { text: "Custom dictionary completion" });
+    containerEl.createEl("h3", { text: "Current file complement" });
 
     new Setting(containerEl)
-      .setName("Custom dictionary paths")
-      .setDesc("For each line, specify a relative path from Vault root.")
-      .addTextArea((tac) => {
-        const el = tac
-          .setValue(this.plugin.settings.customDictionaryPaths)
-          .setPlaceholder("dictionary.md")
-          .onChange(async (value) => {
-            this.plugin.settings.customDictionaryPaths = value;
-            await this.plugin.saveSettings();
-          });
-        el.inputEl.className =
-          "various-complements__settings__custom-dictionary-paths";
-        return el;
+      .setName("Enable Current file complement")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.enableCurrentFileComplement).onChange(
+          async (value) => {
+            this.plugin.settings.enableCurrentFileComplement = value;
+            await this.plugin.saveSettings({ currentFile: true });
+          }
+        );
       });
 
-    containerEl.createEl("h3", { text: "Internal link completion" });
+    containerEl.createEl("h3", { text: "Custom dictionary complement" });
 
     new Setting(containerEl)
-      .setName("Only suggest from custom dictionaries")
+      .setName("Enable Custom dictionary complement")
       .addToggle((tc) => {
         tc.setValue(
-          this.plugin.settings.onlySuggestFromCustomDictionaries
+          this.plugin.settings.enableCustomDictionaryComplement
         ).onChange(async (value) => {
-          this.plugin.settings.onlySuggestFromCustomDictionaries = value;
+          this.plugin.settings.enableCustomDictionaryComplement = value;
+          await this.plugin.saveSettings({ customDictionary: true });
+          this.display();
+        });
+      });
+
+    if (this.plugin.settings.enableCustomDictionaryComplement) {
+      new Setting(containerEl)
+        .setName("Custom dictionary paths")
+        .setDesc("For each line, specify a relative path from Vault root.")
+        .addTextArea((tac) => {
+          const el = tac
+            .setValue(this.plugin.settings.customDictionaryPaths)
+            .setPlaceholder("dictionary.md")
+            .onChange(async (value) => {
+              this.plugin.settings.customDictionaryPaths = value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__custom-dictionary-paths";
+          return el;
+        });
+    }
+
+    containerEl.createEl("h3", { text: "Internal link complement" });
+
+    new Setting(containerEl)
+      .setName("Enable Internal link complement")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.enableInternalLinkComplement).onChange(
+          async (value) => {
+            this.plugin.settings.enableInternalLinkComplement = value;
+            await this.plugin.saveSettings({ internalLink: true });
+          }
+        );
+      });
+
+    containerEl.createEl("h3", { text: "Debug" });
+
+    new Setting(containerEl)
+      .setName("Show log about performance in a console")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.showLogAboutPerformanceInConsole
+        ).onChange(async (value) => {
+          this.plugin.settings.showLogAboutPerformanceInConsole = value;
           await this.plugin.saveSettings();
         });
       });

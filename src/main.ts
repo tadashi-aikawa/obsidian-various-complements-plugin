@@ -42,12 +42,27 @@ export default class VariousComponents extends Plugin {
     this.settings = { ...DEFAULT_SETTINGS, ...(await this.loadData()) };
   }
 
-  async saveSettings(): Promise<void> {
+  async saveSettings(
+    needUpdateTokens: {
+      currentFile?: boolean;
+      customDictionary?: boolean;
+      internalLink?: boolean;
+    } = {}
+  ): Promise<void> {
     await this.saveData(this.settings);
     await this.suggester.updateSettings(this.settings);
+    if (needUpdateTokens.currentFile) {
+      await this.suggester.refreshCurrentFileTokens();
+    }
+    if (needUpdateTokens.customDictionary) {
+      await this.suggester.refreshCustomDictionaryTokens();
+    }
+    if (needUpdateTokens.internalLink) {
+      await this.suggester.refreshInternalLinkTokens();
+    }
   }
 
   async reloadCustomDictionaries(): Promise<void> {
-    await this.suggester.refreshCustomToken();
+    await this.suggester.refreshCustomDictionaryTokens();
   }
 }

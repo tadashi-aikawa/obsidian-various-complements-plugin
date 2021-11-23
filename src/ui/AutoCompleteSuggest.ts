@@ -90,14 +90,16 @@ export class AutoCompleteSuggest
     );
 
     await ins.updateSettings(settings);
-    await ins.refreshCustomToken();
+
+    await ins.refreshCurrentFileTokens();
+    await ins.refreshCustomDictionaryTokens();
     ins.refreshInternalLinkTokens();
 
     app.vault.on("modify", async (_) => {
-      ins.currentFileTokens = await ins.pickTokens();
+      await ins.refreshCurrentFileTokens();
     });
     app.workspace.on("active-leaf-change", async (_) => {
-      ins.currentFileTokens = await ins.pickTokens();
+      await ins.refreshCurrentFileTokens();
       ins.refreshInternalLinkTokens();
     });
 
@@ -116,14 +118,12 @@ export class AutoCompleteSuggest
   }
 
   get words(): Word[] {
-    if (this.settings.onlySuggestFromCustomDictionaries) {
-      return this.customDictionaryService.words;
-    }
+    const currentFileWords = this.currentFileTokens
+      .filter((x) => !this.customDictionaryService.wordsByValue[x])
+      .map((x) => ({ value: x }));
 
     return [
-      ...this.currentFileTokens
-        .filter((x) => !this.customDictionaryService.wordsByValue[x])
-        .map((x) => ({ value: x })),
+      ...currentFileWords,
       ...this.customDictionaryService.words,
       ...this.internalLinkTokens,
     ];
@@ -138,9 +138,7 @@ export class AutoCompleteSuggest
     this.customDictionaryService.updatePaths(
       settings.customDictionaryPaths.split("\n").filter((x) => x)
     );
-
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
-    this.currentFileTokens = await this.pickTokens();
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
@@ -152,7 +150,7 @@ export class AutoCompleteSuggest
             this.settings.maxNumberOfSuggestions
           )
         );
-        console.log("debounceGetSuggestions", performance.now() - start);
+        this.showDebugLog("Get suggestions", performance.now() - start);
       },
       this.settings.delayMilliSeconds,
       true
@@ -178,15 +176,52 @@ export class AutoCompleteSuggest
     };
   }
 
-  async refreshCustomToken(): Promise<void> {
+  async refreshCurrentFileTokens(): Promise<void> {
     const start = performance.now();
-    const tokens = await this.customDictionaryService.refreshCustomTokens();
-    console.log("refreshCustomTokens", performance.now() - start);
-    return tokens;
+
+    if (!this.settings.enableCurrentFileComplement) {
+      this.currentFileTokens = [];
+      this.showDebugLog(
+        "👢 Skip: Index current file tokens",
+        performance.now() - start
+      );
+      return;
+    }
+
+    this.currentFileTokens = await this.pickTokens();
+    this.showDebugLog("Index current file tokens", performance.now() - start);
+  }
+
+  async refreshCustomDictionaryTokens(): Promise<void> {
+    const start = performance.now();
+
+    if (!this.settings.enableCustomDictionaryComplement) {
+      this.customDictionaryService.clearTokens();
+      this.showDebugLog(
+        "👢Skip: Index custom dictionary tokens",
+        performance.now() - start
+      );
+      return;
+    }
+
+    await this.customDictionaryService.refreshCustomTokens();
+    this.showDebugLog(
+      "Index custom dictionary tokens",
+      performance.now() - start
+    );
   }
 
   refreshInternalLinkTokens(): void {
     const start = performance.now();
+
+    if (!this.settings.enableInternalLinkComplement) {
+      this.internalLinkTokens = [];
+      this.showDebugLog(
+        "👢Skip: Index internal link tokens",
+        performance.now() - start
+      );
+      return;
+    }
 
     const resolvedInternalLinkTokens = this.app.vault
       .getMarkdownFiles()
@@ -204,7 +239,7 @@ export class AutoCompleteSuggest
         description: "Not created yet",
       }));
 
-    console.log("refreshInternalLinkTokens", performance.now() - start);
+    this.showDebugLog("Index internal link tokens", performance.now() - start);
 
     this.internalLinkTokens = [
       ...resolvedInternalLinkTokens,
@@ -213,7 +248,6 @@ export class AutoCompleteSuggest
   }
 
   async pickTokens(): Promise<string[]> {
-    const start = performance.now();
     if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
       return [];
     }
@@ -224,9 +258,7 @@ export class AutoCompleteSuggest
     }
 
     const content = await this.app.vault.cachedRead(file);
-    const tokens = uniq(this.tokenizer.tokenize(content));
-    console.log("pickTokens", performance.now() - start);
-    return tokens;
+    return uniq(this.tokenizer.tokenize(content));
   }
 
   onTrigger(
@@ -294,6 +326,12 @@ export class AutoCompleteSuggest
       );
       this.close();
       this.debounceClose();
+    }
+  }
+
+  private showDebugLog(message: string, msec: number) {
+    if (this.settings.showLogAboutPerformanceInConsole) {
+      console.log(`${message}: ${Math.round(msec)}[ms]`);
     }
   }
 }

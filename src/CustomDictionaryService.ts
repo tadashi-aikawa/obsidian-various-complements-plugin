@@ -45,7 +45,8 @@ export class CustomDictionaryService {
   }
 
   async refreshCustomTokens(): Promise<void> {
-    this.words = [];
+    this.clearTokens();
+
     for (const path of this.paths) {
       try {
         const words = await this.loadWords(path);
@@ -58,5 +59,9 @@ export class CustomDictionaryService {
         );
       }
     }
+  }
+
+  clearTokens(): void {
+    this.words = [];
   }
 }
