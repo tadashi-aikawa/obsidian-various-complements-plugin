@@ -37,6 +37,8 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     containerEl.createEl("h2", { text: "Various Complements - Settings" });
 
+    containerEl.createEl("h3", { text: "Main" });
+
     new Setting(containerEl).setName("Strategy").addDropdown((tc) =>
       tc
         .addOptions(
@@ -93,6 +95,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Propagate ESC")
+      .setDesc(
+        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not."
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.propagateEsc).onChange(
+          async (value) => {
+            this.plugin.settings.propagateEsc = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
+
+    containerEl.createEl("h3", { text: "Current file completion" });
+
+    containerEl.createEl("h3", { text: "Custom dictionary completion" });
+
+    new Setting(containerEl)
       .setName("Custom dictionary paths")
       .setDesc("For each line, specify a relative path from Vault root.")
       .addTextArea((tac) => {
@@ -108,6 +128,8 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         return el;
       });
 
+    containerEl.createEl("h3", { text: "Internal link completion" });
+
     new Setting(containerEl)
       .setName("Only suggest from custom dictionaries")
       .addToggle((tc) => {
@@ -117,20 +139,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           this.plugin.settings.onlySuggestFromCustomDictionaries = value;
           await this.plugin.saveSettings();
         });
-      });
-
-    new Setting(containerEl)
-      .setName("Propagate ESC")
-      .setDesc(
-        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not."
-      )
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.propagateEsc).onChange(
-          async (value) => {
-            this.plugin.settings.propagateEsc = value;
-            await this.plugin.saveSettings();
-          }
-        );
       });
   }
 }
