@@ -13,6 +13,7 @@ export interface Settings {
   enableCustomDictionaryComplement: boolean;
   enableInternalLinkComplement: boolean;
   showLogAboutPerformanceInConsole: boolean;
+  insertAfterCompletion: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableCustomDictionaryComplement: false,
   enableInternalLinkComplement: true,
   showLogAboutPerformanceInConsole: false,
+  insertAfterCompletion: true,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -99,6 +101,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Insert space after completion")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.insertAfterCompletion).onChange(
+          async (value) => {
+            this.plugin.settings.insertAfterCompletion = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
 
     new Setting(containerEl)
       .setName("Propagate ESC")

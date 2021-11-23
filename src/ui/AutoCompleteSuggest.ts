@@ -333,8 +333,12 @@ export class AutoCompleteSuggest
 
   selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {
     if (this.context) {
+      const after = this.settings.insertAfterCompletion
+        ? `${word.value} `
+        : word.value;
+
       this.context.editor.replaceRange(
-        word.value,
+        after,
         this.context.start,
         this.context.end
       );
