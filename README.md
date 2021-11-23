@@ -33,6 +33,10 @@ You can add custom dictionaries from settings as follows.
 
 ![settings](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/blob/main/demo/setting-custom-directories.png?raw=true)
 
+- ⚠ Absolute paths are not supported
+- ⚠ Relative paths **that point outside of Vault** are not supported
+  - On desktop, it might work correctly but not supported, be careful :)
+
 #### Definitions of a dictionary file
 
 You can define a word for each line in dictionary files~~~~.
