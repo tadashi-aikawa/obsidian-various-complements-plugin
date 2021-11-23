@@ -107,10 +107,7 @@ export class AutoCompleteSuggest
     );
 
     await ins.updateSettings(settings);
-
-    await ins.refreshCurrentFileTokens();
     await ins.refreshCustomDictionaryTokens();
-    ins.refreshInternalLinkTokens();
 
     ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
@@ -122,6 +119,11 @@ export class AutoCompleteSuggest
         ins.refreshInternalLinkTokens();
       }
     );
+    // Avoid to refer incomplete cache
+    const cacheResolvedRef = app.metadataCache.on("resolved", () => {
+      ins.refreshInternalLinkTokens();
+      ins.app.metadataCache.offref(cacheResolvedRef);
+    });
 
     return ins;
   }
