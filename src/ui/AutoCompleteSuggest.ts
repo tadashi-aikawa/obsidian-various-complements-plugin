@@ -23,17 +23,31 @@ import { AppHelper } from "../app-helper";
 function suggestWords(words: Word[], query: string, max: number): Word[] {
   return Array.from(words)
     .filter((x) => x.value !== query)
-    .filter(
-      (x) =>
-        caseIncludesWithoutSpace(x.value, query) ||
-        x.aliases?.some((a) => caseIncludesWithoutSpace(a, query))
-    )
-    .sort((a, b) => a.value.length - b.value.length)
-    .sort(
-      (a, b) =>
-        Number(lowerStartsWith(b.value, query)) -
-        Number(lowerStartsWith(a.value, query))
-    )
+    .map((x) => {
+      if (caseIncludesWithoutSpace(x.value, query)) {
+        return { word: x, value: x.value, alias: false };
+      }
+
+      const matchedAlias = x.aliases?.find((a) =>
+        caseIncludesWithoutSpace(a, query)
+      );
+      if (matchedAlias) {
+        return { word: x, value: matchedAlias, alias: true };
+      }
+
+      return { word: x, alias: false };
+    })
+    .filter((x) => x.value !== undefined)
+    .sort((a, b) => {
+      const aliasP = (Number(a.alias) - Number(b.alias)) * 10000;
+      const startP =
+        (Number(lowerStartsWith(b.value!, query)) -
+          Number(lowerStartsWith(a.value!, query))) *
+        1000;
+      const lengthP = a.value!.length - b.value!.length;
+      return aliasP + startP + lengthP;
+    })
+    .map((x) => x.word)
     .slice(0, max);
 }
 
