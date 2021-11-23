@@ -312,6 +312,10 @@ export class AutoCompleteSuggest
       return null;
     }
 
+    if (this.tokenizer.shouldIgnore(currentToken)) {
+      return null;
+    }
+
     return {
       start: {
         ch: cursor.ch - currentToken.length,

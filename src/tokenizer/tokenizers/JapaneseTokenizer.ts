@@ -7,8 +7,8 @@ const segmenter = new TinySegmenter();
 function pickTokensAsJapanese(content: string, trimPattern: RegExp): string[] {
   return content
     .split(trimPattern)
-    .flatMap<string>((x) => segmenter.segment(x))
-    .map((x) => x.replace(trimPattern, ""));
+    .filter((x) => x !== "")
+    .flatMap<string>((x) => segmenter.segment(x));
 }
 
 /**
@@ -21,5 +21,9 @@ export class JapaneseTokenizer implements Tokenizer {
 
   getTrimPattern(): RegExp {
     return TRIM_CHAR_PATTERN;
+  }
+
+  shouldIgnore(str: string): boolean {
+    return Boolean(str.match(/^[ぁ-んａ-ｚＡ-Ｚ。、ー　]*$/));
   }
 }

@@ -6,6 +6,7 @@ import { TokenizeStrategy } from "./TokenizeStrategy";
 export interface Tokenizer {
   tokenize(content: string): string[];
   getTrimPattern(): RegExp;
+  shouldIgnore(query: string): boolean;
 }
 
 export function createTokenizer(strategy: TokenizeStrategy): Tokenizer {
