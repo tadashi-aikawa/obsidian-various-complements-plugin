@@ -36,7 +36,6 @@ export default class VariousComponents extends Plugin {
     this.addCommand({
       id: "toggle-auto-complete",
       name: "Toggle Auto-complete",
-      hotkeys: [{ modifiers: ["Mod"], key: " " }],
       callback: async () => {
         await this.suggester.toggleEnabled();
       },
