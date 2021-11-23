@@ -93,7 +93,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setName("Delay milli-seconds for trigger")
       .addSlider((sc) =>
         sc
-          .setLimits(0, 10000, 10)
+          .setLimits(0, 1000, 10)
           .setValue(this.plugin.settings.delayMilliSeconds)
           .setDynamicTooltip()
           .onChange(async (value) => {
