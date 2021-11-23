@@ -7,6 +7,7 @@ import {
   EditorSuggest,
   EditorSuggestContext,
   EditorSuggestTriggerInfo,
+  EventRef,
   KeymapEventHandler,
   MarkdownView,
   Scope,
@@ -84,6 +85,8 @@ export class AutoCompleteSuggest
   suggestions: UnsafeEditorSuggestInterface["suggestions"];
 
   keymapEventHandler: KeymapEventHandler[] = [];
+  modifyEventRef: EventRef;
+  activeLeafChangeRef: EventRef;
 
   private constructor(
     app: App,
@@ -109,15 +112,23 @@ export class AutoCompleteSuggest
     await ins.refreshCustomDictionaryTokens();
     ins.refreshInternalLinkTokens();
 
-    app.vault.on("modify", async (_) => {
+    ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
     });
-    app.workspace.on("active-leaf-change", async (_) => {
-      await ins.refreshCurrentFileTokens();
-      ins.refreshInternalLinkTokens();
-    });
+    ins.activeLeafChangeRef = app.workspace.on(
+      "active-leaf-change",
+      async (_) => {
+        await ins.refreshCurrentFileTokens();
+        ins.refreshInternalLinkTokens();
+      }
+    );
 
     return ins;
+  }
+
+  unregister() {
+    this.app.vault.offref(this.modifyEventRef);
+    this.app.workspace.offref(this.activeLeafChangeRef);
   }
 
   get tokenizerStrategy(): TokenizeStrategy {

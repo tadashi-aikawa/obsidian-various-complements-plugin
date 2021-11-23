@@ -10,6 +10,11 @@ export default class VariousComponents extends Plugin {
   settings: Settings;
   suggester: AutoCompleteSuggest;
 
+  onunload() {
+    super.onunload();
+    this.suggester.unregister();
+  }
+
   async onload() {
     await this.loadSettings();
     this.addSettingTab(new VariousComplementsSettingTab(this.app, this));
