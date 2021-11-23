@@ -9,6 +9,7 @@ export interface Settings {
   delayMilliSeconds: number;
   customDictionaryPaths: string;
   onlySuggestFromCustomDictionaries: boolean;
+  propagateEsc: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -18,6 +19,7 @@ export const DEFAULT_SETTINGS: Settings = {
   delayMilliSeconds: 0,
   customDictionaryPaths: "",
   onlySuggestFromCustomDictionaries: false,
+  propagateEsc: false,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -115,6 +117,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           this.plugin.settings.onlySuggestFromCustomDictionaries = value;
           await this.plugin.saveSettings();
         });
+      });
+
+    new Setting(containerEl)
+      .setName("Propagate ESC")
+      .setDesc(
+        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not."
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.propagateEsc).onChange(
+          async (value) => {
+            this.plugin.settings.propagateEsc = value;
+            await this.plugin.saveSettings();
+          }
+        );
       });
   }
 }

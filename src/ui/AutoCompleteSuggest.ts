@@ -7,6 +7,7 @@ import {
   EditorSuggest,
   EditorSuggestContext,
   EditorSuggestTriggerInfo,
+  KeymapEventHandler,
   MarkdownView,
   Scope,
   TFile,
@@ -38,7 +39,7 @@ function suggestWords(words: Word[], query: string, max: number): Word[] {
 
 // This is an unsafe code..!!
 interface UnsafeEditorSuggestInterface {
-  scope: Scope;
+  scope: Scope & { keys: (KeymapEventHandler & { func: CallableFunction })[] };
   suggestions: {
     selectedItem: number;
     useSelectedItem(ev: Partial<KeyboardEvent>): void;
@@ -68,6 +69,8 @@ export class AutoCompleteSuggest
   scope: UnsafeEditorSuggestInterface["scope"];
   suggestions: UnsafeEditorSuggestInterface["suggestions"];
 
+  keymapEventHandler: KeymapEventHandler[] = [];
+
   private constructor(
     app: App,
     customDictionaryService: CustomDictionaryService
@@ -96,11 +99,6 @@ export class AutoCompleteSuggest
     app.workspace.on("active-leaf-change", async (_) => {
       ins.currentFileTokens = await ins.pickTokens();
       ins.refreshInternalLinkTokens();
-    });
-
-    ins.scope.register([], "Tab", () => {
-      ins.suggestions.useSelectedItem({});
-      return false;
     });
 
     return ins;
@@ -163,6 +161,21 @@ export class AutoCompleteSuggest
     this.debounceClose = debounce(() => {
       this.close();
     }, this.settings.delayMilliSeconds + 50);
+
+    // new
+    this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
+    this.keymapEventHandler = [
+      this.scope.register([], "Tab", () => {
+        this.suggestions.useSelectedItem({});
+        return false;
+      }),
+    ];
+
+    // overwrite
+    this.scope.keys.find((x) => x.key === "Escape")!.func = () => {
+      this.close();
+      return this.settings.propagateEsc;
+    };
   }
 
   async refreshCustomToken(): Promise<void> {
