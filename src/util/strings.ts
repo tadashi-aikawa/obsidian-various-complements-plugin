@@ -8,6 +8,10 @@ export function caseIncludes(one: string, other: string): boolean {
     : one.includes(other);
 }
 
+export function caseIncludesWithoutSpace(one: string, other: string): boolean {
+  return caseIncludes(one.replace(/ /g, ""), other.replace(/ /g, ""));
+}
+
 export function lowerStartsWith(a: string, b: string): boolean {
   return a.toLowerCase().startsWith(b.toLowerCase());
 }

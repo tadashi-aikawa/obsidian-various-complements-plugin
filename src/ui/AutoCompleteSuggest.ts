@@ -11,20 +11,21 @@ import {
   Scope,
   TFile,
 } from "obsidian";
-import { caseIncludes, lowerStartsWith } from "../util/strings";
+import { caseIncludesWithoutSpace, lowerStartsWith } from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 import { CustomDictionaryService, Word } from "../CustomDictionaryService";
 import { uniq } from "../util/collection-helper";
+import { AppHelper } from "../app-helper";
 
 function suggestWords(words: Word[], query: string, max: number): Word[] {
   return Array.from(words)
     .filter((x) => x.value !== query)
     .filter(
       (x) =>
-        caseIncludes(x.value, query) ||
-        x.aliases?.some((a) => caseIncludes(a, query))
+        caseIncludesWithoutSpace(x.value, query) ||
+        x.aliases?.some((a) => caseIncludesWithoutSpace(a, query))
     )
     .sort((a, b) => a.value.length - b.value.length)
     .sort(
@@ -51,8 +52,10 @@ export class AutoCompleteSuggest
   app: App;
   settings: Settings;
   customDictionaryService: CustomDictionaryService;
+  appHelper: AppHelper;
 
   currentFileTokens: string[] = [];
+  internalLinkTokens: Word[] = [];
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
     [EditorSuggestContext, (tokens: Word[]) => void]
@@ -70,6 +73,7 @@ export class AutoCompleteSuggest
     customDictionaryService: CustomDictionaryService
   ) {
     super(app);
+    this.appHelper = new AppHelper(app);
     this.customDictionaryService = customDictionaryService;
   }
 
@@ -84,12 +88,14 @@ export class AutoCompleteSuggest
 
     await ins.updateSettings(settings);
     await ins.refreshCustomToken();
+    ins.refreshInternalLinkTokens();
 
     app.vault.on("modify", async (_) => {
       ins.currentFileTokens = await ins.pickTokens();
     });
     app.workspace.on("active-leaf-change", async (_) => {
       ins.currentFileTokens = await ins.pickTokens();
+      ins.refreshInternalLinkTokens();
     });
 
     ins.scope.register([], "Tab", () => {
@@ -121,6 +127,7 @@ export class AutoCompleteSuggest
         .filter((x) => !this.customDictionaryService.wordsByValue[x])
         .map((x) => ({ value: x })),
       ...this.customDictionaryService.words,
+      ...this.internalLinkTokens,
     ];
   }
 
@@ -139,6 +146,7 @@ export class AutoCompleteSuggest
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
+        const start = performance.now();
         cb(
           suggestWords(
             this.words,
@@ -146,6 +154,7 @@ export class AutoCompleteSuggest
             this.settings.maxNumberOfSuggestions
           )
         );
+        console.log("debounceGetSuggestions", performance.now() - start);
       },
       this.settings.delayMilliSeconds,
       true
@@ -156,11 +165,42 @@ export class AutoCompleteSuggest
     }, this.settings.delayMilliSeconds + 50);
   }
 
-  refreshCustomToken(): Promise<void> {
-    return this.customDictionaryService.refreshCustomTokens();
+  async refreshCustomToken(): Promise<void> {
+    const start = performance.now();
+    const tokens = await this.customDictionaryService.refreshCustomTokens();
+    console.log("refreshCustomTokens", performance.now() - start);
+    return tokens;
+  }
+
+  refreshInternalLinkTokens(): void {
+    const start = performance.now();
+
+    const resolvedInternalLinkTokens = this.app.vault
+      .getMarkdownFiles()
+      .map((x) => ({
+        value: `[[${x.basename}]]`,
+        aliases: [x.basename, ...this.appHelper.getAliases(x)],
+        description: x.path,
+      }));
+
+    const unresolvedInternalLinkTokens = this.appHelper
+      .searchPhantomLinks()
+      .map((x) => ({
+        value: `[[${x}]]`,
+        aliases: [x],
+        description: "Not created yet",
+      }));
+
+    console.log("refreshInternalLinkTokens", performance.now() - start);
+
+    this.internalLinkTokens = [
+      ...resolvedInternalLinkTokens,
+      ...unresolvedInternalLinkTokens,
+    ];
   }
 
   async pickTokens(): Promise<string[]> {
+    const start = performance.now();
     if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
       return [];
     }
@@ -171,7 +211,9 @@ export class AutoCompleteSuggest
     }
 
     const content = await this.app.vault.cachedRead(file);
-    return uniq(this.tokenizer.tokenize(content));
+    const tokens = uniq(this.tokenizer.tokenize(content));
+    console.log("pickTokens", performance.now() - start);
+    return tokens;
   }
 
   onTrigger(
