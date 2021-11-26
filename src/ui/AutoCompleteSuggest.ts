@@ -30,14 +30,14 @@ function suggestWords(words: Word[], query: string, max: number): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
   return Array.from(words)
     .map((x) => {
-      if (x.value === query) {
+      if (x.value === query || x.value.length < query.length) {
         return { word: x, alias: false };
       }
 
       if (
         x.value.startsWith("[[")
           ? lowerStartsWithoutSpace(x.value.replace("[[", ""), query)
-          : x.value.startsWith(query)
+          : startsWithoutSpace(x.value, query)
       ) {
         return { word: x, value: x.value, alias: false };
       }
