@@ -15,9 +15,9 @@ import {
 } from "obsidian";
 import {
   capitalizeFirstLetter,
-  caseIncludesWithoutSpace,
-  upperCaseIncludesWithoutSpace,
   lowerStartsWith,
+  lowerStartsWithoutSpace,
+  startsWithoutSpace,
 } from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
@@ -27,23 +27,31 @@ import { uniq } from "../util/collection-helper";
 import { AppHelper } from "../app-helper";
 
 function suggestWords(words: Word[], query: string, max: number): Word[] {
+  const queryStartWithUpper = capitalizeFirstLetter(query) === query;
   return Array.from(words)
     .map((x) => {
       if (x.value === query) {
         return { word: x, alias: false };
       }
 
-      if (caseIncludesWithoutSpace(x.value, query)) {
+      if (
+        x.value.startsWith("[[")
+          ? lowerStartsWithoutSpace(x.value.replace("[[", ""), query)
+          : x.value.startsWith(query)
+      ) {
         return { word: x, value: x.value, alias: false };
       }
 
-      if (upperCaseIncludesWithoutSpace(x.value, query)) {
+      if (
+        queryStartWithUpper &&
+        startsWithoutSpace(capitalizeFirstLetter(x.value), query)
+      ) {
         x.value = capitalizeFirstLetter(x.value);
         return { word: x, value: x.value, alias: false };
       }
 
       const matchedAlias = x.aliases?.find((a) =>
-        caseIncludesWithoutSpace(a, query)
+        lowerStartsWithoutSpace(a, query)
       );
       if (matchedAlias) {
         return { word: x, value: matchedAlias, alias: true };

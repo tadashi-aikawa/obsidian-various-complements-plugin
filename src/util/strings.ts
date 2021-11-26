@@ -1,29 +1,27 @@
-/**
- * This function uses case-sensitive logic if a second argument has an upper case. Otherwise, uses case-insensitive logic.
- */
-export function caseIncludes(one: string, other: string): boolean {
-  return one.includes(other);
+export function lowerIncludes(one: string, other: string): boolean {
+  return one.toLowerCase().includes(other.toLowerCase());
 }
 
-export function caseIncludesWithoutSpace(one: string, other: string): boolean {
-  return caseIncludes(one.replace(/ /g, ""), other.replace(/ /g, ""));
+export function lowerIncludesWithoutSpace(one: string, other: string): boolean {
+  return lowerIncludes(one.replace(/ /g, ""), other.replace(/ /g, ""));
 }
 
-export function capitalizeFirstLetter(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+export function lowerStartsWithoutSpace(one: string, other: string): boolean {
+  return lowerStartsWith(one.replace(/ /g, ""), other.replace(/ /g, ""));
 }
 
-export function upperCaseIncludesWithoutSpace(
-  one: string,
-  other: string
-): boolean {
-  if (capitalizeFirstLetter(other) !== other) {
-    return false;
-  }
-  let capitalizedOne = capitalizeFirstLetter(one);
-  return caseIncludesWithoutSpace(capitalizedOne, other);
+export function startsWithoutSpace(one: string, other: string): boolean {
+  return one.replace(/ /g, "").startsWith(other.replace(/ /g, ""));
+}
+
+export function includesWithoutSpace(one: string, other: string): boolean {
+  return one.replace(/ /g, "").includes(other.replace(/ /g, ""));
 }
 
 export function lowerStartsWith(a: string, b: string): boolean {
   return a.toLowerCase().startsWith(b.toLowerCase());
+}
+
+export function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
