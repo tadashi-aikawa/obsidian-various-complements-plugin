@@ -12,6 +12,7 @@ export interface Settings {
   enableCurrentFileComplement: boolean;
   enableCustomDictionaryComplement: boolean;
   enableInternalLinkComplement: boolean;
+  disableSuggestionsDuringImeOn: boolean;
   showLogAboutPerformanceInConsole: boolean;
   insertAfterCompletion: boolean;
 }
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableCurrentFileComplement: true,
   enableCustomDictionaryComplement: false,
   enableInternalLinkComplement: true,
+  disableSuggestionsDuringImeOn: false,
   showLogAboutPerformanceInConsole: false,
   insertAfterCompletion: true,
 };
@@ -101,6 +103,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Disable suggestions during IME on")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.disableSuggestionsDuringImeOn
+        ).onChange(async (value) => {
+          this.plugin.settings.disableSuggestionsDuringImeOn = value;
+          await this.plugin.saveSettings();
+        });
+      });
 
     new Setting(containerEl)
       .setName("Insert space after completion")

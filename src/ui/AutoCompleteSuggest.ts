@@ -97,6 +97,17 @@ export class AutoCompleteSuggest
     this.customDictionaryService = customDictionaryService;
   }
 
+  triggerComplete() {
+    const editor = this.appHelper.getMarkdownViewInActiveLeaf()?.editor;
+    const activeFile = this.app.workspace.getActiveFile();
+    if (!editor || !activeFile) {
+      return;
+    }
+
+    // XXX: Unsafe
+    (this as any).trigger(editor, activeFile, true);
+  }
+
   static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(
       app,
@@ -294,6 +305,13 @@ export class AutoCompleteSuggest
     file: TFile
   ): EditorSuggestTriggerInfo | null {
     if (this.disabled) {
+      return null;
+    }
+
+    if (
+      this.settings.disableSuggestionsDuringImeOn &&
+      this.appHelper.isIMEOn()
+    ) {
       return null;
     }
 

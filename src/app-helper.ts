@@ -1,4 +1,4 @@
-import { App, parseFrontMatterAliases, TFile } from "obsidian";
+import { App, MarkdownView, parseFrontMatterAliases, TFile } from "obsidian";
 import { uniq } from "./util/collection-helper";
 
 export class AppHelper {
@@ -12,11 +12,39 @@ export class AppHelper {
     );
   }
 
+  getMarkdownViewInActiveLeaf(): MarkdownView | null {
+    if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
+      return null;
+    }
+
+    return this.app.workspace.activeLeaf!.view as MarkdownView;
+  }
+
   searchPhantomLinks(): string[] {
     return uniq(
       Object.values(this.app.metadataCache.unresolvedLinks)
         .map(Object.keys)
         .flat()
     );
+  }
+
+  /**
+   * Unsafe method
+   */
+  isIMEOn(): boolean {
+    if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
+      return false;
+    }
+
+    const markdownView = this.app.workspace.activeLeaf!.view as MarkdownView;
+    const cm5or6: any = (markdownView.editor as any).cm;
+
+    // cm6
+    if (cm5or6?.inputState?.composing > 0) {
+      return true;
+    }
+
+    // cm5
+    return !!cm5or6?.display?.input?.composing;
   }
 }

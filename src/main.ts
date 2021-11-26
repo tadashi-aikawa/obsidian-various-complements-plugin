@@ -40,6 +40,15 @@ export default class VariousComponents extends Plugin {
         await this.suggester.toggleEnabled();
       },
     });
+
+    this.addCommand({
+      id: "show-suggestions",
+      name: "Show suggestions",
+      hotkeys: [{ modifiers: ["Mod"], key: " " }],
+      callback: async () => {
+        this.suggester.triggerComplete();
+      },
+    });
   }
 
   async loadSettings(): Promise<void> {
