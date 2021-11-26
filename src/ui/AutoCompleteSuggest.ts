@@ -13,7 +13,12 @@ import {
   Scope,
   TFile,
 } from "obsidian";
-import { capitalizeFirstLetter, caseIncludesWithoutSpace, upperCaseIncludesWithoutSpace, lowerStartsWith } from "../util/strings";
+import {
+  capitalizeFirstLetter,
+  caseIncludesWithoutSpace,
+  upperCaseIncludesWithoutSpace,
+  lowerStartsWith,
+} from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
@@ -24,7 +29,7 @@ import { AppHelper } from "../app-helper";
 function suggestWords(words: Word[], query: string, max: number): Word[] {
   return Array.from(words)
     .map((x) => {
-      if (x.value == query) {
+      if (x.value === query) {
         return { word: x, alias: false };
       }
 
@@ -36,7 +41,7 @@ function suggestWords(words: Word[], query: string, max: number): Word[] {
         x.value = capitalizeFirstLetter(x.value);
         return { word: x, value: x.value, alias: false };
       }
-      
+
       const matchedAlias = x.aliases?.find((a) =>
         caseIncludesWithoutSpace(a, query)
       );

@@ -2,7 +2,7 @@
  * This function uses case-sensitive logic if a second argument has an upper case. Otherwise, uses case-insensitive logic.
  */
 export function caseIncludes(one: string, other: string): boolean {
-    return one.includes(other);
+  return one.includes(other);
 }
 
 export function caseIncludesWithoutSpace(one: string, other: string): boolean {
@@ -13,8 +13,11 @@ export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function upperCaseIncludesWithoutSpace(one: string, other: string): boolean {
-  if (capitalizeFirstLetter(other) != other) {
+export function upperCaseIncludesWithoutSpace(
+  one: string,
+  other: string
+): boolean {
+  if (capitalizeFirstLetter(other) !== other) {
     return false;
   }
   let capitalizedOne = capitalizeFirstLetter(one);
