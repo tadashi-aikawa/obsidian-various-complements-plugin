@@ -30,7 +30,7 @@ function suggestWords(words: Word[], query: string, max: number): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
   return Array.from(words)
     .map((x) => {
-      if (x.value === query || x.value.length < query.length) {
+      if (x.value === query) {
         return { word: x, alias: false };
       }
 
