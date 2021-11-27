@@ -38,10 +38,6 @@ function judge(
   query: string,
   queryStartWithUpper: boolean
 ): Judgement {
-  if (word.value === query) {
-    return { word: word, alias: false };
-  }
-
   if (
     queryStartWithUpper &&
     startsWithoutSpace(capitalizeFirstLetter(word.value), query)
