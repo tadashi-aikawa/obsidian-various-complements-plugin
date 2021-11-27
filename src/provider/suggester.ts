@@ -5,6 +5,7 @@ import {
   startsWithoutSpace,
 } from "../util/strings";
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
+import { uniqWith } from "../util/collection-helper";
 
 export interface Word {
   value: string;
@@ -87,7 +88,7 @@ export function suggestWords(
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
       ];
 
-  return Array.from(words)
+  const candidate = Array.from(words)
     .map((x) => judge(x, query, queryStartWithUpper))
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
@@ -101,4 +102,7 @@ export function suggestWords(
     })
     .map((x) => x.word)
     .slice(0, max);
+
+  // XXX: There is no guarantee that equals with max, but it is important for performance
+  return uniqWith(candidate, (a, b) => a.value === b.value);
 }
