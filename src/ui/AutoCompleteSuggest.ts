@@ -151,7 +151,6 @@ export class AutoCompleteSuggest
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
     this.currentFileWordProvider = new CurrentFileWordProvider(
       this.app,
-      this.appHelper,
       this.tokenizer
     );
     await this.refreshCurrentFileTokens();
