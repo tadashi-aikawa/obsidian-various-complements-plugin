@@ -42,8 +42,8 @@ function judge(
     queryStartWithUpper &&
     startsWithoutSpace(capitalizeFirstLetter(word.value), query)
   ) {
-    word.value = capitalizeFirstLetter(word.value);
-    return { word: word, value: word.value, alias: false };
+    const c = capitalizeFirstLetter(word.value);
+    return { word: { ...word, value: c }, value: c, alias: false };
   }
 
   if (
