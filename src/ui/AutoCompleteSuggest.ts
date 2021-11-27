@@ -13,65 +13,13 @@ import {
   Scope,
   TFile,
 } from "obsidian";
-import {
-  capitalizeFirstLetter,
-  lowerStartsWith,
-  lowerStartsWithoutSpace,
-  startsWithoutSpace,
-} from "../util/strings";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 import { CustomDictionaryService, Word } from "../CustomDictionaryService";
 import { uniq } from "../util/collection-helper";
 import { AppHelper } from "../app-helper";
-
-function suggestWords(words: Word[], query: string, max: number): Word[] {
-  const queryStartWithUpper = capitalizeFirstLetter(query) === query;
-  return Array.from(words)
-    .map((x) => {
-      if (x.value === query) {
-        return { word: x, alias: false };
-      }
-
-      if (
-        x.value.startsWith("[[")
-          ? lowerStartsWithoutSpace(x.value.replace("[[", ""), query)
-          : startsWithoutSpace(x.value, query)
-      ) {
-        return { word: x, value: x.value, alias: false };
-      }
-
-      if (
-        queryStartWithUpper &&
-        startsWithoutSpace(capitalizeFirstLetter(x.value), query)
-      ) {
-        x.value = capitalizeFirstLetter(x.value);
-        return { word: x, value: x.value, alias: false };
-      }
-
-      const matchedAlias = x.aliases?.find((a) =>
-        lowerStartsWithoutSpace(a, query)
-      );
-      if (matchedAlias) {
-        return { word: x, value: matchedAlias, alias: true };
-      }
-
-      return { word: x, alias: false };
-    })
-    .filter((x) => x.value !== undefined)
-    .sort((a, b) => {
-      const aliasP = (Number(a.alias) - Number(b.alias)) * 10000;
-      const startP =
-        (Number(lowerStartsWith(b.value!, query)) -
-          Number(lowerStartsWith(a.value!, query))) *
-        1000;
-      const lengthP = a.value!.length - b.value!.length;
-      return aliasP + startP + lengthP;
-    })
-    .map((x) => x.word)
-    .slice(0, max);
-}
+import { suggestWords } from "../suggester/suggester";
 
 // This is an unsafe code..!!
 interface UnsafeEditorSuggestInterface {
