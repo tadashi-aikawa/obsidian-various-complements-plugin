@@ -153,10 +153,12 @@ export class AutoCompleteSuggest
       this.app,
       this.tokenizer
     );
+    await this.refreshCurrentFileTokens();
     this.internalLinkWordProvider = new InternalLinkWordProvider(
       this.app,
       this.appHelper
     );
+    await this.refreshInternalLinkTokens();
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
