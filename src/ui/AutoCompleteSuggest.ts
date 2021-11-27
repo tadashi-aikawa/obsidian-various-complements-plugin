@@ -37,7 +37,7 @@ function suggestWords(words: Word[], query: string, max: number): Word[] {
       if (
         x.value.startsWith("[[")
           ? lowerStartsWithoutSpace(x.value.replace("[[", ""), query)
-          : x.value.startsWith(query)
+          : startsWithoutSpace(x.value, query)
       ) {
         return { word: x, value: x.value, alias: false };
       }
