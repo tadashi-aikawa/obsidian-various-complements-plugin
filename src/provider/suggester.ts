@@ -89,14 +89,14 @@ export function suggestWords(
     .map((x) => judge(x, query, queryStartWithUpper))
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
-      if (a.alias !== b.alias) {
-        return a.alias ? 1 : -1;
-      }
       if (a.value!.length !== b.value!.length) {
         return a.value!.length > b.value!.length ? 1 : -1;
       }
       if (a.word.internalLink !== b.word.internalLink) {
         return b.word.internalLink ? 1 : -1;
+      }
+      if (a.alias !== b.alias) {
+        return a.alias ? 1 : -1;
       }
       return 0;
     })
