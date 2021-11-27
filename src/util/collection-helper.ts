@@ -11,6 +11,17 @@ export const keyBy = <T>(
     {} as { [key: string]: T }
   );
 
+export const groupBy = <T>(
+  values: T[],
+  toKey: (t: T) => string
+): { [key: string]: T[] } =>
+  values.reduce(
+    (prev, cur, _1, _2, k = toKey(cur)) => (
+      (prev[k] || (prev[k] = [])).push(cur), prev
+    ),
+    {} as { [key: string]: T[] }
+  );
+
 export function uniqWith<T>(arr: T[], fn: (one: T, other: T) => boolean) {
   return arr.filter(
     (element, index) => arr.findIndex((step) => fn(element, step)) === index

@@ -9,17 +9,23 @@ import {
   EditorSuggestTriggerInfo,
   EventRef,
   KeymapEventHandler,
-  MarkdownView,
   Scope,
   TFile,
 } from "obsidian";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
-import { CustomDictionaryService, Word } from "../CustomDictionaryService";
-import { uniq } from "../util/collection-helper";
 import { AppHelper } from "../app-helper";
-import { suggestWords } from "../suggester/suggester";
+import { suggestWords, Word, WordsByFirstLetter } from "../provider/suggester";
+import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
+import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
+import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
+
+export type IndexedWords = {
+  currentFile: WordsByFirstLetter;
+  customDictionary: WordsByFirstLetter;
+  internalLink: WordsByFirstLetter;
+};
 
 // This is an unsafe code..!!
 interface UnsafeEditorSuggestInterface {
@@ -36,11 +42,12 @@ export class AutoCompleteSuggest
 {
   app: App;
   settings: Settings;
-  customDictionaryService: CustomDictionaryService;
   appHelper: AppHelper;
 
-  currentFileTokens: string[] = [];
-  internalLinkTokens: Word[] = [];
+  currentFileWordProvider: CurrentFileWordProvider;
+  customDictionaryWordProvider: CustomDictionaryWordProvider;
+  internalLinkWordProvider: InternalLinkWordProvider;
+
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
     [EditorSuggestContext, (tokens: Word[]) => void]
@@ -59,11 +66,11 @@ export class AutoCompleteSuggest
 
   private constructor(
     app: App,
-    customDictionaryService: CustomDictionaryService
+    customDictionarySuggester: CustomDictionaryWordProvider
   ) {
     super(app);
     this.appHelper = new AppHelper(app);
-    this.customDictionaryService = customDictionaryService;
+    this.customDictionaryWordProvider = customDictionarySuggester;
   }
 
   triggerComplete() {
@@ -80,7 +87,7 @@ export class AutoCompleteSuggest
   static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(
       app,
-      new CustomDictionaryService(
+      new CustomDictionaryWordProvider(
         app,
         settings.customDictionaryPaths.split("\n").filter((x) => x)
       )
@@ -124,16 +131,12 @@ export class AutoCompleteSuggest
     );
   }
 
-  get words(): Word[] {
-    const currentFileWords = this.currentFileTokens
-      .filter((x) => !this.customDictionaryService.wordsByValue[x])
-      .map((x) => ({ value: x }));
-
-    return [
-      ...currentFileWords,
-      ...this.customDictionaryService.words,
-      ...this.internalLinkTokens,
-    ];
+  get indexedWords(): IndexedWords {
+    return {
+      currentFile: this.currentFileWordProvider.wordsByFirstLetter,
+      customDictionary: this.customDictionaryWordProvider.wordsByFirstLetter,
+      internalLink: this.internalLinkWordProvider.wordsByFirstLetter,
+    };
   }
 
   toggleEnabled(): void {
@@ -142,17 +145,25 @@ export class AutoCompleteSuggest
 
   async updateSettings(settings: Settings) {
     this.settings = settings;
-    this.customDictionaryService.updatePaths(
+    this.customDictionaryWordProvider.updatePaths(
       settings.customDictionaryPaths.split("\n").filter((x) => x)
     );
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
+    this.currentFileWordProvider = new CurrentFileWordProvider(
+      this.app,
+      this.tokenizer
+    );
+    this.internalLinkWordProvider = new InternalLinkWordProvider(
+      this.app,
+      this.appHelper
+    );
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
         const start = performance.now();
         cb(
           suggestWords(
-            this.words,
+            this.indexedWords,
             context.query,
             this.settings.maxNumberOfSuggestions
           )
@@ -187,7 +198,7 @@ export class AutoCompleteSuggest
     const start = performance.now();
 
     if (!this.settings.enableCurrentFileComplement) {
-      this.currentFileTokens = [];
+      this.currentFileWordProvider.clearWords();
       this.showDebugLog(
         "👢 Skip: Index current file tokens",
         performance.now() - start
@@ -195,7 +206,7 @@ export class AutoCompleteSuggest
       return;
     }
 
-    this.currentFileTokens = await this.pickTokens();
+    await this.currentFileWordProvider.refreshWords();
     this.showDebugLog("Index current file tokens", performance.now() - start);
   }
 
@@ -203,7 +214,7 @@ export class AutoCompleteSuggest
     const start = performance.now();
 
     if (!this.settings.enableCustomDictionaryComplement) {
-      this.customDictionaryService.clearTokens();
+      this.customDictionaryWordProvider.clearWords();
       this.showDebugLog(
         "👢Skip: Index custom dictionary tokens",
         performance.now() - start
@@ -211,7 +222,7 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.customDictionaryService.refreshCustomTokens();
+    await this.customDictionaryWordProvider.refreshCustomWords();
     this.showDebugLog(
       "Index custom dictionary tokens",
       performance.now() - start
@@ -222,7 +233,7 @@ export class AutoCompleteSuggest
     const start = performance.now();
 
     if (!this.settings.enableInternalLinkComplement) {
-      this.internalLinkTokens = [];
+      this.internalLinkWordProvider.clearWords();
       this.showDebugLog(
         "👢Skip: Index internal link tokens",
         performance.now() - start
@@ -230,42 +241,8 @@ export class AutoCompleteSuggest
       return;
     }
 
-    const resolvedInternalLinkTokens = this.app.vault
-      .getMarkdownFiles()
-      .map((x) => ({
-        value: `[[${x.basename}]]`,
-        aliases: [x.basename, ...this.appHelper.getAliases(x)],
-        description: x.path,
-      }));
-
-    const unresolvedInternalLinkTokens = this.appHelper
-      .searchPhantomLinks()
-      .map((x) => ({
-        value: `[[${x}]]`,
-        aliases: [x],
-        description: "Not created yet",
-      }));
-
+    this.internalLinkWordProvider.refreshWords();
     this.showDebugLog("Index internal link tokens", performance.now() - start);
-
-    this.internalLinkTokens = [
-      ...resolvedInternalLinkTokens,
-      ...unresolvedInternalLinkTokens,
-    ];
-  }
-
-  async pickTokens(): Promise<string[]> {
-    if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
-      return [];
-    }
-
-    const file = this.app.workspace.getActiveFile();
-    if (!file) {
-      return [];
-    }
-
-    const content = await this.app.vault.cachedRead(file);
-    return uniq(this.tokenizer.tokenize(content));
   }
 
   onTrigger(

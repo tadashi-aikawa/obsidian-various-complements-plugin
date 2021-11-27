@@ -1,11 +1,6 @@
 import { App, FileSystemAdapter, Notice } from "obsidian";
-import { keyBy } from "./util/collection-helper";
-
-export interface Word {
-  value: string;
-  description?: string;
-  aliases?: string[];
-}
+import { keyBy } from "../util/collection-helper";
+import { pushWord, Word, WordsByFirstLetter } from "./suggester";
 
 function lineToWord(line: string): Word {
   const [value, description, ...aliases] = line.split("\t");
@@ -16,8 +11,10 @@ function lineToWord(line: string): Word {
   };
 }
 
-export class CustomDictionaryService {
-  words: Word[] = [];
+export class CustomDictionaryWordProvider {
+  private words: Word[] = [];
+  wordByValue: { [value: string]: Word };
+  wordsByFirstLetter: WordsByFirstLetter;
 
   private app: App;
   private fileSystemAdapter: FileSystemAdapter;
@@ -29,23 +26,19 @@ export class CustomDictionaryService {
     this.paths = paths;
   }
 
-  get wordsByValue(): { [value: string]: Word } {
-    return keyBy(this.words, (x) => x.value);
-  }
-
   updatePaths(paths: string[]): void {
     this.paths = paths;
   }
 
   async loadWords(path: string): Promise<Word[]> {
     return (await this.fileSystemAdapter.read(path))
-      .split(/(\r\n|\n)/)
+      .split(/\r\n|\n/)
       .filter((x) => x)
       .map(lineToWord);
   }
 
-  async refreshCustomTokens(): Promise<void> {
-    this.clearTokens();
+  async refreshCustomWords(): Promise<void> {
+    this.clearWords();
 
     for (const path of this.paths) {
       try {
@@ -59,9 +52,19 @@ export class CustomDictionaryService {
         );
       }
     }
+
+    this.wordByValue = keyBy(this.words, (x) => x.value);
+    for (const word of this.words) {
+      pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
+      word.aliases?.forEach((a) =>
+        pushWord(this.wordsByFirstLetter, a.charAt(0), word)
+      );
+    }
   }
 
-  clearTokens(): void {
+  clearWords(): void {
     this.words = [];
+    this.wordByValue = {};
+    this.wordsByFirstLetter = {};
   }
 }
