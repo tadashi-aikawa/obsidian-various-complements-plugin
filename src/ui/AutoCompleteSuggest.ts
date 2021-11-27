@@ -302,12 +302,14 @@ export class AutoCompleteSuggest
 
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
-    base.createDiv({ text: word.value });
+    base.createDiv({
+      text: word.internalLink ? `[[${word.value}]]` : word.value,
+    });
 
     if (word.description) {
       base.createDiv({
         cls: "various-complements__suggest__description",
-        text: word.description,
+        text: `${word.description}`,
       });
     }
 
@@ -316,12 +318,16 @@ export class AutoCompleteSuggest
 
   selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {
     if (this.context) {
-      const after = this.settings.insertAfterCompletion
-        ? `${word.value} `
-        : word.value;
+      let insertedText = word.value;
+      if (word.internalLink) {
+        insertedText = `[[${insertedText}]]`;
+      }
+      if (this.settings.insertAfterCompletion) {
+        insertedText = `${insertedText} `;
+      }
 
       this.context.editor.replaceRange(
-        after,
+        insertedText,
         this.context.start,
         this.context.end
       );

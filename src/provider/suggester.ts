@@ -11,6 +11,7 @@ export interface Word {
   value: string;
   description?: string;
   aliases?: string[];
+  internalLink?: boolean;
 }
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
@@ -47,11 +48,7 @@ function judge(
     return { word: { ...word, value: c }, value: c, alias: false };
   }
 
-  if (
-    word.value.startsWith("[[")
-      ? lowerStartsWithoutSpace(word.value.replace("[[", ""), query)
-      : lowerStartsWithoutSpace(word.value, query)
-  ) {
+  if (lowerStartsWithoutSpace(word.value, query)) {
     return { word: word, value: word.value, alias: false };
   }
 

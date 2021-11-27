@@ -14,25 +14,26 @@ export class InternalLinkWordProvider {
     const resolvedInternalLinkWords = this.app.vault
       .getMarkdownFiles()
       .map((x) => ({
-        value: `[[${x.basename}]]`,
+        value: x.basename,
         aliases: [x.basename, ...this.appHelper.getAliases(x)],
         description: x.path,
+        internalLink: true,
       }));
 
     const unresolvedInternalLinkWords = this.appHelper
       .searchPhantomLinks()
       .map((x) => ({
-        value: `[[${x}]]`,
+        value: x,
         aliases: [x],
         description: "Not created yet",
+        internalLink: true,
       }));
 
     this.words = [...resolvedInternalLinkWords, ...unresolvedInternalLinkWords];
     for (const word of this.words) {
-      // 2 because `[[..`
-      pushWord(this.wordsByFirstLetter, word.value.charAt(2), word);
+      pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
       word.aliases?.forEach((a) =>
-        pushWord(this.wordsByFirstLetter, a.charAt(2), word)
+        pushWord(this.wordsByFirstLetter, a.charAt(0), word)
       );
     }
   }
