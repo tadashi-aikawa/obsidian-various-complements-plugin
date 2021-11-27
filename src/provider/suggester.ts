@@ -1,6 +1,5 @@
 import {
   capitalizeFirstLetter,
-  lowerStartsWith,
   lowerStartsWithoutSpace,
   startsWithoutSpace,
 } from "../util/strings";
@@ -42,6 +41,7 @@ function judge(
 ): Judgement {
   if (
     queryStartWithUpper &&
+    !word.internalLink &&
     startsWithoutSpace(capitalizeFirstLetter(word.value), query)
   ) {
     const c = capitalizeFirstLetter(word.value);
@@ -89,13 +89,16 @@ export function suggestWords(
     .map((x) => judge(x, query, queryStartWithUpper))
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
-      const aliasP = (Number(a.alias) - Number(b.alias)) * 10000;
-      const startP =
-        (Number(lowerStartsWith(b.value!, query)) -
-          Number(lowerStartsWith(a.value!, query))) *
-        1000;
-      const lengthP = a.value!.length - b.value!.length;
-      return aliasP + startP + lengthP;
+      if (a.alias !== b.alias) {
+        return a.alias ? 1 : -1;
+      }
+      if (a.value!.length !== b.value!.length) {
+        return a.value!.length > b.value!.length ? 1 : -1;
+      }
+      if (a.word.internalLink !== b.word.internalLink) {
+        return b.word.internalLink ? 1 : -1;
+      }
+      return 0;
     })
     .map((x) => x.word)
     .slice(0, max);

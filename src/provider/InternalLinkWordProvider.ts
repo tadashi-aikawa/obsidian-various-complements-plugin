@@ -15,7 +15,7 @@ export class InternalLinkWordProvider {
       .getMarkdownFiles()
       .map((x) => ({
         value: x.basename,
-        aliases: [x.basename, ...this.appHelper.getAliases(x)],
+        aliases: this.appHelper.getAliases(x),
         description: x.path,
         internalLink: true,
       }));
@@ -24,7 +24,6 @@ export class InternalLinkWordProvider {
       .searchPhantomLinks()
       .map((x) => ({
         value: x,
-        aliases: [x],
         description: "Not created yet",
         internalLink: true,
       }));
