@@ -1,7 +1,6 @@
 import {
   capitalizeFirstLetter,
   lowerStartsWithoutSpace,
-  startsWithoutSpace,
 } from "../util/strings";
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
@@ -39,19 +38,14 @@ function judge(
   query: string,
   queryStartWithUpper: boolean
 ): Judgement {
-  if (
-    queryStartWithUpper &&
-    !word.internalLink &&
-    startsWithoutSpace(capitalizeFirstLetter(word.value), query)
-  ) {
-    const c = capitalizeFirstLetter(word.value);
-    return { word: { ...word, value: c }, value: c, alias: false };
-  }
-
   if (lowerStartsWithoutSpace(word.value, query)) {
-    return { word: word, value: word.value, alias: false };
+    if (queryStartWithUpper && !word.internalLink) {
+      const c = capitalizeFirstLetter(word.value);
+      return { word: { ...word, value: c }, value: c, alias: false };
+    } else {
+      return { word: word, value: word.value, alias: false };
+    }
   }
-
   const matchedAlias = word.aliases?.find((a) =>
     lowerStartsWithoutSpace(a, query)
   );
