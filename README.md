@@ -7,7 +7,7 @@ This plugin for [Obsidian] enables you to complement input in markdown files.
 
 ## ⌨️Features
 
-### Auto Complete in current file
+### Current file complement
 
 It complements the text with tokens that exists in a current file.
 
@@ -17,13 +17,18 @@ You can set a strategy if the separator of your language is not only whitespace.
 
 #### Default
 
-![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/default.gif)
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/current-file-complement.gif)
 
 #### Japanese
 
-![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/japanese.gif)
+![default](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/japanese-current-file-complement.gif)
 
-### Auto Complete from custom dictionaries
+#### Matching logic
+
+- Prefix match
+- case-sensitive (only first letter)
+
+### Custom dictionary complement
 
 You can also use custom dictionaries to show suggestions on auto-complete.
 
@@ -63,6 +68,24 @@ It is more straightforward to edit on Google Spread Sheet.
 
 **After you update settings about custom dictionaries, please execute a `Reload custom dictionaries` command.**
 
+#### Matching logic
+
+- Prefix match
+- case-sensitive (only first letter)
+
+### Internal link complement
+
+It complements the text with internal links, which include both resolved and unresolved.
+
+![internal-link-complement-demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/internal-link-complement.gif)
+
+You can notice it and insert them **even if you forget to have created internal links**.
+
+#### Matching logic
+
+- Prefix match (Ignore prefix-emoji)
+  - `Obs` matches both `Obsidian` and `💎Obsidian`
+- **case-insensitive**
 
 ## 👁 Live preview support
 
