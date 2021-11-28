@@ -104,5 +104,8 @@ export function suggestWords(
     .slice(0, max);
 
   // XXX: There is no guarantee that equals with max, but it is important for performance
-  return uniqWith(candidate, (a, b) => a.value === b.value);
+  return uniqWith(
+    candidate,
+    (a, b) => a.value === b.value && a.internalLink === b.internalLink
+  );
 }
