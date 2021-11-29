@@ -33,6 +33,7 @@ export class CustomDictionaryWordProvider {
   async loadWords(path: string): Promise<Word[]> {
     return (await this.fileSystemAdapter.read(path))
       .split(/\r\n|\n/)
+      .map((x) => x.replace(/%%.*%%/g, ""))
       .filter((x) => x)
       .map(lineToWord);
   }

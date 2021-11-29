@@ -50,7 +50,8 @@ You can define a word for each line in dictionary files.
 | ---- | ----------- | -------------- |
 | word | description | aliases        |
 
-It uses `<TAB>` as a separator.
+- It uses `<TAB>` as a separator
+- Surrounding with `%%` means a comment (ex: `%%This is a comment%%`)
 
 Ex.
 ```
