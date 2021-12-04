@@ -17,7 +17,7 @@ export class CurrentFileWordProvider {
   async refreshWords(): Promise<void> {
     this.clearWords();
 
-    const editor = this.appHelper.getMarkdownViewInActiveLeaf()?.editor;
+    const editor = this.appHelper.getCurrentEditor();
     if (!editor) {
       return;
     }

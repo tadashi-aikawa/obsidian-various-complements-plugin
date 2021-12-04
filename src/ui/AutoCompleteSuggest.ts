@@ -74,7 +74,7 @@ export class AutoCompleteSuggest
   }
 
   triggerComplete() {
-    const editor = this.appHelper.getMarkdownViewInActiveLeaf()?.editor;
+    const editor = this.appHelper.getCurrentEditor();
     const activeFile = this.app.workspace.getActiveFile();
     if (!editor || !activeFile) {
       return;
@@ -113,6 +113,44 @@ export class AutoCompleteSuggest
     });
 
     return ins;
+  }
+
+  predictableComplete() {
+    const editor = this.appHelper.getCurrentEditor();
+    if (!editor) {
+      return;
+    }
+
+    const cursor = editor.getCursor();
+    const currentToken = this.tokenizer
+      .tokenize(editor.getLine(cursor.line).slice(0, cursor.ch))
+      .last();
+    if (!currentToken) {
+      return;
+    }
+
+    let suggestion = this.tokenizer
+      .tokenize(editor.getRange({ line: cursor.line - 50, ch: 0 }, cursor))
+      .reverse()
+      .slice(1)
+      .find((x) => x.startsWith(currentToken));
+    if (!suggestion) {
+      suggestion = this.tokenizer
+        .tokenize(editor.getRange(cursor, { line: cursor.line + 50, ch: 0 }))
+        .find((x) => x.startsWith(currentToken));
+    }
+    if (!suggestion) {
+      return;
+    }
+
+    editor.replaceRange(
+      suggestion,
+      { line: cursor.line, ch: cursor.ch - currentToken.length },
+      { line: cursor.line, ch: cursor.ch }
+    );
+
+    this.close();
+    this.debounceClose();
   }
 
   unregister() {

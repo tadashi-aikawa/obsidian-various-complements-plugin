@@ -1,4 +1,10 @@
-import { App, MarkdownView, parseFrontMatterAliases, TFile } from "obsidian";
+import {
+  App,
+  Editor,
+  MarkdownView,
+  parseFrontMatterAliases,
+  TFile,
+} from "obsidian";
 import { uniq } from "./util/collection-helper";
 
 export class AppHelper {
@@ -18,6 +24,10 @@ export class AppHelper {
     }
 
     return this.app.workspace.activeLeaf!.view as MarkdownView;
+  }
+
+  getCurrentEditor(): Editor | null {
+    return this.getMarkdownViewInActiveLeaf()?.editor ?? null;
   }
 
   searchPhantomLinks(): string[] {

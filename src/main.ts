@@ -49,6 +49,15 @@ export default class VariousComponents extends Plugin {
         this.suggester.triggerComplete();
       },
     });
+
+    this.addCommand({
+      id: "predictable-complements",
+      name: "Predictable complement",
+      hotkeys: [{ modifiers: ["Shift"], key: " " }],
+      callback: async () => {
+        this.suggester.predictableComplete();
+      },
+    });
   }
 
   async loadSettings(): Promise<void> {
