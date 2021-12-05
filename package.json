@@ -5,16 +5,23 @@
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
-    "build": "rollup --config rollup.config.js"
+    "build": "rollup --config rollup.config.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-typescript": "^7.16.0",
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
+    "@types/jest": "^27.0.3",
     "@types/node": "^14.14.2",
+    "babel-jest": "^27.4.2",
+    "jest": "^27.4.3",
     "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
     "prettier": "^2.2.1",
     "rollup": "^2.32.1",
