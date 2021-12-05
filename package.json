@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
