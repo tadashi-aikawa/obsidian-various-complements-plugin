@@ -34,7 +34,8 @@ export function pushWord(
   wordsByFirstLetter[key].push(word);
 }
 
-function judge(
+// Public for tests
+export function judge(
   word: Word,
   query: string,
   queryStartWithUpper: boolean
