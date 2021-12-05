@@ -16,10 +16,11 @@ import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 import { AppHelper } from "../app-helper";
-import { suggestWords, Word, WordsByFirstLetter } from "../provider/suggester";
+import { Word, WordsByFirstLetter } from "../provider/suggester";
 import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
+import { MatchStrategy } from "../provider/MatchStrategy";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -162,6 +163,10 @@ export class AutoCompleteSuggest
     return TokenizeStrategy.fromName(this.settings.strategy);
   }
 
+  get matchStrategy(): MatchStrategy {
+    return MatchStrategy.fromName(this.settings.matchStrategy);
+  }
+
   get minNumberTriggered(): number {
     return (
       this.settings.minNumberOfCharactersTriggered ||
@@ -203,7 +208,7 @@ export class AutoCompleteSuggest
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
         const start = performance.now();
         cb(
-          suggestWords(
+          this.matchStrategy.handler(
             this.indexedWords,
             context.query,
             this.settings.maxNumberOfSuggestions

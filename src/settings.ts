@@ -1,9 +1,11 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import VariousComponents from "./main";
 import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
+import { MatchStrategy } from "./provider/MatchStrategy";
 
 export interface Settings {
   strategy: string;
+  matchStrategy: string;
   maxNumberOfSuggestions: number;
   minNumberOfCharactersTriggered: number;
   delayMilliSeconds: number;
@@ -19,6 +21,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   strategy: "default",
+  matchStrategy: "prefix",
   maxNumberOfSuggestions: 5,
   minNumberOfCharactersTriggered: 0,
   delayMilliSeconds: 0,
@@ -63,6 +66,28 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings({ currentFile: true });
         })
     );
+
+    new Setting(containerEl).setName("Match strategy").addDropdown((tc) =>
+      tc
+        .addOptions(
+          MatchStrategy.values().reduce(
+            (p, c) => ({ ...p, [c.name]: c.name }),
+            {}
+          )
+        )
+        .setValue(this.plugin.settings.matchStrategy)
+        .onChange(async (value) => {
+          this.plugin.settings.matchStrategy = value;
+          await this.plugin.saveSettings({ currentFile: true });
+          this.display();
+        })
+    );
+    if (this.plugin.settings.matchStrategy === MatchStrategy.PARTIAL.name) {
+      containerEl.createEl("div", {
+        text: "⚠ `partial` is more than 10 times slower than `prefix`",
+        cls: "various-complements__settings__warning",
+      });
+    }
 
     new Setting(containerEl)
       .setName("Max number of suggestions")
