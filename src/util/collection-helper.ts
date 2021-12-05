@@ -1,7 +1,3 @@
-export function uniq<T>(values: T[]): T[] {
-  return [...new Set(values)];
-}
-
 export const keyBy = <T>(
   values: T[],
   toKey: (t: T) => string
@@ -21,6 +17,10 @@ export const groupBy = <T>(
     ),
     {} as { [key: string]: T[] }
   );
+
+export function uniq<T>(values: T[]): T[] {
+  return [...new Set(values)];
+}
 
 export function uniqWith<T>(arr: T[], fn: (one: T, other: T) => boolean) {
   return arr.filter(
