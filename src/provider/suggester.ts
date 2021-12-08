@@ -1,6 +1,7 @@
 import {
   capitalizeFirstLetter,
   lowerIncludesWithoutSpace,
+  lowerStartsWith,
   lowerStartsWithoutSpace,
 } from "../util/strings";
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
@@ -107,7 +108,8 @@ export function suggestWords(
 }
 
 // TODO: refactoring
-function judgeByPartialMatch(
+// Public for tests
+export function judgeByPartialMatch(
   word: Word,
   query: string,
   queryStartWithUpper: boolean
@@ -120,15 +122,23 @@ function judgeByPartialMatch(
       return { word: word, value: word.value, alias: false };
     }
   }
+
+  const matchedAliasStarts = word.aliases?.find((a) =>
+    lowerStartsWithoutSpace(a, query)
+  );
+  if (matchedAliasStarts) {
+    return { word: word, value: matchedAliasStarts, alias: true };
+  }
+
   if (lowerIncludesWithoutSpace(word.value, query)) {
     return { word: word, value: word.value, alias: false };
   }
 
-  const matchedAlias = word.aliases?.find((a) =>
+  const matchedAliasIncluded = word.aliases?.find((a) =>
     lowerIncludesWithoutSpace(a, query)
   );
-  if (matchedAlias) {
-    return { word: word, value: matchedAlias, alias: true };
+  if (matchedAliasIncluded) {
+    return { word: word, value: matchedAliasIncluded, alias: true };
   }
 
   return { word: word, alias: false };
@@ -153,8 +163,8 @@ export function suggestWordsByPartialMatch(
     .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper))
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
-      const as = a.value!.startsWith(query);
-      const bs = b.value!.startsWith(query);
+      const as = lowerStartsWith(a.value!, query);
+      const bs = lowerStartsWith(b.value!, query);
       if (as !== bs) {
         return bs ? 1 : -1;
       }
