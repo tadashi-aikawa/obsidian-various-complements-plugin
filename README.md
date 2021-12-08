@@ -26,8 +26,13 @@ You can set a strategy if the separator of your language is not only whitespace.
 
 #### Matching logic
 
-- Prefix match
-- case-sensitive (only first letter)
+- If `Match strategy` is `prefix`
+  - Prefix match
+  - case-sensitive (only first letter)
+- If `Match strategy` is `partial`
+  - Partial match
+  - case-insensitive
+
 
 ### Custom dictionary complement
 
@@ -72,8 +77,12 @@ It is more straightforward to edit on Google Spread Sheet.
 
 #### Matching logic
 
-- Prefix match
-- case-sensitive (only first letter)
+- If `Match strategy` is `prefix`
+  - Prefix match
+  - case-sensitive (only first letter)
+- If `Match strategy` is `partial`
+  - Partial match
+  - case-insensitive
 
 ### Internal link complement
 
@@ -85,9 +94,27 @@ You can notice it and insert them **even if you forget to have created internal 
 
 #### Matching logic
 
-- Prefix match (Ignore prefix-emoji)
-  - `Obs` matches both `Obsidian` and `💎Obsidian`
-- **case-insensitive**
+- If `Match strategy` is `prefix`
+  - Prefix match (Ignore prefix-emoji)
+    - `Obs` matches both `Obsidian` and `💎Obsidian`
+  - **case-insensitive**
+- If `Match strategy` is `partial`
+  - Partial match
+  - case-insensitive
+  
+### Predictable complement
+
+Predictable complement is similar to a [Hippie completion] for IntelliJ IDEA; it is triggered by a hotkey, `Shift + Space` by default.
+
+[Hippie completion]: https://www.jetbrains.com/help/idea/auto-completing-code.html#hippie_completion
+
+![predictable-complement-demo](https://raw.githubusercontent.com/tadashi-aikawa/obsidian-various-complements-plugin/main/demo/predictable-complement.gif)
+
+#### Matching logic
+
+- Prefix match
+- case-sensitive
+
 
 ## 👁 Live preview support
 
