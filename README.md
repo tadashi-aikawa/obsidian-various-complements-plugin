@@ -8,7 +8,7 @@ This plugin for [Obsidian] enables you to complement input in markdown files.
 
 ## ⌨️Features
 
-### Current file complement
+### ✨ Current file complement
 
 It complements the text with tokens that exists in a current file.
 
@@ -34,7 +34,7 @@ You can set a strategy if the separator of your language is not only whitespace.
   - case-insensitive
 
 
-### Custom dictionary complement
+### ✨ Custom dictionary complement
 
 You can also use custom dictionaries to show suggestions on auto-complete.
 
@@ -84,7 +84,7 @@ It is more straightforward to edit on Google Spread Sheet.
   - Partial match
   - case-insensitive
 
-### Internal link complement
+### ✨ Internal link complement
 
 It complements the text with internal links, which include both resolved and unresolved.
 
@@ -102,7 +102,7 @@ You can notice it and insert them **even if you forget to have created internal 
   - Partial match
   - case-insensitive
   
-### Predictable complement
+### ✨ Predictable complement
 
 Predictable complement is similar to a [Hippie completion] for IntelliJ IDEA; it is triggered by a hotkey, `Shift + Space` by default.
 
