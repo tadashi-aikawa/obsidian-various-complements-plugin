@@ -8,6 +8,7 @@ import {
 
 export default class VariousComponents extends Plugin {
   settings: Settings;
+  settingTab: VariousComplementsSettingTab;
   suggester: AutoCompleteSuggest;
 
   onunload() {
@@ -17,7 +18,9 @@ export default class VariousComponents extends Plugin {
 
   async onload() {
     await this.loadSettings();
-    this.addSettingTab(new VariousComplementsSettingTab(this.app, this));
+
+    this.settingTab = new VariousComplementsSettingTab(this.app, this);
+    this.addSettingTab(this.settingTab);
 
     this.suggester = await AutoCompleteSuggest.new(this.app, this.settings);
     this.registerEditorSuggest(this.suggester);
@@ -38,6 +41,14 @@ export default class VariousComponents extends Plugin {
       name: "Toggle Auto-complete",
       callback: async () => {
         await this.suggester.toggleEnabled();
+      },
+    });
+
+    this.addCommand({
+      id: "toggle-match-strategy",
+      name: "Toggle Match strategy",
+      callback: async () => {
+        await this.settingTab.toggleMatchStrategy();
       },
     });
 

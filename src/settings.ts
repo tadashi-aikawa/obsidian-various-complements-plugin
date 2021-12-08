@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import VariousComponents from "./main";
 import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "./provider/MatchStrategy";
@@ -235,5 +235,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+  }
+
+  async toggleMatchStrategy() {
+    switch (this.plugin.settings.matchStrategy) {
+      case "prefix":
+        this.plugin.settings.matchStrategy = "partial";
+        break;
+      case "partial":
+        this.plugin.settings.matchStrategy = "prefix";
+        break;
+      default:
+        new Notice("⚠Unexpected error");
+    }
+    await this.plugin.saveSettings();
   }
 }
