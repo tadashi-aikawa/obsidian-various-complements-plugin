@@ -376,6 +376,7 @@ export class AutoCompleteSuggest
       if (this.settings.insertAfterCompletion) {
         insertedText = `${insertedText} `;
       }
+      insertedText = insertedText.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
 
       this.context.editor.replaceRange(
         insertedText,
