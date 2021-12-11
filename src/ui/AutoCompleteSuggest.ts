@@ -21,6 +21,7 @@ import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordPr
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
+import { CycleThroughSuggestionsKeys } from "../CycleThroughSuggestionsKeys";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -34,6 +35,7 @@ interface UnsafeEditorSuggestInterface {
   suggestions: {
     selectedItem: number;
     useSelectedItem(ev: Partial<KeyboardEvent>): void;
+    setSelectedItem(selected: number, scroll: boolean): void;
   };
 }
 
@@ -231,14 +233,48 @@ export class AutoCompleteSuggest
       this.close();
     }, this.settings.delayMilliSeconds + 50);
 
-    // new
+    this.registerKeymaps();
+  }
+
+  private registerKeymaps() {
+    // Clear
     this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
-    this.keymapEventHandler = [
+    this.keymapEventHandler = [];
+
+    // Cycle throw suggestions keys
+    const keys = CycleThroughSuggestionsKeys.fromName(
+      this.settings.additionalCycleThroughSuggestionsKeys
+    );
+    if (keys !== CycleThroughSuggestionsKeys.NONE) {
+      this.keymapEventHandler.push(
+        this.scope.register(keys.nextKey.modifiers, keys.nextKey.key, () => {
+          this.suggestions.setSelectedItem(
+            this.suggestions.selectedItem + 1,
+            true
+          );
+          return false;
+        }),
+        this.scope.register(
+          keys.previousKey.modifiers,
+          keys.previousKey.key,
+          () => {
+            this.suggestions.setSelectedItem(
+              this.suggestions.selectedItem - 1,
+              true
+            );
+            return false;
+          }
+        )
+      );
+    }
+
+    // Ignore if additionalCycleThroughSuggestionsKeys uses
+    this.keymapEventHandler.push(
       this.scope.register([], "Tab", () => {
         this.suggestions.useSelectedItem({});
         return false;
-      }),
-    ];
+      })
+    );
 
     // overwrite
     this.scope.keys.find((x) => x.key === "Escape")!.func = () => {

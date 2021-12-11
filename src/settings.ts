@@ -2,6 +2,7 @@ import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import VariousComponents from "./main";
 import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "./provider/MatchStrategy";
+import { CycleThroughSuggestionsKeys } from "./CycleThroughSuggestionsKeys";
 
 export interface Settings {
   strategy: string;
@@ -18,6 +19,7 @@ export interface Settings {
   showLogAboutPerformanceInConsole: boolean;
   insertAfterCompletion: boolean;
   delimiterToHideSuggestion: string;
+  additionalCycleThroughSuggestionsKeys: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -35,6 +37,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showLogAboutPerformanceInConsole: false,
   insertAfterCompletion: true,
   delimiterToHideSuggestion: "",
+  additionalCycleThroughSuggestionsKeys: "None",
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -180,6 +183,23 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }
         );
       });
+
+    new Setting(containerEl)
+      .setName("Additional cycle through suggestions keys")
+      .addDropdown((tc) =>
+        tc
+          .addOptions(
+            CycleThroughSuggestionsKeys.values().reduce(
+              (p, c) => ({ ...p, [c.name]: c.name }),
+              {}
+            )
+          )
+          .setValue(this.plugin.settings.additionalCycleThroughSuggestionsKeys)
+          .onChange(async (value) => {
+            this.plugin.settings.additionalCycleThroughSuggestionsKeys = value;
+            await this.plugin.saveSettings();
+          })
+      );
 
     containerEl.createEl("h3", { text: "Current file complement" });
 
