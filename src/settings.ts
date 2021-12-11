@@ -17,6 +17,7 @@ export interface Settings {
   disableSuggestionsDuringImeOn: boolean;
   showLogAboutPerformanceInConsole: boolean;
   insertAfterCompletion: boolean;
+  delimiterToHideSuggestion: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -33,6 +34,7 @@ export const DEFAULT_SETTINGS: Settings = {
   disableSuggestionsDuringImeOn: false,
   showLogAboutPerformanceInConsole: false,
   insertAfterCompletion: true,
+  delimiterToHideSuggestion: "",
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -160,6 +162,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         tc.setValue(this.plugin.settings.propagateEsc).onChange(
           async (value) => {
             this.plugin.settings.propagateEsc = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
+
+    new Setting(containerEl)
+      .setName("Delimiter to hide a suggestion")
+      .setDesc(
+        "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but complements to 'abcdefg'."
+      )
+      .addText((cb) => {
+        cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
+          async (value) => {
+            this.plugin.settings.delimiterToHideSuggestion = value;
             await this.plugin.saveSettings();
           }
         );

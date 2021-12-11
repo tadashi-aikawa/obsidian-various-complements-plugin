@@ -353,8 +353,13 @@ export class AutoCompleteSuggest
 
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
+    const text = word.internalLink ? `[[${word.value}]]` : word.value;
     base.createDiv({
-      text: word.internalLink ? `[[${word.value}]]` : word.value,
+      text:
+        this.settings.delimiterToHideSuggestion &&
+        text.includes(this.settings.delimiterToHideSuggestion)
+          ? `${text.split(this.settings.delimiterToHideSuggestion)[0]} ...`
+          : text,
     });
 
     if (word.description) {
@@ -375,6 +380,12 @@ export class AutoCompleteSuggest
       }
       if (this.settings.insertAfterCompletion) {
         insertedText = `${insertedText} `;
+      }
+      if (this.settings.delimiterToHideSuggestion) {
+        insertedText = insertedText.replace(
+          this.settings.delimiterToHideSuggestion,
+          ""
+        );
       }
       insertedText = insertedText.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
 
