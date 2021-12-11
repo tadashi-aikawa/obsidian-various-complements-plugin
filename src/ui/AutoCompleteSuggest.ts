@@ -131,13 +131,20 @@ export class AutoCompleteSuggest
     }
 
     let suggestion = this.tokenizer
-      .tokenize(editor.getRange({ line: cursor.line - 50, ch: 0 }, cursor))
+      .tokenize(
+        editor.getRange({ line: Math.max(cursor.line - 50, 0), ch: 0 }, cursor)
+      )
       .reverse()
       .slice(1)
       .find((x) => x.startsWith(currentToken));
     if (!suggestion) {
       suggestion = this.tokenizer
-        .tokenize(editor.getRange(cursor, { line: cursor.line + 50, ch: 0 }))
+        .tokenize(
+          editor.getRange(cursor, {
+            line: Math.min(cursor.line + 50, editor.lineCount() - 1),
+            ch: 0,
+          })
+        )
         .find((x) => x.startsWith(currentToken));
     }
     if (!suggestion) {
