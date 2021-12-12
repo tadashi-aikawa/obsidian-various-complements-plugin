@@ -58,6 +58,7 @@ You can define a word for each line in dictionary files.
 
 - It uses `<TAB>` as a separator
 - Surrounding with `%%` means a comment (ex: `%%This is a comment%%`)
+- It can use `\t` as Tab, `\n` as a line break
 
 Ex.
 ```
