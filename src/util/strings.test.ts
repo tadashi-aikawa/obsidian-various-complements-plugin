@@ -1,4 +1,5 @@
 import {
+  allAlphabets,
   capitalizeFirstLetter,
   excludeEmoji,
   excludeSpace,
@@ -6,6 +7,23 @@ import {
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
 } from "./strings";
+
+describe.each`
+  text      | expected
+  ${"abc"}  | ${true}
+  ${"ABC"}  | ${true}
+  ${"123"}  | ${true}
+  ${"aB3"}  | ${true}
+  ${"a_c"}  | ${true}
+  ${"a-c"}  | ${true}
+  ${"あbc"} | ${false}
+  ${"亜bc"} | ${false}
+  ${"Ａbc"} | ${false}
+`("allAlphabets", ({ text, expected }) => {
+  test(`allAlphabets(${text}) = ${expected}`, () => {
+    expect(allAlphabets(text)).toBe(expected);
+  });
+});
 
 describe.each`
   text        | expected

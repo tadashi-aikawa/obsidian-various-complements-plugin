@@ -20,6 +20,7 @@ export interface Settings {
   insertAfterCompletion: boolean;
   delimiterToHideSuggestion: string;
   additionalCycleThroughSuggestionsKeys: string;
+  onlyComplementEnglishOnCurrentFileComplement: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -38,6 +39,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertAfterCompletion: true,
   delimiterToHideSuggestion: "",
   additionalCycleThroughSuggestionsKeys: "None",
+  onlyComplementEnglishOnCurrentFileComplement: false,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -210,9 +212,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           async (value) => {
             this.plugin.settings.enableCurrentFileComplement = value;
             await this.plugin.saveSettings({ currentFile: true });
+            this.display();
           }
         );
       });
+
+    if (this.plugin.settings.enableCurrentFileComplement) {
+      new Setting(containerEl)
+        .setName("Only complement English on current file complement")
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement
+          ).onChange(async (value) => {
+            this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement =
+              value;
+            await this.plugin.saveSettings({ currentFile: true });
+          });
+        });
+    }
 
     containerEl.createEl("h3", { text: "Custom dictionary complement" });
 

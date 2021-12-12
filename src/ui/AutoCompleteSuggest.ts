@@ -295,7 +295,9 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.currentFileWordProvider.refreshWords();
+    await this.currentFileWordProvider.refreshWords(
+      this.settings.onlyComplementEnglishOnCurrentFileComplement
+    );
     this.showDebugLog("Index current file tokens", performance.now() - start);
   }
 

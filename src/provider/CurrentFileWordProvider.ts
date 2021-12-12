@@ -3,6 +3,7 @@ import { groupBy, uniq } from "../util/collection-helper";
 import { Word, WordsByFirstLetter } from "./suggester";
 import { Tokenizer } from "../tokenizer/tokenizer";
 import { AppHelper } from "../app-helper";
+import { allAlphabets } from "../util/strings";
 
 export class CurrentFileWordProvider {
   private words: Word[] = [];
@@ -14,7 +15,7 @@ export class CurrentFileWordProvider {
     private tokenizer: Tokenizer
   ) {}
 
-  async refreshWords(): Promise<void> {
+  async refreshWords(onlyEnglish: boolean): Promise<void> {
     this.clearWords();
 
     const editor = this.appHelper.getCurrentEditor();
@@ -34,7 +35,10 @@ export class CurrentFileWordProvider {
       .last();
 
     const content = await this.app.vault.cachedRead(file);
-    this.words = uniq(this.tokenizer.tokenize(content))
+    const tokens = onlyEnglish
+      ? this.tokenizer.tokenize(content).filter(allAlphabets)
+      : this.tokenizer.tokenize(content);
+    this.words = uniq(tokens)
       .filter((x) => x !== currentToken)
       .map((x) => ({
         value: x,

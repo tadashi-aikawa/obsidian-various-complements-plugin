@@ -3,6 +3,10 @@ const regEmoji = new RegExp(
   "g"
 );
 
+export function allAlphabets(text: string): boolean {
+  return Boolean(text.match(/^[a-zA-Z0-9_-]+$/));
+}
+
 export function excludeEmoji(text: string): string {
   return text.replace(regEmoji, "");
 }
