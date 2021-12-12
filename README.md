@@ -133,10 +133,6 @@ It supports on mobile.
 - Requirements
     - [Task]
 
-### Todo
-
-- [ ] [Use WebWorker to improve performance](https://github.com/obsidianmd/obsidian-releases/pull/155#issuecomment-774930410)
-
 ### Development
 
 ```console
