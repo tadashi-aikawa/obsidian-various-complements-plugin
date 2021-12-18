@@ -19,6 +19,7 @@ export interface Settings {
   showLogAboutPerformanceInConsole: boolean;
   insertAfterCompletion: boolean;
   delimiterToHideSuggestion: string;
+  caretLocationSymbolAfterComplement: string;
   additionalCycleThroughSuggestionsKeys: string;
   onlyComplementEnglishOnCurrentFileComplement: boolean;
 }
@@ -38,6 +39,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showLogAboutPerformanceInConsole: false,
   insertAfterCompletion: true,
   delimiterToHideSuggestion: "",
+  caretLocationSymbolAfterComplement: "",
   additionalCycleThroughSuggestionsKeys: "None",
   onlyComplementEnglishOnCurrentFileComplement: false,
 };
@@ -173,20 +175,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Delimiter to hide a suggestion")
-      .setDesc(
-        "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but complements to 'abcdefg'."
-      )
-      .addText((cb) => {
-        cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
-          async (value) => {
-            this.plugin.settings.delimiterToHideSuggestion = value;
-            await this.plugin.saveSettings();
-          }
-        );
-      });
-
-    new Setting(containerEl)
       .setName("Additional cycle through suggestions keys")
       .addDropdown((tc) =>
         tc
@@ -261,6 +249,34 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             "various-complements__settings__custom-dictionary-paths";
           return el;
         });
+
+      new Setting(containerEl)
+        .setName("Delimiter to hide a suggestion")
+        .setDesc(
+          "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but complements to 'abcdefg'."
+        )
+        .addText((cb) => {
+          cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
+            async (value) => {
+              this.plugin.settings.delimiterToHideSuggestion = value;
+              await this.plugin.saveSettings();
+            }
+          );
+        });
+
+      new Setting(containerEl)
+        .setName("Caret location symbol after complement")
+        .setDesc(
+          "If set '<CARET>' and there is '<li><CARET></li>' in custom dictionary, it complements '<li></li>' and move a caret where between '<li>' and `</li>`."
+        )
+        .addText((cb) => {
+          cb.setValue(
+            this.plugin.settings.caretLocationSymbolAfterComplement
+          ).onChange(async (value) => {
+            this.plugin.settings.caretLocationSymbolAfterComplement = value;
+            await this.plugin.saveSettings();
+          });
+        });
     }
 
     containerEl.createEl("h3", { text: "Internal link complement" });
@@ -299,6 +315,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         this.plugin.settings.matchStrategy = "prefix";
         break;
       default:
+        // noinspection ObjectAllocationIgnored
         new Notice("⚠Unexpected error");
     }
     await this.plugin.saveSettings();

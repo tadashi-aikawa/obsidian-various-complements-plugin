@@ -427,11 +427,25 @@ export class AutoCompleteSuggest
       }
       insertedText = insertedText.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
 
-      this.context.editor.replaceRange(
-        insertedText,
-        this.context.start,
-        this.context.end
-      );
+      const caret = this.settings.caretLocationSymbolAfterComplement;
+      const positionToMove = caret ? insertedText.indexOf(caret) : -1;
+      if (positionToMove !== -1) {
+        insertedText = insertedText.replace("<CARET>", "");
+      }
+
+      const editor = this.context.editor;
+      editor.replaceRange(insertedText, this.context.start, this.context.end);
+
+      if (positionToMove !== -1) {
+        editor.setCursor(
+          editor.offsetToPos(
+            editor.posToOffset(editor.getCursor()) -
+              insertedText.length +
+              positionToMove
+          )
+        );
+      }
+
       this.close();
       this.debounceClose();
     }
