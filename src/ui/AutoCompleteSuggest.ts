@@ -426,7 +426,7 @@ export class AutoCompleteSuggest
       const caret = this.settings.caretLocationSymbolAfterComplement;
       const positionToMove = caret ? insertedText.indexOf(caret) : -1;
       if (positionToMove !== -1) {
-        insertedText = insertedText.replace("<CARET>", "");
+        insertedText = insertedText.replace(caret, "");
       }
 
       const editor = this.context.editor;
