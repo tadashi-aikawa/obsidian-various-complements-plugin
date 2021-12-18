@@ -15,8 +15,8 @@ function pickTokensAsJapanese(content: string, trimPattern: RegExp): string[] {
  * Japanese needs original logic.
  */
 export class JapaneseTokenizer implements Tokenizer {
-  tokenize(content: string): string[] {
-    return pickTokensAsJapanese(content, this.getTrimPattern());
+  tokenize(content: string, raw?: boolean): string[] {
+    return pickTokensAsJapanese(content, raw ? / /g : this.getTrimPattern());
   }
 
   getTrimPattern(): RegExp {

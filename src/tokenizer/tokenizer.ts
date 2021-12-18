@@ -4,7 +4,7 @@ import { JapaneseTokenizer } from "./tokenizers/JapaneseTokenizer";
 import { TokenizeStrategy } from "./TokenizeStrategy";
 
 export interface Tokenizer {
-  tokenize(content: string): string[];
+  tokenize(content: string, raw?: boolean): string[];
   getTrimPattern(): RegExp;
   shouldIgnore(query: string): boolean;
 }

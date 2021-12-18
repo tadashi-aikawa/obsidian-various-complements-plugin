@@ -352,21 +352,17 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    const currentChar = editor.getRange(
-      { line: cursor.line, ch: cursor.ch - 1 },
-      cursor
+    const tokens = this.tokenizer.tokenize(
+      editor.getLine(cursor.line).slice(0, cursor.ch),
+      true
     );
-    if (currentChar.match(this.tokenizer.getTrimPattern())) {
-      return null;
-    }
-
-    const currentToken = this.tokenizer
-      .tokenize(editor.getLine(cursor.line).slice(0, cursor.ch))
-      .last();
+    const currentToken = tokens.last();
     if (!currentToken || currentToken.length < this.minNumberTriggered) {
       return null;
     }
-
+    if (currentToken[0].match(this.tokenizer.getTrimPattern())) {
+      return null;
+    }
     if (this.tokenizer.shouldIgnore(currentToken)) {
       return null;
     }
