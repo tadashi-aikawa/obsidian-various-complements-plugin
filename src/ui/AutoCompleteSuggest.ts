@@ -352,6 +352,14 @@ export class AutoCompleteSuggest
       return null;
     }
 
+    const currentChar = editor.getRange(
+      { line: cursor.line, ch: cursor.ch - 1 },
+      cursor
+    );
+    if (currentChar === " ") {
+      return null;
+    }
+
     const tokens = this.tokenizer.tokenize(
       editor.getLine(cursor.line).slice(0, cursor.ch),
       true
