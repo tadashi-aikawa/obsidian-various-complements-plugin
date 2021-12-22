@@ -4,7 +4,7 @@
 [![Tests](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/workflows/Tests/badge.svg)](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/actions)
 ![downloads](https://img.shields.io/github/downloads/tadashi-aikawa/obsidian-various-complements-plugin/total)
 
-This plugin for [Obsidian] enables you to complement input in markdown files.
+This plugin for [Obsidian] enables you complete words like the auto-completion of IDE.
 
 ## ⌨️Features
 
