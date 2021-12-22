@@ -429,7 +429,10 @@ export class AutoCompleteSuggest
           ""
         );
       }
-      insertedText = insertedText.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+      insertedText = insertedText
+        .replace(/(?<!\\)\\n/g, "\n")
+        .replace(/(?<!\\)\\t/g, "\t")
+        .replace(/\\\\/g, "\\");
 
       const caret = this.settings.caretLocationSymbolAfterComplement;
       const positionToMove = caret ? insertedText.indexOf(caret) : -1;
