@@ -429,10 +429,13 @@ export class AutoCompleteSuggest
           ""
         );
       }
+      // This tricky logics for Safari
+      // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/56
       insertedText = insertedText
-        .replace(/(?<!\\)\\n/g, "\n")
-        .replace(/(?<!\\)\\t/g, "\t")
-        .replace(/\\\\/g, "\\");
+        .replace(/\\\\/g, "__VariousComplementsEscape__")
+        .replace(/\\n/g, "\n")
+        .replace(/\\t/g, "\t")
+        .replace(/__VariousComplementsEscape__/g, "\\");
 
       const caret = this.settings.caretLocationSymbolAfterComplement;
       const positionToMove = caret ? insertedText.indexOf(caret) : -1;
