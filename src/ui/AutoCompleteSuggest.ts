@@ -37,6 +37,7 @@ interface UnsafeEditorSuggestInterface {
     useSelectedItem(ev: Partial<KeyboardEvent>): void;
     setSelectedItem(selected: number, scroll: boolean): void;
   };
+  isOpen: boolean;
 }
 
 export class AutoCompleteSuggest
@@ -57,7 +58,8 @@ export class AutoCompleteSuggest
   >;
   debounceClose: Debouncer<[]>;
 
-  disabled: boolean;
+  runManually: boolean;
+  declare isOpen: boolean;
 
   // unsafe!!
   scope: UnsafeEditorSuggestInterface["scope"];
@@ -84,6 +86,7 @@ export class AutoCompleteSuggest
     }
 
     // XXX: Unsafe
+    this.runManually = true;
     (this as any).trigger(editor, activeFile, true);
   }
 
@@ -189,10 +192,6 @@ export class AutoCompleteSuggest
       customDictionary: this.customDictionaryWordProvider.wordsByFirstLetter,
       internalLink: this.internalLinkWordProvider.wordsByFirstLetter,
     };
-  }
-
-  toggleEnabled(): void {
-    this.disabled = !this.disabled;
   }
 
   async updateSettings(settings: Settings) {
@@ -341,13 +340,18 @@ export class AutoCompleteSuggest
     editor: Editor,
     file: TFile
   ): EditorSuggestTriggerInfo | null {
-    if (this.disabled) {
+    if (
+      !this.settings.complementAutomatically &&
+      !this.isOpen &&
+      !this.runManually
+    ) {
       return null;
     }
 
     if (
       this.settings.disableSuggestionsDuringImeOn &&
-      this.appHelper.isIMEOn()
+      this.appHelper.isIMEOn() &&
+      !this.runManually
     ) {
       return null;
     }
@@ -357,6 +361,7 @@ export class AutoCompleteSuggest
       cursor
     );
     if (currentChar === " ") {
+      this.runManually = false;
       return null;
     }
 
@@ -365,16 +370,25 @@ export class AutoCompleteSuggest
       true
     );
     const currentToken = tokens.last();
-    if (!currentToken || currentToken.length < this.minNumberTriggered) {
-      return null;
-    }
-    if (currentToken[0].match(this.tokenizer.getTrimPattern())) {
-      return null;
-    }
-    if (this.tokenizer.shouldIgnore(currentToken)) {
+    if (!currentToken) {
+      this.runManually = false;
       return null;
     }
 
+    if (currentToken[0].match(this.tokenizer.getTrimPattern())) {
+      this.runManually = false;
+      return null;
+    }
+    if (!this.runManually) {
+      if (currentToken.length < this.minNumberTriggered) {
+        return null;
+      }
+      if (this.tokenizer.shouldIgnore(currentToken)) {
+        return null;
+      }
+    }
+
+    this.runManually = false;
     return {
       start: {
         ch: cursor.ch - currentToken.length,

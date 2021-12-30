@@ -37,14 +37,6 @@ export default class VariousComponents extends Plugin {
     });
 
     this.addCommand({
-      id: "toggle-auto-complete",
-      name: "Toggle Auto-complete",
-      callback: async () => {
-        await this.suggester.toggleEnabled();
-      },
-    });
-
-    this.addCommand({
       id: "toggle-match-strategy",
       name: "Toggle Match strategy",
       callback: async () => {

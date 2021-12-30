@@ -9,6 +9,7 @@ export interface Settings {
   matchStrategy: string;
   maxNumberOfSuggestions: number;
   minNumberOfCharactersTriggered: number;
+  complementAutomatically: boolean;
   delayMilliSeconds: number;
   customDictionaryPaths: string;
   propagateEsc: boolean;
@@ -29,6 +30,7 @@ export const DEFAULT_SETTINGS: Settings = {
   matchStrategy: "prefix",
   maxNumberOfSuggestions: 5,
   minNumberOfCharactersTriggered: 0,
+  complementAutomatically: true,
   delayMilliSeconds: 0,
   customDictionaryPaths: "",
   propagateEsc: false,
@@ -124,6 +126,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Complement automatically")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.complementAutomatically).onChange(
+          async (value) => {
+            this.plugin.settings.complementAutomatically = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
 
     new Setting(containerEl)
       .setName("Delay milli-seconds for trigger")
