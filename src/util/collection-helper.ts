@@ -27,3 +27,22 @@ export function uniqWith<T>(arr: T[], fn: (one: T, other: T) => boolean) {
     (element, index) => arr.findIndex((step) => fn(element, step)) === index
   );
 }
+
+export function arrayEquals(
+  arr1: unknown[],
+  arr2: unknown[],
+  length?: number
+): boolean {
+  let l = Math.max(arr1.length, arr2.length);
+  if (length !== undefined) {
+    l = Math.min(l, length);
+  }
+
+  for (let i = 0; i < l; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}

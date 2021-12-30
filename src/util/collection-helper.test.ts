@@ -1,4 +1,10 @@
-import { groupBy, keyBy, uniq, uniqWith } from "./collection-helper";
+import {
+  arrayEquals,
+  groupBy,
+  keyBy,
+  uniq,
+  uniqWith,
+} from "./collection-helper";
 
 describe.each`
   values                 | toKey                      | expected
@@ -36,5 +42,23 @@ describe.each`
 `("uniqWith", ({ arr, fn, expected }) => {
   test(`uniqWith(${arr}, ${fn}) = ${expected}`, () => {
     expect(uniqWith(arr, fn)).toStrictEqual(expected);
+  });
+});
+
+describe.each`
+  arr1                   | arr2                   | length       | expected
+  ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} | ${undefined} | ${true}
+  ${[]}                  | ${[]}                  | ${undefined} | ${true}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} | ${undefined} | ${false}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} | ${1}         | ${true}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} | ${2}         | ${true}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} | ${3}         | ${false}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} | ${undefined} | ${false}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} | ${1}         | ${true}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} | ${2}         | ${true}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} | ${3}         | ${false}
+`("arrayEquals", ({ arr1, arr2, length, expected }) => {
+  test(`arrayEquals(${arr1}, ${arr2}, ${length}) = ${expected}`, () => {
+    expect(arrayEquals(arr1, arr2, length)).toStrictEqual(expected);
   });
 });

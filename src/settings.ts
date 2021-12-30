@@ -10,6 +10,7 @@ export interface Settings {
   maxNumberOfSuggestions: number;
   minNumberOfCharactersTriggered: number;
   complementAutomatically: boolean;
+  overwriteDuplicatedExistedPhrase: boolean;
   delayMilliSeconds: number;
   customDictionaryPaths: string;
   propagateEsc: boolean;
@@ -31,6 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
   maxNumberOfSuggestions: 5,
   minNumberOfCharactersTriggered: 0,
   complementAutomatically: true,
+  overwriteDuplicatedExistedPhrase: false,
   delayMilliSeconds: 0,
   customDictionaryPaths: "",
   propagateEsc: false,
@@ -136,6 +138,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }
         );
+      });
+
+    new Setting(containerEl)
+      .setName("Overwrite duplicated existed phrase")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.overwriteDuplicatedExistedPhrase
+        ).onChange(async (value) => {
+          this.plugin.settings.overwriteDuplicatedExistedPhrase = value;
+          await this.plugin.saveSettings();
+        });
       });
 
     new Setting(containerEl)

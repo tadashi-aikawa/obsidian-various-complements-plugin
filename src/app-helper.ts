@@ -30,6 +30,14 @@ export class AppHelper {
     return this.getMarkdownViewInActiveLeaf()?.editor ?? null;
   }
 
+  getCurrentLine(editor: Editor): string {
+    return editor.getLine(editor.getCursor().line);
+  }
+
+  getCurrentLineUntilCursor(editor: Editor): string {
+    return this.getCurrentLine(editor).slice(0, editor.getCursor().ch);
+  }
+
   searchPhantomLinks(): string[] {
     return uniq(
       Object.values(this.app.metadataCache.unresolvedLinks)

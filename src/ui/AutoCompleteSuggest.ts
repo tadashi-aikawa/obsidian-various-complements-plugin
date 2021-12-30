@@ -22,6 +22,8 @@ import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../CycleThroughSuggestionsKeys";
+import { arrayEquals } from "../util/collection-helper";
+import { excludeEmoji } from "../util/strings";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -461,7 +463,11 @@ export class AutoCompleteSuggest
     }
 
     const editor = this.context.editor;
-    editor.replaceRange(insertedText, this.context.start, this.context.end);
+    editor.replaceRange(
+      insertedText,
+      this.suggestReplaceStartPosition(word, this.context),
+      this.context.end
+    );
 
     if (positionToMove !== -1) {
       editor.setCursor(
@@ -475,6 +481,47 @@ export class AutoCompleteSuggest
 
     this.close();
     this.debounceClose();
+  }
+
+  private suggestReplaceStartPosition(
+    word: Word,
+    context: EditorSuggestContext
+  ): EditorPosition {
+    if (!this.settings.overwriteDuplicatedExistedPhrase) {
+      return context.start;
+    }
+
+    const currentLineUntilCursor = this.appHelper.getCurrentLineUntilCursor(
+      context.editor
+    );
+    const currentLineTokensFromCursor = this.tokenizer
+      .tokenize(currentLineUntilCursor, true)
+      .map((x) => x.toLowerCase())
+      .slice(0, -1)
+      .reverse();
+
+    const suggestionTokensReversed = this.tokenizer
+      .tokenize(excludeEmoji(word.value), true)
+      .map((x) => x.toLowerCase())
+      .reverse();
+
+    const i = suggestionTokensReversed.indexOf(currentLineTokensFromCursor[0]);
+    const judgementTokens = suggestionTokensReversed.slice(i);
+
+    const shouldReplaceExisted = arrayEquals(
+      currentLineTokensFromCursor,
+      judgementTokens,
+      judgementTokens.length
+    );
+
+    return shouldReplaceExisted
+      ? {
+          ...context.start,
+          ch: currentLineUntilCursor
+            .toLowerCase()
+            .lastIndexOf(judgementTokens.last()!),
+        }
+      : context.start;
   }
 
   private showDebugLog(message: string, msec: number) {
