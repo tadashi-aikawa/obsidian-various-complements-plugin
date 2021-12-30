@@ -1,4 +1,4 @@
-import { App, FileSystemAdapter, Notice } from "obsidian";
+import { App, FileSystemAdapter, Notice, request } from "obsidian";
 import { keyBy } from "../util/collection-helper";
 import { pushWord, Word, WordsByFirstLetter } from "./suggester";
 
@@ -31,7 +31,11 @@ export class CustomDictionaryWordProvider {
   }
 
   async loadWords(path: string): Promise<Word[]> {
-    return (await this.fileSystemAdapter.read(path))
+    const contents = path.match(new RegExp("^https?://"))
+      ? await request({ url: path })
+      : await this.fileSystemAdapter.read(path);
+
+    return contents
       .split(/\r\n|\n/)
       .map((x) => x.replace(/%%.*%%/g, ""))
       .filter((x) => x)

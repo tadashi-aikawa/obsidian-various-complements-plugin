@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   complementAutomatically: true,
   overwriteDuplicatedExistedPhrase: false,
   delayMilliSeconds: 0,
-  customDictionaryPaths: "",
+  customDictionaryPaths: `https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt`,
   ignoreEnterKey: false,
   ignoreTabKey: false,
   propagateEsc: false,
@@ -294,7 +294,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     if (this.plugin.settings.enableCustomDictionaryComplement) {
       new Setting(containerEl)
         .setName("Custom dictionary paths")
-        .setDesc("For each line, specify a relative path from Vault root.")
+        .setDesc(
+          "Specify either a relative path from Vault root or URL for each line."
+        )
         .addTextArea((tac) => {
           const el = tac
             .setValue(this.plugin.settings.customDictionaryPaths)
