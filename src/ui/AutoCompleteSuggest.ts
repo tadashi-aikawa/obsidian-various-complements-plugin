@@ -429,50 +429,52 @@ export class AutoCompleteSuggest
   }
 
   selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {
-    if (this.context) {
-      let insertedText = word.value;
-      if (word.internalLink) {
-        insertedText = `[[${insertedText}]]`;
-      }
-      if (this.settings.insertAfterCompletion) {
-        insertedText = `${insertedText} `;
-      }
-      if (this.settings.delimiterToHideSuggestion) {
-        insertedText = insertedText.replace(
-          this.settings.delimiterToHideSuggestion,
-          ""
-        );
-      }
-      // This tricky logics for Safari
-      // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/56
-      insertedText = insertedText
-        .replace(/\\\\/g, "__VariousComplementsEscape__")
-        .replace(/\\n/g, "\n")
-        .replace(/\\t/g, "\t")
-        .replace(/__VariousComplementsEscape__/g, "\\");
-
-      const caret = this.settings.caretLocationSymbolAfterComplement;
-      const positionToMove = caret ? insertedText.indexOf(caret) : -1;
-      if (positionToMove !== -1) {
-        insertedText = insertedText.replace(caret, "");
-      }
-
-      const editor = this.context.editor;
-      editor.replaceRange(insertedText, this.context.start, this.context.end);
-
-      if (positionToMove !== -1) {
-        editor.setCursor(
-          editor.offsetToPos(
-            editor.posToOffset(editor.getCursor()) -
-              insertedText.length +
-              positionToMove
-          )
-        );
-      }
-
-      this.close();
-      this.debounceClose();
+    if (!this.context) {
+      return;
     }
+
+    let insertedText = word.value;
+    if (word.internalLink) {
+      insertedText = `[[${insertedText}]]`;
+    }
+    if (this.settings.insertAfterCompletion) {
+      insertedText = `${insertedText} `;
+    }
+    if (this.settings.delimiterToHideSuggestion) {
+      insertedText = insertedText.replace(
+        this.settings.delimiterToHideSuggestion,
+        ""
+      );
+    }
+    // This tricky logics for Safari
+    // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/56
+    insertedText = insertedText
+      .replace(/\\\\/g, "__VariousComplementsEscape__")
+      .replace(/\\n/g, "\n")
+      .replace(/\\t/g, "\t")
+      .replace(/__VariousComplementsEscape__/g, "\\");
+
+    const caret = this.settings.caretLocationSymbolAfterComplement;
+    const positionToMove = caret ? insertedText.indexOf(caret) : -1;
+    if (positionToMove !== -1) {
+      insertedText = insertedText.replace(caret, "");
+    }
+
+    const editor = this.context.editor;
+    editor.replaceRange(insertedText, this.context.start, this.context.end);
+
+    if (positionToMove !== -1) {
+      editor.setCursor(
+        editor.offsetToPos(
+          editor.posToOffset(editor.getCursor()) -
+            insertedText.length +
+            positionToMove
+        )
+      );
+    }
+
+    this.close();
+    this.debounceClose();
   }
 
   private showDebugLog(message: string, msec: number) {
