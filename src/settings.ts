@@ -13,6 +13,8 @@ export interface Settings {
   overwriteDuplicatedExistedPhrase: boolean;
   delayMilliSeconds: number;
   customDictionaryPaths: string;
+  ignoreEnterKey: boolean;
+  ignoreTabKey: boolean;
   propagateEsc: boolean;
   enableCurrentFileComplement: boolean;
   enableCustomDictionaryComplement: boolean;
@@ -35,6 +37,8 @@ export const DEFAULT_SETTINGS: Settings = {
   overwriteDuplicatedExistedPhrase: false,
   delayMilliSeconds: 0,
   customDictionaryPaths: "",
+  ignoreEnterKey: false,
+  ignoreTabKey: false,
   propagateEsc: false,
   enableCurrentFileComplement: true,
   enableCustomDictionaryComplement: false,
@@ -181,6 +185,34 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         tc.setValue(this.plugin.settings.insertAfterCompletion).onChange(
           async (value) => {
             this.plugin.settings.insertAfterCompletion = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
+
+    new Setting(containerEl)
+      .setName("Ignore Enter key")
+      .setDesc(
+        "It is handy when you want to avoid selecting the suggestion by Enter key unintentionally"
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.ignoreEnterKey).onChange(
+          async (value) => {
+            this.plugin.settings.ignoreEnterKey = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
+
+    new Setting(containerEl)
+      .setName("Ignore Tab key")
+      .setDesc(
+        "It is handy when you want to avoid selecting the suggestion by Tab key unintentionally"
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.ignoreTabKey).onChange(
+          async (value) => {
+            this.plugin.settings.ignoreTabKey = value;
             await this.plugin.saveSettings();
           }
         );

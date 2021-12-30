@@ -272,6 +272,11 @@ export class AutoCompleteSuggest
     // Ignore if additionalCycleThroughSuggestionsKeys uses
     this.keymapEventHandler.push(
       this.scope.register([], "Tab", () => {
+        if (this.settings.ignoreTabKey) {
+          this.close();
+          return true;
+        }
+
         this.suggestions.useSelectedItem({});
         return false;
       })
@@ -281,6 +286,15 @@ export class AutoCompleteSuggest
     this.scope.keys.find((x) => x.key === "Escape")!.func = () => {
       this.close();
       return this.settings.propagateEsc;
+    };
+    this.scope.keys.find((x) => x.key === "Enter")!.func = () => {
+      if (this.settings.ignoreEnterKey) {
+        this.close();
+        return true;
+      }
+
+      this.suggestions.useSelectedItem({});
+      return false;
     };
   }
 
