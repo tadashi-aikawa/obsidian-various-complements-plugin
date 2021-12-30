@@ -361,6 +361,7 @@ export class AutoCompleteSuggest
       !this.isOpen &&
       !this.runManually
     ) {
+      this.showDebugLog("Don't show suggestions");
       return null;
     }
 
@@ -369,6 +370,7 @@ export class AutoCompleteSuggest
       this.appHelper.isIMEOn() &&
       !this.runManually
     ) {
+      this.showDebugLog("Don't show suggestions for IME");
       return null;
     }
 
@@ -376,8 +378,12 @@ export class AutoCompleteSuggest
       { line: cursor.line, ch: cursor.ch - 1 },
       cursor
     );
+    this.showDebugLog(`[onTrigger] currentChar is ${currentChar}`);
     if (currentChar === " ") {
       this.runManually = false;
+      this.showDebugLog(
+        "Don't show suggestions because currentChar is whitespace"
+      );
       return null;
     }
 
@@ -385,21 +391,47 @@ export class AutoCompleteSuggest
       editor.getLine(cursor.line).slice(0, cursor.ch),
       true
     );
+    this.showDebugLog(`[onTrigger] tokens is ${tokens}`);
+
     const currentToken = tokens.last();
+    this.showDebugLog(`[onTrigger] currentToken is ${currentToken}`);
     if (!currentToken) {
       this.runManually = false;
+      this.showDebugLog(`Don't show suggestions because currentToken is empty`);
       return null;
     }
 
-    if (currentToken[0].match(this.tokenizer.getTrimPattern())) {
+    if (currentToken[0].match(/\//)) {
       this.runManually = false;
+      this.showDebugLog(
+        `Don't show suggestions for avoiding to conflict with the slash command.`
+      );
       return null;
     }
+
+    const trimmedCurrentToken = this.tokenizer.tokenize(currentToken)?.[0];
+    this.showDebugLog(
+      `[onTrigger] trimmedCurrentToken is ${trimmedCurrentToken}`
+    );
+    if (!trimmedCurrentToken) {
+      this.runManually = false;
+      this.showDebugLog(
+        `Don't show suggestions because trimmedCurrentToken is empty`
+      );
+      return null;
+    }
+
     if (!this.runManually) {
-      if (currentToken.length < this.minNumberTriggered) {
+      if (trimmedCurrentToken.length < this.minNumberTriggered) {
+        this.showDebugLog(
+          "Don't show suggestions because trimmedCurrentToken is less than minNumberTriggered option"
+        );
         return null;
       }
-      if (this.tokenizer.shouldIgnore(currentToken)) {
+      if (this.tokenizer.shouldIgnore(trimmedCurrentToken)) {
+        this.showDebugLog(
+          "Don't show suggestions because trimmedCurrentToken should ignored"
+        );
         return null;
       }
     }
@@ -407,11 +439,11 @@ export class AutoCompleteSuggest
     this.runManually = false;
     return {
       start: {
-        ch: cursor.ch - currentToken.length,
+        ch: cursor.ch - trimmedCurrentToken.length,
         line: cursor.line,
       },
       end: cursor,
-      query: currentToken,
+      query: trimmedCurrentToken,
     };
   }
 
@@ -538,9 +570,13 @@ export class AutoCompleteSuggest
       : context.start;
   }
 
-  private showDebugLog(message: string, msec: number) {
+  private showDebugLog(message: string, msec?: number) {
     if (this.settings.showLogAboutPerformanceInConsole) {
-      console.log(`${message}: ${Math.round(msec)}[ms]`);
+      if (msec !== undefined) {
+        console.log(`${message}: ${Math.round(msec)}[ms]`);
+      } else {
+        console.log(message);
+      }
     }
   }
 }
