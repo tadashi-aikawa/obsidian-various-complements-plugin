@@ -22,8 +22,7 @@ import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../CycleThroughSuggestionsKeys";
-import { arrayEqualsUntil } from "../util/collection-helper";
-import { excludeEmoji } from "../util/strings";
+import { suggestCh } from "../replacer";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -541,36 +540,15 @@ export class AutoCompleteSuggest
       context.editor
     );
 
-    const currentLineTokensUntilCursor = this.tokenizer
-      .tokenize(currentLineUntilCursor, true)
-      .map((x) => x.toLowerCase());
-    const currentToken = currentLineTokensUntilCursor.last()!;
-    const currentLineTokensReversed = currentLineTokensUntilCursor
-      .slice(0, -1)
-      .reverse();
-
-    const suggestionTokensReversed = this.tokenizer
-      .tokenize(excludeEmoji(word.value), true)
-      .map((x) => x.toLowerCase())
-      .reverse();
-
-    const i = suggestionTokensReversed.indexOf(currentLineTokensReversed[0]);
-    const judgementTokens = suggestionTokensReversed.slice(i);
-
-    const untilEqualIndex = arrayEqualsUntil(
-      currentLineTokensReversed,
-      judgementTokens
-    );
-
-    return untilEqualIndex === -1
-      ? context.start
-      : {
-          ...context.start,
-          ch: currentLineUntilCursor
-            .slice(0, -currentToken.length)
-            .toLowerCase()
-            .lastIndexOf(judgementTokens[untilEqualIndex]),
-        };
+    return {
+      ...context.start,
+      ch: suggestCh(
+        this.tokenizer,
+        currentLineUntilCursor,
+        word.value,
+        context.start.ch
+      ),
+    };
   }
 
   private showDebugLog(message: string, msec?: number) {
