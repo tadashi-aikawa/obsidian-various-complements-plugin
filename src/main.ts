@@ -69,6 +69,17 @@ export default class VariousComponents extends Plugin {
         this.suggester.predictableComplete();
       },
     });
+
+    this.addCommand({
+      id: "copy-plugin-settings",
+      name: "Copy plugin settings",
+      callback: async () => {
+        await navigator.clipboard.writeText(
+          this.settingTab.getPluginSettingsAsJsonString()
+        );
+        new Notice("Copy settings of Various Complements");
+      },
+    });
   }
 
   async loadSettings(): Promise<void> {
