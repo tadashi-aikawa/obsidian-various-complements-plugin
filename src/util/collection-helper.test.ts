@@ -1,5 +1,5 @@
 import {
-  arrayEquals,
+  arrayEquals, arrayEqualsUntil,
   groupBy,
   keyBy,
   uniq,
@@ -60,5 +60,18 @@ describe.each`
 `("arrayEquals", ({ arr1, arr2, length, expected }) => {
   test(`arrayEquals(${arr1}, ${arr2}, ${length}) = ${expected}`, () => {
     expect(arrayEquals(arr1, arr2, length)).toStrictEqual(expected);
+  });
+});
+
+describe.each`
+  arr1                   | arr2                   |  expected
+  ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} |  ${2}
+  ${[]}                  | ${[]}                  |  ${-1}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} |  ${1}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} |  ${1}
+  ${["aa", "iii", "uu"]}       | ${["aa", "iii"]} |  ${1}
+`("arrayEqualsUntil", ({ arr1, arr2, expected }) => {
+  test(`arrayEqualsUntil(${arr1}, ${arr2}) = ${expected}`, () => {
+    expect(arrayEqualsUntil(arr1, arr2)).toStrictEqual(expected);
   });
 });

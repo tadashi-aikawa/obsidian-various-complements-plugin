@@ -22,7 +22,7 @@ import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../CycleThroughSuggestionsKeys";
-import { arrayEquals } from "../util/collection-helper";
+import { arrayEqualsUntil } from "../util/collection-helper";
 import { excludeEmoji } from "../util/strings";
 
 export type IndexedWords = {
@@ -540,9 +540,12 @@ export class AutoCompleteSuggest
     const currentLineUntilCursor = this.appHelper.getCurrentLineUntilCursor(
       context.editor
     );
-    const currentLineTokensFromCursor = this.tokenizer
+
+    const currentLineTokensUntilCursor = this.tokenizer
       .tokenize(currentLineUntilCursor, true)
-      .map((x) => x.toLowerCase())
+      .map((x) => x.toLowerCase());
+    const currentToken = currentLineTokensUntilCursor.last()!;
+    const currentLineTokensReversed = currentLineTokensUntilCursor
       .slice(0, -1)
       .reverse();
 
@@ -551,23 +554,23 @@ export class AutoCompleteSuggest
       .map((x) => x.toLowerCase())
       .reverse();
 
-    const i = suggestionTokensReversed.indexOf(currentLineTokensFromCursor[0]);
+    const i = suggestionTokensReversed.indexOf(currentLineTokensReversed[0]);
     const judgementTokens = suggestionTokensReversed.slice(i);
 
-    const shouldReplaceExisted = arrayEquals(
-      currentLineTokensFromCursor,
-      judgementTokens,
-      judgementTokens.length
+    const untilEqualIndex = arrayEqualsUntil(
+      currentLineTokensReversed,
+      judgementTokens
     );
 
-    return shouldReplaceExisted
-      ? {
+    return untilEqualIndex === -1
+      ? context.start
+      : {
           ...context.start,
           ch: currentLineUntilCursor
+            .slice(0, -currentToken.length)
             .toLowerCase()
-            .lastIndexOf(judgementTokens.last()!),
-        }
-      : context.start;
+            .lastIndexOf(judgementTokens[untilEqualIndex]),
+        };
   }
 
   private showDebugLog(message: string, msec?: number) {

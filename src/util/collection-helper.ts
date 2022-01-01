@@ -46,3 +46,14 @@ export function arrayEquals(
 
   return true;
 }
+
+export function arrayEqualsUntil(arr1: unknown[], arr2: unknown[]): number {
+  let l = Math.min(arr1.length, arr2.length);
+  for (let i = 0; i < l; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return i - 1;
+    }
+  }
+
+  return l - 1;
+}
