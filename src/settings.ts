@@ -364,6 +364,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    new Setting(containerEl)
+      .setName("current settings as JSON for support")
+      .setDesc("Please copy this value when you create an issue on GitHub")
+      .addTextArea((tac) => {
+        const el = tac
+          .setValue(JSON.stringify(this.plugin.settings, null, 4))
+          .setDisabled(true);
+        el.inputEl.className =
+          "various-complements__settings__current-settings-json";
+        return el;
+      });
   }
 
   async toggleMatchStrategy() {
