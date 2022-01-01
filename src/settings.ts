@@ -370,7 +370,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setDesc("Please copy this value when you create an issue on GitHub")
       .addTextArea((tac) => {
         const el = tac
-          .setValue(JSON.stringify(this.plugin.settings, null, 4))
+          .setValue(
+            JSON.stringify(
+              {
+                version: this.plugin.manifest.version,
+                mobile: (this.app as any).isMobile,
+                settings: this.plugin.settings,
+              },
+              null,
+              4
+            )
+          )
           .setDisabled(true);
         el.inputEl.className =
           "various-complements__settings__current-settings-json";
