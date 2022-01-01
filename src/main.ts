@@ -45,6 +45,14 @@ export default class VariousComponents extends Plugin {
     });
 
     this.addCommand({
+      id: "toggle-complement-automatically",
+      name: "Toggle Complement automatically",
+      callback: async () => {
+        await this.settingTab.toggleComplementAutomatically();
+      },
+    });
+
+    this.addCommand({
       id: "show-suggestions",
       name: "Show suggestions",
       hotkeys: [{ modifiers: ["Mod"], key: " " }],

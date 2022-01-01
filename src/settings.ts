@@ -402,4 +402,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
     await this.plugin.saveSettings();
   }
+
+  async toggleComplementAutomatically() {
+    this.plugin.settings.complementAutomatically =
+      !this.plugin.settings.complementAutomatically;
+    await this.plugin.saveSettings();
+  }
 }
