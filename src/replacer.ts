@@ -11,7 +11,8 @@ export function suggestCh(
   const currentLineTokensUntilCursor = tokenizer
     .tokenize(currentLineUntilCursor, true)
     .map((x) => x.toLowerCase());
-  const currentToken = currentLineTokensUntilCursor.last()!;
+  const currentToken =
+    currentLineTokensUntilCursor[currentLineTokensUntilCursor.length - 1];
   const currentLineTokensReversed = currentLineTokensUntilCursor
     .slice(0, -1)
     .reverse();
