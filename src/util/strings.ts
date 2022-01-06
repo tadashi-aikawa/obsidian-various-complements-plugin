@@ -34,3 +34,21 @@ export function lowerStartsWithoutSpace(one: string, other: string): boolean {
 export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function* splitRaw(
+  text: string,
+  regexp: RegExp
+): IterableIterator<string> {
+  let previousIndex = 0;
+  for (let r of text.matchAll(regexp)) {
+    if (previousIndex !== r.index!) {
+      yield text.slice(previousIndex, r.index!);
+    }
+    yield text[r.index!];
+    previousIndex = r.index! + 1;
+  }
+
+  if (previousIndex !== text.length) {
+    yield text.slice(previousIndex, text.length);
+  }
+}

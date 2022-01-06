@@ -6,6 +6,7 @@ import {
   lowerIncludes,
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
+  splitRaw,
 } from "./strings";
 
 describe.each`
@@ -102,5 +103,16 @@ describe.each`
 `("capitalizeFirstLetter", ({ text, expected }) => {
   test(`capitalizeFirstLetter(${text}) = ${expected}`, () => {
     expect(capitalizeFirstLetter(text)).toBe(expected);
+  });
+});
+
+describe.each`
+  text                      | regexp      | expected
+  ${"I am tadashi-aikawa."} | ${/[ -.]/g} | ${["I", " ", "am", " ", "tadashi", "-", "aikawa", "."]}
+  ${" am tadashi-aikawa."}  | ${/[ -.]/g} | ${[" ", "am", " ", "tadashi", "-", "aikawa", "."]}
+  ${"I am tadashi-aikawa"}  | ${/[ -.]/g} | ${["I", " ", "am", " ", "tadashi", "-", "aikawa"]}
+`("splitRaw", ({ text, regexp, expected }) => {
+  test(`splitRaw(${text}, ${regexp}) = ${expected}`, () => {
+    expect(Array.from(splitRaw(text, regexp))).toStrictEqual(expected);
   });
 });

@@ -400,7 +400,7 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    if (currentToken[0].match(/\//)) {
+    if (currentToken[0].match(this.tokenizer.getTrimPattern())) {
       this.runManually = false;
       this.showDebugLog(
         `Don't show suggestions for avoiding to conflict with the slash command.`
