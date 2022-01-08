@@ -12,6 +12,8 @@ export interface Word {
   description?: string;
   aliases?: string[];
   internalLink?: boolean;
+  // Add after judge
+  matchedAlias?: string;
 }
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
@@ -53,7 +55,11 @@ export function judge(
     lowerStartsWithoutSpace(a, query)
   );
   if (matchedAlias) {
-    return { word: word, value: matchedAlias, alias: true };
+    return {
+      word: { ...word, matchedAlias },
+      value: matchedAlias,
+      alias: true,
+    };
   }
 
   return { word: word, alias: false };
@@ -127,7 +133,11 @@ export function judgeByPartialMatch(
     lowerStartsWithoutSpace(a, query)
   );
   if (matchedAliasStarts) {
-    return { word: word, value: matchedAliasStarts, alias: true };
+    return {
+      word: { ...word, matchedAlias: matchedAliasStarts },
+      value: matchedAliasStarts,
+      alias: true,
+    };
   }
 
   if (lowerIncludesWithoutSpace(word.value, query)) {
@@ -138,7 +148,11 @@ export function judgeByPartialMatch(
     lowerIncludesWithoutSpace(a, query)
   );
   if (matchedAliasIncluded) {
-    return { word: word, value: matchedAliasIncluded, alias: true };
+    return {
+      word: { ...word, matchedAlias: matchedAliasIncluded },
+      value: matchedAliasIncluded,
+      alias: true,
+    };
   }
 
   return { word: word, alias: false };
@@ -182,6 +196,7 @@ export function suggestWordsByPartialMatch(
     .map((x) => x.word)
     .slice(0, max);
 
+  console.log(candidate);
   // XXX: There is no guarantee that equals with max, but it is important for performance
   return uniqWith(
     candidate,

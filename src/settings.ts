@@ -26,6 +26,7 @@ export interface Settings {
   caretLocationSymbolAfterComplement: string;
   additionalCycleThroughSuggestionsKeys: string;
   onlyComplementEnglishOnCurrentFileComplement: boolean;
+  suggestInternalLinkWithAlias: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -50,6 +51,7 @@ export const DEFAULT_SETTINGS: Settings = {
   caretLocationSymbolAfterComplement: "",
   additionalCycleThroughSuggestionsKeys: "None",
   onlyComplementEnglishOnCurrentFileComplement: false,
+  suggestInternalLinkWithAlias: false,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -351,6 +353,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }
         );
       });
+
+    if (this.plugin.settings.enableInternalLinkComplement) {
+      new Setting(containerEl)
+        .setName("Suggest with an alias")
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.suggestInternalLinkWithAlias
+          ).onChange(async (value) => {
+            this.plugin.settings.suggestInternalLinkWithAlias = value;
+            await this.plugin.saveSettings();
+          });
+        });
+    }
 
     containerEl.createEl("h3", { text: "Debug" });
 

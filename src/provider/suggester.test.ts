@@ -41,7 +41,7 @@ describe.each`
   ${{ value: "abcde" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde" }, value: "Abcde", alias: false }}
   ${{ value: "abcde" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde" }, alias: false }}
   ${{ value: "abcde", internalLink: true }}    | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", internalLink: true }, value: "abcde", alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"] }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc" }, value: "abc", alias: true }}
   ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"] }, alias: false }}
   ${{ value: "abcde" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde" }, alias: false }}
 `("judge", ({ word, query, queryStartWithUpper, expected }) => {
@@ -61,8 +61,8 @@ describe.each`
   ${{ value: "abcde" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde" }, value: "Abcde", alias: false }}
   ${{ value: "abcde" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde" }, value: "abcde", alias: false }}
   ${{ value: "abcde", internalLink: true }}    | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", internalLink: true }, value: "abcde", alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"] }, value: "abc", alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"] }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc" }, value: "abc", alias: true }}
   ${{ value: "abcde" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde" }, alias: false }}
 `("judgeByPartialMatch", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judgeByPartialMatch(${JSON.stringify(
@@ -104,9 +104,14 @@ describe("suggestWords", () => {
       { value: "AI", internalLink: true },
       { value: "ai" },
       { value: "AWS", internalLink: true },
-      { value: "uwaa", aliases: ["aaa"] },
+      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -117,7 +122,12 @@ describe("suggestWords", () => {
       { value: "AI", internalLink: true },
       { value: "ai" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -126,7 +136,12 @@ describe("suggestWords", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "aiu", 10)).toStrictEqual([
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -138,9 +153,14 @@ describe("suggestWords", () => {
       { value: "Ai" },
       { value: "AWS", internalLink: true },
       { value: "AWS" },
-      { value: "uwaa", aliases: ["aaa"] },
+      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -151,7 +171,12 @@ describe("suggestWords", () => {
       { value: "AI", internalLink: true },
       { value: "Ai" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -162,7 +187,12 @@ describe("suggestWords", () => {
       { value: "AI", internalLink: true },
       { value: "Ai" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -171,7 +201,12 @@ describe("suggestWords", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "AIU", 10)).toStrictEqual([
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -186,7 +221,10 @@ describe("suggestWords", () => {
   test("Query: U", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "U", 10)).toStrictEqual([
-      { value: "UFO", aliases: ["Unidentified flying object"] },
+      {
+        value: "UFO",
+        aliases: ["Unidentified flying object"],
+      },
       { value: "Uwaa", aliases: ["aaa"] },
     ]);
   });
@@ -237,9 +275,14 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "ai" },
       { value: "AWS", internalLink: true },
       { value: "AWS" },
-      { value: "uwaa", aliases: ["aaa"] },
+      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -250,7 +293,12 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "AI", internalLink: true },
       { value: "ai" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -259,7 +307,12 @@ describe("suggestWordsByPartialMatch", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "aiu", 10)).toStrictEqual([
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -271,9 +324,14 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "Ai" },
       { value: "AWS", internalLink: true },
       { value: "AWS" },
-      { value: "uwaa", aliases: ["aaa"] },
+      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -284,7 +342,12 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "AI", internalLink: true },
       { value: "Ai" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -295,7 +358,12 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "AI", internalLink: true },
       { value: "Ai" },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -304,7 +372,12 @@ describe("suggestWordsByPartialMatch", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "AIU", 10)).toStrictEqual([
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "AiUEO" },
     ]);
   });
@@ -315,7 +388,12 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "UFO", aliases: ["Unidentified flying object"] },
       { value: "uwaa", aliases: ["aaa"] },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });
@@ -326,7 +404,12 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "UFO", aliases: ["Unidentified flying object"] },
       { value: "Uwaa", aliases: ["aaa"] },
       { value: "aiUEO", internalLink: true },
-      { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+      {
+        value: "あいうえお",
+        internalLink: true,
+        aliases: ["aiueo"],
+        matchedAlias: "aiueo",
+      },
       { value: "aiUEO" },
     ]);
   });

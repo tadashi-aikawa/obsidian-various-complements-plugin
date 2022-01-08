@@ -456,7 +456,14 @@ export class AutoCompleteSuggest
 
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
-    const text = word.internalLink ? `[[${word.value}]]` : word.value;
+    let text = word.value;
+    if (word.internalLink) {
+      text =
+        this.settings.suggestInternalLinkWithAlias && word.matchedAlias
+          ? `[[${word.value}|${word.matchedAlias}]]`
+          : `[[${word.value}]]`;
+    }
+
     base.createDiv({
       text:
         this.settings.delimiterToHideSuggestion &&
@@ -482,7 +489,10 @@ export class AutoCompleteSuggest
 
     let insertedText = word.value;
     if (word.internalLink) {
-      insertedText = `[[${insertedText}]]`;
+      insertedText =
+        this.settings.suggestInternalLinkWithAlias && word.matchedAlias
+          ? `[[${insertedText}|${word.matchedAlias}]]`
+          : `[[${insertedText}]]`;
     }
     if (this.settings.insertAfterCompletion) {
       insertedText = `${insertedText} `;
