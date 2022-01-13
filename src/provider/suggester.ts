@@ -196,7 +196,6 @@ export function suggestWordsByPartialMatch(
     .map((x) => x.word)
     .slice(0, max);
 
-  console.log(candidate);
   // XXX: There is no guarantee that equals with max, but it is important for performance
   return uniqWith(
     candidate,

@@ -3,8 +3,10 @@ import VariousComponents from "./main";
 import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "./provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "./CycleThroughSuggestionsKeys";
+import { ColumnDelimiter } from "./ColumnDelimiter";
 
 export interface Settings {
+  // general
   strategy: string;
   matchStrategy: string;
   maxNumberOfSuggestions: number;
@@ -12,24 +14,35 @@ export interface Settings {
   complementAutomatically: boolean;
   overwriteDuplicatedExistedPhrase: boolean;
   delayMilliSeconds: number;
-  customDictionaryPaths: string;
+  disableSuggestionsDuringImeOn: boolean;
+  // FIXME: Rename at next major version up
+  insertAfterCompletion: boolean;
   ignoreEnterKey: boolean;
   ignoreTabKey: boolean;
   propagateEsc: boolean;
+  additionalCycleThroughSuggestionsKeys: string;
+
+  // current file complement
   enableCurrentFileComplement: boolean;
+  onlyComplementEnglishOnCurrentFileComplement: boolean;
+
+  // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
-  enableInternalLinkComplement: boolean;
-  disableSuggestionsDuringImeOn: boolean;
-  showLogAboutPerformanceInConsole: boolean;
-  insertAfterCompletion: boolean;
+  customDictionaryPaths: string;
+  columnDelimiter: string;
   delimiterToHideSuggestion: string;
   caretLocationSymbolAfterComplement: string;
-  additionalCycleThroughSuggestionsKeys: string;
-  onlyComplementEnglishOnCurrentFileComplement: boolean;
+
+  // internal link complement
+  enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
+
+  // debug
+  showLogAboutPerformanceInConsole: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
+  // general
   strategy: "default",
   matchStrategy: "prefix",
   maxNumberOfSuggestions: 5,
@@ -37,21 +50,30 @@ export const DEFAULT_SETTINGS: Settings = {
   complementAutomatically: true,
   overwriteDuplicatedExistedPhrase: false,
   delayMilliSeconds: 0,
-  customDictionaryPaths: `https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt`,
+  disableSuggestionsDuringImeOn: false,
+  insertAfterCompletion: true,
   ignoreEnterKey: false,
   ignoreTabKey: false,
   propagateEsc: false,
+  additionalCycleThroughSuggestionsKeys: "None",
+
+  // current file complement
   enableCurrentFileComplement: true,
+  onlyComplementEnglishOnCurrentFileComplement: false,
+
+  // custom dictionary complement
   enableCustomDictionaryComplement: false,
-  enableInternalLinkComplement: true,
-  disableSuggestionsDuringImeOn: false,
-  showLogAboutPerformanceInConsole: false,
-  insertAfterCompletion: true,
+  customDictionaryPaths: `https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt`,
+  columnDelimiter: "Tab",
   delimiterToHideSuggestion: "",
   caretLocationSymbolAfterComplement: "",
-  additionalCycleThroughSuggestionsKeys: "None",
-  onlyComplementEnglishOnCurrentFileComplement: false,
+
+  // internal link complement
+  enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
+
+  // debug
+  showLogAboutPerformanceInConsole: false,
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -311,6 +333,21 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             "various-complements__settings__custom-dictionary-paths";
           return el;
         });
+
+      new Setting(containerEl).setName("Column delimiter").addDropdown((tc) =>
+        tc
+          .addOptions(
+            ColumnDelimiter.values().reduce(
+              (p, c) => ({ ...p, [c.name]: c.name }),
+              {}
+            )
+          )
+          .setValue(this.plugin.settings.columnDelimiter)
+          .onChange(async (value) => {
+            this.plugin.settings.columnDelimiter = value;
+            await this.plugin.saveSettings();
+          })
+      );
 
       new Setting(containerEl)
         .setName("Delimiter to hide a suggestion")

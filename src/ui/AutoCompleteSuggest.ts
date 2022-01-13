@@ -23,6 +23,7 @@ import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../CycleThroughSuggestionsKeys";
 import { suggestCh } from "../replacer";
+import { ColumnDelimiter } from "../ColumnDelimiter";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -96,7 +97,8 @@ export class AutoCompleteSuggest
       app,
       new CustomDictionaryWordProvider(
         app,
-        settings.customDictionaryPaths.split("\n").filter((x) => x)
+        settings.customDictionaryPaths.split("\n").filter((x) => x),
+        ColumnDelimiter.fromName(settings.columnDelimiter)
       )
     );
 
@@ -172,6 +174,7 @@ export class AutoCompleteSuggest
     this.app.workspace.offref(this.activeLeafChangeRef);
   }
 
+  // settings getters
   get tokenizerStrategy(): TokenizeStrategy {
     return TokenizeStrategy.fromName(this.settings.strategy);
   }
@@ -186,6 +189,7 @@ export class AutoCompleteSuggest
       this.tokenizerStrategy.triggerThreshold
     );
   }
+  // --- end ---
 
   get indexedWords(): IndexedWords {
     return {
@@ -197,8 +201,9 @@ export class AutoCompleteSuggest
 
   async updateSettings(settings: Settings) {
     this.settings = settings;
-    this.customDictionaryWordProvider.updatePaths(
-      settings.customDictionaryPaths.split("\n").filter((x) => x)
+    this.customDictionaryWordProvider.update(
+      settings.customDictionaryPaths.split("\n").filter((x) => x),
+      ColumnDelimiter.fromName(settings.columnDelimiter)
     );
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
     this.currentFileWordProvider = new CurrentFileWordProvider(
