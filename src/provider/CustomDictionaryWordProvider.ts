@@ -3,23 +3,46 @@ import { pushWord, Word, WordsByFirstLetter } from "./suggester";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
 
+function escape(value: string): string {
+  // This tricky logics for Safari
+  // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/56
+  return value
+    .replace(/\\/g, "__VariousComplementsEscape__")
+    .replace(/\n/g, "\\n")
+    .replace(/\t/g, "\\t")
+    .replace(/__VariousComplementsEscape__/g, "\\\\");
+}
+
+function unescape(value: string): string {
+  // This tricky logics for Safari
+  // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/56
+  return value
+    .replace(/\\\\/g, "__VariousComplementsEscape__")
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
+    .replace(/__VariousComplementsEscape__/g, "\\");
+}
+
 function lineToWord(line: string, delimiter: ColumnDelimiter): Word {
   const [value, description, ...aliases] = line.split(delimiter.value);
   return {
-    value,
+    value: unescape(value),
     description,
     aliases,
   };
 }
 
 function wordToLine(word: Word, delimiter: ColumnDelimiter): string {
+  const escapedValue = escape(word.value);
   if (!word.description && !word.aliases) {
-    return word.value;
+    return escapedValue;
   }
   if (!word.aliases) {
-    return [word.value, word.description].join(delimiter.value);
+    return [escapedValue, word.description].join(delimiter.value);
   }
-  return [word.value, word.description, ...word.aliases].join(delimiter.value);
+  return [escapedValue, word.description, ...word.aliases].join(
+    delimiter.value
+  );
 }
 
 export class CustomDictionaryWordProvider {
