@@ -21,9 +21,9 @@ import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordPr
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
-import { CycleThroughSuggestionsKeys } from "../CycleThroughSuggestionsKeys";
+import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
 import { suggestCh } from "../replacer";
-import { ColumnDelimiter } from "../ColumnDelimiter";
+import { ColumnDelimiter } from "../option/ColumnDelimiter";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;

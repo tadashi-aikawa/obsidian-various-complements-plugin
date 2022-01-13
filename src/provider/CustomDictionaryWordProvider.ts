@@ -1,7 +1,7 @@
 import { App, FileSystemAdapter, Notice, request } from "obsidian";
 import { keyBy } from "../util/collection-helper";
 import { pushWord, Word, WordsByFirstLetter } from "./suggester";
-import { ColumnDelimiter } from "../ColumnDelimiter";
+import { ColumnDelimiter } from "../option/ColumnDelimiter";
 
 function lineToWord(line: string, delimiter: ColumnDelimiter): Word {
   const [value, description, ...aliases] = line.split(delimiter.value);

@@ -2,8 +2,8 @@ import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import VariousComponents from "./main";
 import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "./provider/MatchStrategy";
-import { CycleThroughSuggestionsKeys } from "./CycleThroughSuggestionsKeys";
-import { ColumnDelimiter } from "./ColumnDelimiter";
+import { CycleThroughSuggestionsKeys } from "./option/CycleThroughSuggestionsKeys";
+import { ColumnDelimiter } from "./option/ColumnDelimiter";
 
 export interface Settings {
   // general
