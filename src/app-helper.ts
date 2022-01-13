@@ -30,6 +30,10 @@ export class AppHelper {
     return this.getMarkdownViewInActiveLeaf()?.editor ?? null;
   }
 
+  getSelection(): string | undefined {
+    return this.getCurrentEditor()?.getSelection();
+  }
+
   getCurrentLine(editor: Editor): string {
     return editor.getLine(editor.getCursor().line);
   }

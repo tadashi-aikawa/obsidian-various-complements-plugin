@@ -1,7 +1,7 @@
 import { App, FileSystemAdapter, Notice, request } from "obsidian";
-import { keyBy } from "../util/collection-helper";
 import { pushWord, Word, WordsByFirstLetter } from "./suggester";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
+import { isURL } from "../util/path";
 
 function lineToWord(line: string, delimiter: ColumnDelimiter): Word {
   const [value, description, ...aliases] = line.split(delimiter.value);
@@ -10,6 +10,16 @@ function lineToWord(line: string, delimiter: ColumnDelimiter): Word {
     description,
     aliases,
   };
+}
+
+function wordToLine(word: Word, delimiter: ColumnDelimiter): string {
+  if (!word.description && !word.aliases) {
+    return word.value;
+  }
+  if (!word.aliases) {
+    return [word.value, word.description].join(delimiter.value);
+  }
+  return [word.value, word.description, ...word.aliases].join(delimiter.value);
 }
 
 export class CustomDictionaryWordProvider {
@@ -29,13 +39,17 @@ export class CustomDictionaryWordProvider {
     this.delimiter = delimiter;
   }
 
+  get editablePaths(): string[] {
+    return this.paths.filter((x) => !isURL(x));
+  }
+
   update(paths: string[], delimiter: ColumnDelimiter): void {
     this.paths = paths;
     this.delimiter = delimiter;
   }
 
-  async loadWords(path: string): Promise<Word[]> {
-    const contents = path.match(new RegExp("^https?://"))
+  private async loadWords(path: string): Promise<Word[]> {
+    const contents = isURL(path)
       ? await request({ url: path })
       : await this.fileSystemAdapter.read(path);
 
@@ -62,13 +76,26 @@ export class CustomDictionaryWordProvider {
       }
     }
 
-    this.wordByValue = keyBy(this.words, (x) => x.value);
-    for (const word of this.words) {
-      pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
-      word.aliases?.forEach((a) =>
-        pushWord(this.wordsByFirstLetter, a.charAt(0), word)
-      );
-    }
+    this.words.forEach((x) => this.addWord(x));
+  }
+
+  async addWordWithDictionary(
+    word: Word,
+    dictionaryPath: string
+  ): Promise<void> {
+    this.addWord(word);
+    await this.fileSystemAdapter.append(
+      dictionaryPath,
+      "\n" + wordToLine(word, this.delimiter)
+    );
+  }
+
+  private addWord(word: Word) {
+    this.wordByValue[word.value] = word;
+    pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
+    word.aliases?.forEach((a) =>
+      pushWord(this.wordsByFirstLetter, a.charAt(0), word)
+    );
   }
 
   clearWords(): void {

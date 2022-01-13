@@ -1,4 +1,4 @@
-import { basename, dirname, extname } from "./path";
+import { basename, dirname, extname, isURL } from "./path";
 
 describe.each`
   path               | ext          | expected
@@ -55,5 +55,20 @@ describe.each`
 `("dirname", ({ path, expected }) => {
   test(`dirname(${path}) = ${expected}`, () => {
     expect(dirname(path)).toBe(expected);
+  });
+});
+
+describe.each`
+  path              | expected
+  ${"http://hoge"}  | ${true}
+  ${"https://hoge"} | ${true}
+  ${"file:///hoge"} | ${false}
+  ${"./hoge/hoge"}  | ${false}
+  ${"hoge/hoge"}    | ${false}
+  ${"./http/hoge"}  | ${false}
+  ${"http/hoge"}    | ${false}
+`("isURL", ({ path, expected }) => {
+  test(`isURL(${path}) = ${expected}`, () => {
+    expect(isURL(path)).toBe(expected);
   });
 });

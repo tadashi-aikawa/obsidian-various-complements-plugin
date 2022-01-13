@@ -57,3 +57,10 @@ export function arrayEqualsUntil(arr1: unknown[], arr2: unknown[]): number {
 
   return l - 1;
 }
+
+export function mirrorMap<T>(
+  collection: T[],
+  toValue: (t: T) => string
+): { [key: string]: string } {
+  return collection.reduce((p, c) => ({ ...p, [toValue(c)]: toValue(c) }), {});
+}

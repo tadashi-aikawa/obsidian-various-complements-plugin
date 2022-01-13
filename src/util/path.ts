@@ -11,3 +11,7 @@ export function extname(path: string): string {
 export function dirname(path: string): string {
   return path.match(/(.+)[\\/].+$/)?.[1] ?? ".";
 }
+
+export function isURL(path: string): boolean {
+  return Boolean(path.match(new RegExp("^https?://")));
+}

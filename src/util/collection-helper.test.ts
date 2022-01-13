@@ -1,7 +1,9 @@
 import {
-  arrayEquals, arrayEqualsUntil,
+  arrayEquals,
+  arrayEqualsUntil,
   groupBy,
   keyBy,
+  mirrorMap,
   uniq,
   uniqWith,
 } from "./collection-helper";
@@ -64,14 +66,24 @@ describe.each`
 });
 
 describe.each`
-  arr1                   | arr2                   |  expected
-  ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} |  ${2}
-  ${[]}                  | ${[]}                  |  ${-1}
-  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} |  ${1}
-  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} |  ${1}
-  ${["aa", "iii", "uu"]}       | ${["aa", "iii"]} |  ${1}
+  arr1                   | arr2                   | expected
+  ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} | ${2}
+  ${[]}                  | ${[]}                  | ${-1}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} | ${1}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} | ${1}
+  ${["aa", "iii", "uu"]} | ${["aa", "iii"]}       | ${1}
 `("arrayEqualsUntil", ({ arr1, arr2, expected }) => {
   test(`arrayEqualsUntil(${arr1}, ${arr2}) = ${expected}`, () => {
     expect(arrayEqualsUntil(arr1, arr2)).toStrictEqual(expected);
+  });
+});
+
+describe.each`
+  arr                           | toValue            | expected
+  ${["aa", "ii"]}               | ${(x: any) => x}   | ${{ aa: "aa", ii: "ii" }}
+  ${[{ s: "aa" }, { s: "ii" }]} | ${(x: any) => x.s} | ${{ aa: "aa", ii: "ii" }}
+`("mirrorMap", ({ arr, toValue, expected }) => {
+  test(`mirrorMap(${arr}, ${toValue}) = ${expected}`, () => {
+    expect(mirrorMap(arr, toValue)).toStrictEqual(expected);
   });
 });

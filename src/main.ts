@@ -5,8 +5,11 @@ import {
   Settings,
   VariousComplementsSettingTab,
 } from "./settings";
+import { CustomDictionaryWordRegisterModal } from "./ui/CustomDictionaryWordRegisterModal";
+import { AppHelper } from "./app-helper";
 
 export default class VariousComponents extends Plugin {
+  appHelper: AppHelper;
   settings: Settings;
   settingTab: VariousComplementsSettingTab;
   suggester: AutoCompleteSuggest;
@@ -17,6 +20,8 @@ export default class VariousComponents extends Plugin {
   }
 
   async onload() {
+    this.appHelper = new AppHelper(this.app);
+
     await this.loadSettings();
 
     this.settingTab = new VariousComplementsSettingTab(this.app, this);
@@ -58,6 +63,40 @@ export default class VariousComponents extends Plugin {
       hotkeys: [{ modifiers: ["Mod"], key: " " }],
       callback: async () => {
         this.suggester.triggerComplete();
+      },
+    });
+
+    this.addCommand({
+      id: "add-word-custom-dictionary",
+      name: "Add a word to a custom dictionary",
+      hotkeys: [{ modifiers: ["Mod", "Shift"], key: " " }],
+      callback: async () => {
+        const provider = this.suggester.customDictionaryWordProvider;
+        const selectedWord = this.appHelper.getSelection();
+
+        const modal = new CustomDictionaryWordRegisterModal(
+          this.app,
+          provider.editablePaths,
+          selectedWord,
+          async (dictionaryPath, word) => {
+            if (provider.wordByValue[word.value]) {
+              new Notice(`⚠ ${word.value} already exists`, 0);
+              return;
+            }
+
+            await provider.addWordWithDictionary(word, dictionaryPath);
+            new Notice(`☑ Added ${word.value}`);
+            modal.close();
+          }
+        );
+
+        modal.open();
+
+        if (selectedWord) {
+          modal.button.buttonEl.focus();
+        } else {
+          modal.wordTextArea.inputEl.focus();
+        }
       },
     });
 
