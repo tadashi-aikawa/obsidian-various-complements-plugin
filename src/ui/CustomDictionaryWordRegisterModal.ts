@@ -52,21 +52,21 @@ export class CustomDictionaryWordRegisterModal extends Modal {
           this.button.removeCta();
         }
       });
-    this.wordTextArea.inputEl.setAttribute("style", "width: 400px");
+    this.wordTextArea.inputEl.setAttribute("style", "min-width: 100%;");
 
     contentEl.createEl("h4", { text: "Description" });
     new TextComponent(contentEl)
       .onChange((v) => {
         this.description = v;
       })
-      .inputEl.setAttribute("style", "width: 400px");
+      .inputEl.setAttribute("style", "min-width: 100%;");
 
     contentEl.createEl("h4", { text: "Aliases (for each line)" });
     new TextAreaComponent(contentEl)
       .onChange((v) => {
         this.aliases = v.split("\n");
       })
-      .inputEl.setAttribute("style", "width: 400px");
+      .inputEl.setAttribute("style", "min-width: 100%;");
 
     this.button = new ButtonComponent(
       contentEl.createEl("div", {
