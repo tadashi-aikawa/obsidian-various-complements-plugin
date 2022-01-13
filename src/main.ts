@@ -85,7 +85,7 @@ export default class VariousComponents extends Plugin {
             }
 
             await provider.addWordWithDictionary(word, dictionaryPath);
-            new Notice(`☑ Added ${word.value}`);
+            new Notice(`Added ${word.value}`);
             modal.close();
           }
         );
