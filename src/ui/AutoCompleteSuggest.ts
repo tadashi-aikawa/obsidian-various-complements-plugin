@@ -24,6 +24,7 @@ import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
 import { suggestCh } from "../replacer";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
+import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -246,22 +247,25 @@ export class AutoCompleteSuggest
     this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
     this.keymapEventHandler = [];
 
-    // Cycle throw suggestions keys
-    const keys = CycleThroughSuggestionsKeys.fromName(
+    const cycleThroughSuggestionsKeys = CycleThroughSuggestionsKeys.fromName(
       this.settings.additionalCycleThroughSuggestionsKeys
     );
-    if (keys !== CycleThroughSuggestionsKeys.NONE) {
+    if (cycleThroughSuggestionsKeys !== CycleThroughSuggestionsKeys.NONE) {
       this.keymapEventHandler.push(
-        this.scope.register(keys.nextKey.modifiers, keys.nextKey.key, () => {
-          this.suggestions.setSelectedItem(
-            this.suggestions.selectedItem + 1,
-            true
-          );
-          return false;
-        }),
         this.scope.register(
-          keys.previousKey.modifiers,
-          keys.previousKey.key,
+          cycleThroughSuggestionsKeys.nextKey.modifiers,
+          cycleThroughSuggestionsKeys.nextKey.key,
+          () => {
+            this.suggestions.setSelectedItem(
+              this.suggestions.selectedItem + 1,
+              true
+            );
+            return false;
+          }
+        ),
+        this.scope.register(
+          cycleThroughSuggestionsKeys.previousKey.modifiers,
+          cycleThroughSuggestionsKeys.previousKey.key,
           () => {
             this.suggestions.setSelectedItem(
               this.suggestions.selectedItem - 1,
@@ -273,32 +277,48 @@ export class AutoCompleteSuggest
       );
     }
 
-    // Ignore if additionalCycleThroughSuggestionsKeys uses
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "Enter")!);
+    const selectSuggestionKey = SelectSuggestionKey.fromName(
+      this.settings.selectSuggestionKeys
+    );
+    if (selectSuggestionKey !== SelectSuggestionKey.ENTER) {
+      this.keymapEventHandler.push(
+        this.scope.register(
+          SelectSuggestionKey.ENTER.keyBind.modifiers,
+          SelectSuggestionKey.ENTER.keyBind.key,
+          () => {
+            this.close();
+            return true;
+          }
+        )
+      );
+    }
+    if (selectSuggestionKey !== SelectSuggestionKey.TAB) {
+      this.keymapEventHandler.push(
+        this.scope.register(
+          SelectSuggestionKey.TAB.keyBind.modifiers,
+          SelectSuggestionKey.TAB.keyBind.key,
+          () => {
+            this.close();
+            return true;
+          }
+        )
+      );
+    }
     this.keymapEventHandler.push(
-      this.scope.register([], "Tab", () => {
-        if (this.settings.ignoreTabKey) {
-          this.close();
-          return true;
+      this.scope.register(
+        selectSuggestionKey.keyBind.modifiers,
+        selectSuggestionKey.keyBind.key,
+        () => {
+          this.suggestions.useSelectedItem({});
+          return false;
         }
-
-        this.suggestions.useSelectedItem({});
-        return false;
-      })
+      )
     );
 
-    // overwrite
     this.scope.keys.find((x) => x.key === "Escape")!.func = () => {
       this.close();
       return this.settings.propagateEsc;
-    };
-    this.scope.keys.find((x) => x.key === "Enter")!.func = () => {
-      if (this.settings.ignoreEnterKey) {
-        this.close();
-        return true;
-      }
-
-      this.suggestions.useSelectedItem({});
-      return false;
     };
   }
 

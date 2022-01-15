@@ -4,6 +4,8 @@ import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "./provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "./option/CycleThroughSuggestionsKeys";
 import { ColumnDelimiter } from "./option/ColumnDelimiter";
+import { SelectSuggestionKey } from "./option/SelectSuggestionKey";
+import { mirrorMap } from "./util/collection-helper";
 
 export interface Settings {
   // general
@@ -17,10 +19,11 @@ export interface Settings {
   disableSuggestionsDuringImeOn: boolean;
   // FIXME: Rename at next major version up
   insertAfterCompletion: boolean;
-  ignoreEnterKey: boolean;
-  ignoreTabKey: boolean;
-  propagateEsc: boolean;
+
+  // key customization
+  selectSuggestionKeys: string;
   additionalCycleThroughSuggestionsKeys: string;
+  propagateEsc: boolean;
 
   // current file complement
   enableCurrentFileComplement: boolean;
@@ -52,10 +55,11 @@ export const DEFAULT_SETTINGS: Settings = {
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
   insertAfterCompletion: true,
-  ignoreEnterKey: false,
-  ignoreTabKey: false,
-  propagateEsc: false,
+
+  // key customization
+  selectSuggestionKeys: "Enter",
   additionalCycleThroughSuggestionsKeys: "None",
+  propagateEsc: false,
 
   // current file complement
   enableCurrentFileComplement: true,
@@ -214,47 +218,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         );
       });
 
-    new Setting(containerEl)
-      .setName("Ignore Enter key")
-      .setDesc(
-        "It is handy when you want to avoid selecting the suggestion by Enter key unintentionally"
-      )
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.ignoreEnterKey).onChange(
-          async (value) => {
-            this.plugin.settings.ignoreEnterKey = value;
-            await this.plugin.saveSettings();
-          }
-        );
-      });
+    containerEl.createEl("h3", { text: "Key customization" });
 
     new Setting(containerEl)
-      .setName("Ignore Tab key")
-      .setDesc(
-        "It is handy when you want to avoid selecting the suggestion by Tab key unintentionally"
-      )
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.ignoreTabKey).onChange(
-          async (value) => {
-            this.plugin.settings.ignoreTabKey = value;
+      .setName("Select a suggestion key")
+      .addDropdown((tc) =>
+        tc
+          .addOptions(mirrorMap(SelectSuggestionKey.values(), (x) => x.name))
+          .setValue(this.plugin.settings.selectSuggestionKeys)
+          .onChange(async (value) => {
+            this.plugin.settings.selectSuggestionKeys = value;
             await this.plugin.saveSettings();
-          }
-        );
-      });
-
-    new Setting(containerEl)
-      .setName("Propagate ESC")
-      .setDesc(
-        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not."
-      )
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.propagateEsc).onChange(
-          async (value) => {
-            this.plugin.settings.propagateEsc = value;
-            await this.plugin.saveSettings();
-          }
-        );
-      });
+          })
+      );
 
     new Setting(containerEl)
       .setName("Additional cycle through suggestions keys")
@@ -272,6 +248,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Propagate ESC")
+      .setDesc(
+        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not."
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.propagateEsc).onChange(
+          async (value) => {
+            this.plugin.settings.propagateEsc = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
 
     containerEl.createEl("h3", { text: "Current file complement" });
 

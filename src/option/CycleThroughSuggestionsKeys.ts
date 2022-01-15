@@ -1,6 +1,10 @@
 import { Modifier } from "obsidian";
 
-type Name = "None" | "Tab/Shift+Tab" | "Mod+N/Mod+P" | "Mod+J/Mod+K";
+type Name =
+  | "None"
+  | "Tab, Shift+Tab"
+  | "Ctrl/Cmd+N, Ctrl/Cmd+P"
+  | "Ctrl/Cmd+J, Ctrl/Cmd+K";
 interface KeyBind {
   modifiers: Modifier[];
   key: string | null;
@@ -15,17 +19,17 @@ export class CycleThroughSuggestionsKeys {
     { modifiers: [], key: null }
   );
   static readonly TAB = new CycleThroughSuggestionsKeys(
-    "Tab/Shift+Tab",
+    "Tab, Shift+Tab",
     { modifiers: [], key: "Tab" },
     { modifiers: ["Shift"], key: "Tab" }
   );
   static readonly EMACS = new CycleThroughSuggestionsKeys(
-    "Mod+N/Mod+P",
+    "Ctrl/Cmd+N, Ctrl/Cmd+P",
     { modifiers: ["Mod"], key: "N" },
     { modifiers: ["Mod"], key: "P" }
   );
   static readonly VIM = new CycleThroughSuggestionsKeys(
-    "Mod+J/Mod+K",
+    "Ctrl/Cmd+J, Ctrl/Cmd+K",
     { modifiers: ["Mod"], key: "J" },
     { modifiers: ["Mod"], key: "K" }
   );
