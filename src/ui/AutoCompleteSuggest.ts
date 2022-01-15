@@ -22,9 +22,9 @@ import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
-import { suggestCh } from "../replacer";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
+import { uniqWith } from "../util/collection-helper";
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
@@ -222,13 +222,34 @@ export class AutoCompleteSuggest
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
         const start = performance.now();
-        cb(
-          this.matchStrategy.handler(
-            this.indexedWords,
-            context.query,
-            this.settings.maxNumberOfSuggestions
+
+        const words = this.tokenizer
+          .recursiveTokenize(context.query)
+          .filter(
+            (x, i, xs) =>
+              this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
+                xs.length &&
+              x.word.length >= this.minNumberTriggered &&
+              !x.word.endsWith(" ")
           )
+          .map((q) =>
+            this.matchStrategy
+              .handler(
+                this.indexedWords,
+                q.word,
+                this.settings.maxNumberOfSuggestions
+              )
+              .map((word) => ({ ...word, offset: q.offset }))
+          )
+          .flat();
+
+        cb(
+          uniqWith(
+            words,
+            (a, b) => a.value === b.value && a.internalLink === b.internalLink
+          ).slice(0, this.settings.maxNumberOfSuggestions)
         );
+
         this.showDebugLog("Get suggestions", performance.now() - start);
       },
       this.settings.delayMilliSeconds,
@@ -380,6 +401,8 @@ export class AutoCompleteSuggest
     editor: Editor,
     file: TFile
   ): EditorSuggestTriggerInfo | null {
+    const start = performance.now();
+
     if (
       !this.settings.complementAutomatically &&
       !this.isOpen &&
@@ -398,25 +421,18 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    const currentChar = editor.getRange(
-      { line: cursor.line, ch: cursor.ch - 1 },
-      cursor
-    );
-    this.showDebugLog(`[onTrigger] currentChar is ${currentChar}`);
-    if (currentChar === " ") {
-      this.runManually = false;
-      this.showDebugLog(
-        "Don't show suggestions because currentChar is whitespace"
-      );
-      return null;
-    }
-
     const currentLineUntilCursor =
       this.appHelper.getCurrentLineUntilCursor(editor);
     const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
     this.showDebugLog(`[onTrigger] tokens is ${tokens}`);
 
-    const currentToken = tokens.last();
+    const tokenized = this.tokenizer.recursiveTokenize(currentLineUntilCursor);
+    const currentToken =
+      tokenized[
+        tokenized.length > this.settings.maxNumberOfWordsAsPhrase
+          ? tokenized.length - this.settings.maxNumberOfWordsAsPhrase
+          : 0
+      ]?.word;
     this.showDebugLog(`[onTrigger] currentToken is ${currentToken}`);
     if (!currentToken) {
       this.runManually = false;
@@ -434,41 +450,41 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    const trimmedCurrentToken = this.tokenizer.tokenize(currentToken)?.[0];
-    this.showDebugLog(
-      `[onTrigger] trimmedCurrentToken is ${trimmedCurrentToken}`
-    );
-    if (!trimmedCurrentToken) {
+    if (
+      currentToken.length === 1 &&
+      Boolean(currentToken.match(this.tokenizer.getTrimPattern()))
+    ) {
       this.runManually = false;
       this.showDebugLog(
-        `Don't show suggestions because trimmedCurrentToken is empty`
+        `Don't show suggestions because currentToken is TRIM_PATTERN`
       );
       return null;
     }
 
     if (!this.runManually) {
-      if (trimmedCurrentToken.length < this.minNumberTriggered) {
+      if (currentToken.length < this.minNumberTriggered) {
         this.showDebugLog(
-          "Don't show suggestions because trimmedCurrentToken is less than minNumberTriggered option"
+          "Don't show suggestions because currentToken is less than minNumberTriggered option"
         );
         return null;
       }
-      if (this.tokenizer.shouldIgnore(trimmedCurrentToken)) {
+      if (this.tokenizer.shouldIgnore(currentToken)) {
         this.showDebugLog(
-          "Don't show suggestions because trimmedCurrentToken should ignored"
+          "Don't show suggestions because currentToken should ignored"
         );
         return null;
       }
     }
 
+    this.showDebugLog("onTrigger", performance.now() - start);
     this.runManually = false;
     return {
       start: {
-        ch: cursor.ch - trimmedCurrentToken.length,
+        ch: cursor.ch - currentToken.length,
         line: cursor.line,
       },
       end: cursor,
-      query: trimmedCurrentToken,
+      query: currentToken,
     };
   }
 
@@ -537,9 +553,13 @@ export class AutoCompleteSuggest
     }
 
     const editor = this.context.editor;
+    console.log("word offset", word.offset);
     editor.replaceRange(
       insertedText,
-      this.suggestReplaceStartPosition(word, this.context),
+      {
+        ...this.context.start,
+        ch: this.context.start.ch + word.offset!,
+      },
       this.context.end
     );
 
@@ -555,29 +575,6 @@ export class AutoCompleteSuggest
 
     this.close();
     this.debounceClose();
-  }
-
-  private suggestReplaceStartPosition(
-    word: Word,
-    context: EditorSuggestContext
-  ): EditorPosition {
-    if (!this.settings.overwriteDuplicatedExistedPhrase) {
-      return context.start;
-    }
-
-    const currentLineUntilCursor = this.appHelper.getCurrentLineUntilCursor(
-      context.editor
-    );
-
-    return {
-      ...context.start,
-      ch: suggestCh(
-        this.tokenizer,
-        currentLineUntilCursor,
-        word.value,
-        context.start.ch
-      ),
-    };
   }
 
   private showDebugLog(message: string, msec?: number) {

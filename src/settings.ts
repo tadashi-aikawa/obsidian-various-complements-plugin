@@ -12,9 +12,10 @@ export interface Settings {
   strategy: string;
   matchStrategy: string;
   maxNumberOfSuggestions: number;
+  maxNumberOfWordsAsPhrase: number;
   minNumberOfCharactersTriggered: number;
+  minNumberOfWordsTriggeredPhrase: number;
   complementAutomatically: boolean;
-  overwriteDuplicatedExistedPhrase: boolean;
   delayMilliSeconds: number;
   disableSuggestionsDuringImeOn: boolean;
   // FIXME: Rename at next major version up
@@ -48,10 +49,12 @@ export const DEFAULT_SETTINGS: Settings = {
   // general
   strategy: "default",
   matchStrategy: "prefix",
+
   maxNumberOfSuggestions: 5,
+  maxNumberOfWordsAsPhrase: 3,
   minNumberOfCharactersTriggered: 0,
+  minNumberOfWordsTriggeredPhrase: 1,
   complementAutomatically: true,
-  overwriteDuplicatedExistedPhrase: false,
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
   insertAfterCompletion: true,
@@ -148,6 +151,25 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Max number of words as a phrase")
+      .addSlider((sc) =>
+        sc
+          .setLimits(1, 10, 1)
+          .setValue(this.plugin.settings.maxNumberOfWordsAsPhrase)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.maxNumberOfWordsAsPhrase = value;
+            await this.plugin.saveSettings();
+          })
+      );
+    if (this.plugin.settings.maxNumberOfWordsAsPhrase > 1) {
+      containerEl.createEl("div", {
+        text: `⚠ It makes slower more than ${this.plugin.settings.maxNumberOfWordsAsPhrase} times`,
+        cls: "various-complements__settings__warning",
+      });
+    }
+
+    new Setting(containerEl)
       .setName("Min number of characters for trigger")
       .setDesc("It uses a default value of Strategy if set 0.")
       .addSlider((sc) =>
@@ -162,6 +184,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Min number of words for trigger")
+      .addSlider((sc) =>
+        sc
+          .setLimits(1, 10, 1)
+          .setValue(this.plugin.settings.minNumberOfWordsTriggeredPhrase)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.minNumberOfWordsTriggeredPhrase = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Complement automatically")
       .addToggle((tc) => {
         tc.setValue(this.plugin.settings.complementAutomatically).onChange(
@@ -170,17 +205,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }
         );
-      });
-
-    new Setting(containerEl)
-      .setName("Overwrite duplicated existed phrase")
-      .addToggle((tc) => {
-        tc.setValue(
-          this.plugin.settings.overwriteDuplicatedExistedPhrase
-        ).onChange(async (value) => {
-          this.plugin.settings.overwriteDuplicatedExistedPhrase = value;
-          await this.plugin.saveSettings();
-        });
       });
 
     new Setting(containerEl)

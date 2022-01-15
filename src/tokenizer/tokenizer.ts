@@ -5,6 +5,7 @@ import { TokenizeStrategy } from "./TokenizeStrategy";
 
 export interface Tokenizer {
   tokenize(content: string, raw?: boolean): string[];
+  recursiveTokenize(content: string): { word: string; offset: number }[]
   getTrimPattern(): RegExp;
   shouldIgnore(query: string): boolean;
 }

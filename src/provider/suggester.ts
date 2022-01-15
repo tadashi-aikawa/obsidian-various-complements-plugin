@@ -1,8 +1,7 @@
 import {
   capitalizeFirstLetter,
-  lowerIncludesWithoutSpace,
+  lowerIncludes,
   lowerStartsWith,
-  lowerStartsWithoutSpace,
 } from "../util/strings";
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
@@ -14,6 +13,7 @@ export interface Word {
   internalLink?: boolean;
   // Add after judge
   matchedAlias?: string;
+  offset?: number;
 }
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
@@ -43,7 +43,7 @@ export function judge(
   query: string,
   queryStartWithUpper: boolean
 ): Judgement {
-  if (lowerStartsWithoutSpace(word.value, query)) {
+  if (lowerStartsWith(word.value, query)) {
     if (queryStartWithUpper && !word.internalLink) {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
@@ -51,9 +51,7 @@ export function judge(
       return { word: word, value: word.value, alias: false };
     }
   }
-  const matchedAlias = word.aliases?.find((a) =>
-    lowerStartsWithoutSpace(a, query)
-  );
+  const matchedAlias = word.aliases?.find((a) => lowerStartsWith(a, query));
   if (matchedAlias) {
     return {
       word: { ...word, matchedAlias },
@@ -120,7 +118,7 @@ export function judgeByPartialMatch(
   query: string,
   queryStartWithUpper: boolean
 ): Judgement {
-  if (lowerStartsWithoutSpace(word.value, query)) {
+  if (lowerStartsWith(word.value, query)) {
     if (queryStartWithUpper && !word.internalLink) {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
@@ -130,7 +128,7 @@ export function judgeByPartialMatch(
   }
 
   const matchedAliasStarts = word.aliases?.find((a) =>
-    lowerStartsWithoutSpace(a, query)
+    lowerStartsWith(a, query)
   );
   if (matchedAliasStarts) {
     return {
@@ -140,12 +138,12 @@ export function judgeByPartialMatch(
     };
   }
 
-  if (lowerIncludesWithoutSpace(word.value, query)) {
+  if (lowerIncludes(word.value, query)) {
     return { word: word, value: word.value, alias: false };
   }
 
   const matchedAliasIncluded = word.aliases?.find((a) =>
-    lowerIncludesWithoutSpace(a, query)
+    lowerIncludes(a, query)
   );
   if (matchedAliasIncluded) {
     return {
