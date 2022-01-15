@@ -152,6 +152,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Max number of words as a phrase")
+      .setDesc(`[⚠Warning] It makes slower more than N times (N is set value)`)
       .addSlider((sc) =>
         sc
           .setLimits(1, 10, 1)
@@ -162,12 +163,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
-    if (this.plugin.settings.maxNumberOfWordsAsPhrase > 1) {
-      containerEl.createEl("div", {
-        text: `⚠ It makes slower more than ${this.plugin.settings.maxNumberOfWordsAsPhrase} times`,
-        cls: "various-complements__settings__warning",
-      });
-    }
 
     new Setting(containerEl)
       .setName("Min number of characters for trigger")
