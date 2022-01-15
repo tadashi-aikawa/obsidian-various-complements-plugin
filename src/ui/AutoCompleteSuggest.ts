@@ -391,10 +391,9 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    const tokens = this.tokenizer.tokenize(
-      editor.getLine(cursor.line).slice(0, cursor.ch),
-      true
-    );
+    const currentLineUntilCursor =
+      this.appHelper.getCurrentLineUntilCursor(editor);
+    const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
     this.showDebugLog(`[onTrigger] tokens is ${tokens}`);
 
     const currentToken = tokens.last();
@@ -405,10 +404,12 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    if (currentToken[0].match(this.tokenizer.getTrimPattern())) {
+    const currentTokenSeparatedWhiteSpace =
+      currentLineUntilCursor.split(" ").last() ?? "";
+    if (/^[:\/^]/.test(currentTokenSeparatedWhiteSpace)) {
       this.runManually = false;
       this.showDebugLog(
-        `Don't show suggestions for avoiding to conflict with the slash command.`
+        `Don't show suggestions for avoiding to conflict with the other commands.`
       );
       return null;
     }
