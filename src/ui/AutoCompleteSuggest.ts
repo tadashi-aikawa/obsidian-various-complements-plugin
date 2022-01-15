@@ -64,6 +64,8 @@ export class AutoCompleteSuggest
   runManually: boolean;
   declare isOpen: boolean;
 
+  contextStartCh: number;
+
   // unsafe!!
   scope: UnsafeEditorSuggestInterface["scope"];
   suggestions: UnsafeEditorSuggestInterface["suggestions"];
@@ -478,9 +480,12 @@ export class AutoCompleteSuggest
 
     this.showDebugLog("onTrigger", performance.now() - start);
     this.runManually = false;
+
+    // For multi-word completion
+    this.contextStartCh = cursor.ch - currentToken.length;
     return {
       start: {
-        ch: cursor.ch - currentToken.length,
+        ch: cursor.ch - (tokenized.last()?.word?.length ?? 0), // For multi-word completion
         line: cursor.line,
       },
       end: cursor,
@@ -553,12 +558,11 @@ export class AutoCompleteSuggest
     }
 
     const editor = this.context.editor;
-    console.log("word offset", word.offset);
     editor.replaceRange(
       insertedText,
       {
         ...this.context.start,
-        ch: this.context.start.ch + word.offset!,
+        ch: this.contextStartCh + word.offset!,
       },
       this.context.end
     );
