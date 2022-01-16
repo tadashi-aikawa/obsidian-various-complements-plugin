@@ -232,6 +232,7 @@ export class AutoCompleteSuggest
               this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
                 xs.length &&
               x.word.length >= this.minNumberTriggered &&
+              !this.tokenizer.shouldIgnore(x.word) &&
               !x.word.endsWith(" ")
           )
           .map((q) =>
