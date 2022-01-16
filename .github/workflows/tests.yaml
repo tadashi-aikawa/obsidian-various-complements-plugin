@@ -30,7 +30,7 @@ jobs:
           description: "⚠ Various Complements Tests failed!"
           footer: "Node.js v16"
           severity: error
-          avatarUrl: https://cdn.otamart.com/item-picture/26205822/0-1574353123758.jpg
+          avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
   notify:
@@ -45,5 +45,5 @@ jobs:
           description: "✅ Various Complements Tests passed!"
           footer: "Node.js v16"
           severity: info
-          avatarUrl: https://cdn.otamart.com/item-picture/26205822/0-1574353123758.jpg
+          avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
