@@ -35,7 +35,7 @@ jobs:
           description: "⚠ Various Complements Release failed!"
           details: "${{ github.ref }}"
           severity: error
-          avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
+          avatarUrl: https://assets.wprock.fr/emoji/joypixels/512/1f680.png
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
   notify:
@@ -50,5 +50,5 @@ jobs:
           description: "🚀 Various Complements Release finished!"
           details: "${{ github.ref }}"
           severity: info
-          avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
+          avatarUrl: https://assets.wprock.fr/emoji/joypixels/512/1f680.png
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
