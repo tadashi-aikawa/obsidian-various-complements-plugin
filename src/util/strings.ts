@@ -11,12 +11,24 @@ export function excludeEmoji(text: string): string {
   return text.replace(regEmoji, "");
 }
 
+export function excludeSpace(text: string): string {
+  return text.replace(/ /g, "");
+}
+
 export function lowerIncludes(one: string, other: string): boolean {
   return one.toLowerCase().includes(other.toLowerCase());
 }
 
+export function lowerIncludesWithoutSpace(one: string, other: string): boolean {
+  return lowerIncludes(excludeSpace(one), excludeSpace(other));
+}
+
 export function lowerStartsWith(a: string, b: string): boolean {
   return a.toLowerCase().startsWith(b.toLowerCase());
+}
+
+export function lowerStartsWithoutSpace(one: string, other: string): boolean {
+  return lowerStartsWith(excludeSpace(one), excludeSpace(other));
 }
 
 export function capitalizeFirstLetter(str: string): string {
