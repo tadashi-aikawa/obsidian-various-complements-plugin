@@ -50,6 +50,36 @@ export class AppHelper {
     );
   }
 
+  getMarkdownFileByPath(path: string): TFile | null {
+    if (!path.endsWith(".md")) {
+      return null;
+    }
+
+    const abstractFile = this.app.vault.getAbstractFileByPath(path);
+    if (!abstractFile) {
+      return null;
+    }
+
+    return abstractFile as TFile;
+  }
+
+  openMarkdownFile(file: TFile, newLeaf: boolean, offset: number = 0) {
+    const leaf = this.app.workspace.getLeaf(newLeaf);
+
+    leaf
+      .openFile(file, this.app.workspace.activeLeaf?.getViewState())
+      .then(() => {
+        this.app.workspace.setActiveLeaf(leaf, true, true);
+        const viewOfType = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (viewOfType) {
+          const editor = viewOfType.editor;
+          const pos = editor.offsetToPos(offset);
+          editor.setCursor(pos);
+          editor.scrollIntoView({ from: pos, to: pos }, true);
+        }
+      });
+  }
+
   /**
    * Unsafe method
    */

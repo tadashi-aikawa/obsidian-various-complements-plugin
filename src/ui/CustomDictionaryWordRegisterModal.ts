@@ -2,12 +2,15 @@ import {
   App,
   ButtonComponent,
   DropdownComponent,
+  ExtraButtonComponent,
   Modal,
+  Notice,
   TextAreaComponent,
   TextComponent,
 } from "obsidian";
 import { mirrorMap } from "../util/collection-helper";
 import { Word } from "../provider/suggester";
+import { AppHelper } from "../app-helper";
 
 export class CustomDictionaryWordRegisterModal extends Modal {
   currentDictionaryPath: string;
@@ -17,6 +20,7 @@ export class CustomDictionaryWordRegisterModal extends Modal {
 
   wordTextArea: TextAreaComponent;
   button: ButtonComponent;
+  openFileButton: ExtraButtonComponent;
 
   constructor(
     app: App,
@@ -25,6 +29,7 @@ export class CustomDictionaryWordRegisterModal extends Modal {
     onClickAdd: (dictionaryPath: string, word: Word) => void
   ) {
     super(app);
+    const appHelper = new AppHelper(app);
     this.currentDictionaryPath = dictionaryPaths[0];
     this.value = initialValue;
 
@@ -39,6 +44,25 @@ export class CustomDictionaryWordRegisterModal extends Modal {
       .onChange((v) => {
         this.currentDictionaryPath = v;
       });
+    this.openFileButton = new ExtraButtonComponent(contentEl)
+      .setIcon("enter")
+      .setTooltip("Open the file")
+      .onClick(() => {
+        const markdownFile = appHelper.getMarkdownFileByPath(
+          this.currentDictionaryPath
+        );
+        if (!markdownFile) {
+          new Notice(`Can't open ${this.currentDictionaryPath}`);
+          return;
+        }
+
+        this.close();
+        appHelper.openMarkdownFile(markdownFile, true);
+      });
+    this.openFileButton.extraSettingsEl.setAttribute(
+      "style",
+      "display: inline"
+    );
 
     contentEl.createEl("h4", { text: "Word" });
     this.wordTextArea = new TextAreaComponent(contentEl)
