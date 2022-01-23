@@ -426,6 +426,22 @@ export class AutoCompleteSuggest
 
     const currentLineUntilCursor =
       this.appHelper.getCurrentLineUntilCursor(editor);
+    if (currentLineUntilCursor.startsWith("---")) {
+      this.showDebugLog(
+        "Don't show suggestions because it supposes front matter or horizontal line"
+      );
+      return null;
+    }
+    if (
+      currentLineUntilCursor.startsWith("~~~") ||
+      currentLineUntilCursor.startsWith("```")
+    ) {
+      this.showDebugLog(
+        "Don't show suggestions because it supposes front code block"
+      );
+      return null;
+    }
+
     const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
     this.showDebugLog(`[onTrigger] tokens is ${tokens}`);
 
