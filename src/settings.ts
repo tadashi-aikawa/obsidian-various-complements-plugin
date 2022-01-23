@@ -396,6 +396,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           async (value) => {
             this.plugin.settings.enableInternalLinkComplement = value;
             await this.plugin.saveSettings({ internalLink: true });
+            this.display();
           }
         );
       });
