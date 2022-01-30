@@ -225,8 +225,13 @@ export class AutoCompleteSuggest
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
         const start = performance.now();
 
-        const words = this.tokenizer
-          .recursiveTokenize(context.query)
+        this.showDebugLog(`[context.query]: ${context.query}`);
+        const queries = JSON.parse(context.query) as {
+          word: string;
+          offset: number;
+        }[];
+
+        const words = queries
           .filter(
             (x, i, xs) =>
               this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
@@ -446,12 +451,16 @@ export class AutoCompleteSuggest
     this.showDebugLog(`[onTrigger] tokens is ${tokens}`);
 
     const tokenized = this.tokenizer.recursiveTokenize(currentLineUntilCursor);
-    const currentToken =
-      tokenized[
-        tokenized.length > this.settings.maxNumberOfWordsAsPhrase
-          ? tokenized.length - this.settings.maxNumberOfWordsAsPhrase
-          : 0
-      ]?.word;
+    const currentTokens = tokenized.slice(
+      tokenized.length > this.settings.maxNumberOfWordsAsPhrase
+        ? tokenized.length - this.settings.maxNumberOfWordsAsPhrase
+        : 0
+    );
+    this.showDebugLog(
+      `[onTrigger] currentTokens is ${JSON.stringify(currentTokens)}`
+    );
+
+    const currentToken = currentTokens[0]?.word;
     this.showDebugLog(`[onTrigger] currentToken is ${currentToken}`);
     if (!currentToken) {
       this.runManually = false;
@@ -506,7 +515,12 @@ export class AutoCompleteSuggest
         line: cursor.line,
       },
       end: cursor,
-      query: currentToken,
+      query: JSON.stringify(
+        currentTokens.map((x) => ({
+          ...x,
+          offset: x.offset - currentTokens[0].offset,
+        }))
+      ),
     };
   }
 
