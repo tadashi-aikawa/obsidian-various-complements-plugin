@@ -26,6 +26,10 @@ import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { uniqWith } from "../util/collection-helper";
 
+function buildLogMessage(message: string, msec: number) {
+  return `${message}: ${Math.round(msec)}[ms]`;
+}
+
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
   customDictionary: WordsByFirstLetter;
@@ -225,7 +229,7 @@ export class AutoCompleteSuggest
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
         const start = performance.now();
 
-        this.showDebugLog(`[context.query]: ${context.query}`);
+        this.showDebugLog(() => `[context.query]: ${context.query}`);
         const queries = JSON.parse(context.query) as {
           word: string;
           offset: number;
@@ -258,7 +262,9 @@ export class AutoCompleteSuggest
           ).slice(0, this.settings.maxNumberOfSuggestions)
         );
 
-        this.showDebugLog("Get suggestions", performance.now() - start);
+        this.showDebugLog(() =>
+          buildLogMessage("Get suggestions", performance.now() - start)
+        );
       },
       this.settings.delayMilliSeconds,
       true
@@ -356,9 +362,11 @@ export class AutoCompleteSuggest
 
     if (!this.settings.enableCurrentFileComplement) {
       this.currentFileWordProvider.clearWords();
-      this.showDebugLog(
-        "👢 Skip: Index current file tokens",
-        performance.now() - start
+      this.showDebugLog(() =>
+        buildLogMessage(
+          "👢 Skip: Index current file tokens",
+          performance.now() - start
+        )
       );
       return;
     }
@@ -366,7 +374,9 @@ export class AutoCompleteSuggest
     await this.currentFileWordProvider.refreshWords(
       this.settings.onlyComplementEnglishOnCurrentFileComplement
     );
-    this.showDebugLog("Index current file tokens", performance.now() - start);
+    this.showDebugLog(() =>
+      buildLogMessage("Index current file tokens", performance.now() - start)
+    );
   }
 
   async refreshCustomDictionaryTokens(): Promise<void> {
@@ -374,17 +384,21 @@ export class AutoCompleteSuggest
 
     if (!this.settings.enableCustomDictionaryComplement) {
       this.customDictionaryWordProvider.clearWords();
-      this.showDebugLog(
-        "👢Skip: Index custom dictionary tokens",
-        performance.now() - start
+      this.showDebugLog(() =>
+        buildLogMessage(
+          "👢Skip: Index custom dictionary tokens",
+          performance.now() - start
+        )
       );
       return;
     }
 
     await this.customDictionaryWordProvider.refreshCustomWords();
-    this.showDebugLog(
-      "Index custom dictionary tokens",
-      performance.now() - start
+    this.showDebugLog(() =>
+      buildLogMessage(
+        "Index custom dictionary tokens",
+        performance.now() - start
+      )
     );
   }
 
@@ -393,15 +407,19 @@ export class AutoCompleteSuggest
 
     if (!this.settings.enableInternalLinkComplement) {
       this.internalLinkWordProvider.clearWords();
-      this.showDebugLog(
-        "👢Skip: Index internal link tokens",
-        performance.now() - start
+      this.showDebugLog(() =>
+        buildLogMessage(
+          "👢Skip: Index internal link tokens",
+          performance.now() - start
+        )
       );
       return;
     }
 
     this.internalLinkWordProvider.refreshWords();
-    this.showDebugLog("Index internal link tokens", performance.now() - start);
+    this.showDebugLog(() =>
+      buildLogMessage("Index internal link tokens", performance.now() - start)
+    );
   }
 
   onTrigger(
@@ -416,7 +434,7 @@ export class AutoCompleteSuggest
       !this.isOpen &&
       !this.runManually
     ) {
-      this.showDebugLog("Don't show suggestions");
+      this.showDebugLog(() => "Don't show suggestions");
       return null;
     }
 
@@ -425,7 +443,7 @@ export class AutoCompleteSuggest
       this.appHelper.isIMEOn() &&
       !this.runManually
     ) {
-      this.showDebugLog("Don't show suggestions for IME");
+      this.showDebugLog(() => "Don't show suggestions for IME");
       return null;
     }
 
@@ -433,7 +451,8 @@ export class AutoCompleteSuggest
       this.appHelper.getCurrentLineUntilCursor(editor);
     if (currentLineUntilCursor.startsWith("---")) {
       this.showDebugLog(
-        "Don't show suggestions because it supposes front matter or horizontal line"
+        () =>
+          "Don't show suggestions because it supposes front matter or horizontal line"
       );
       return null;
     }
@@ -442,13 +461,13 @@ export class AutoCompleteSuggest
       currentLineUntilCursor.startsWith("```")
     ) {
       this.showDebugLog(
-        "Don't show suggestions because it supposes front code block"
+        () => "Don't show suggestions because it supposes front code block"
       );
       return null;
     }
 
     const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
-    this.showDebugLog(`[onTrigger] tokens is ${tokens}`);
+    this.showDebugLog(() => `[onTrigger] tokens is ${tokens}`);
 
     const tokenized = this.tokenizer.recursiveTokenize(currentLineUntilCursor);
     const currentTokens = tokenized.slice(
@@ -457,14 +476,16 @@ export class AutoCompleteSuggest
         : 0
     );
     this.showDebugLog(
-      `[onTrigger] currentTokens is ${JSON.stringify(currentTokens)}`
+      () => `[onTrigger] currentTokens is ${JSON.stringify(currentTokens)}`
     );
 
     const currentToken = currentTokens[0]?.word;
-    this.showDebugLog(`[onTrigger] currentToken is ${currentToken}`);
+    this.showDebugLog(() => `[onTrigger] currentToken is ${currentToken}`);
     if (!currentToken) {
       this.runManually = false;
-      this.showDebugLog(`Don't show suggestions because currentToken is empty`);
+      this.showDebugLog(
+        () => `Don't show suggestions because currentToken is empty`
+      );
       return null;
     }
 
@@ -473,7 +494,8 @@ export class AutoCompleteSuggest
     if (/^[:\/^]/.test(currentTokenSeparatedWhiteSpace)) {
       this.runManually = false;
       this.showDebugLog(
-        `Don't show suggestions for avoiding to conflict with the other commands.`
+        () =>
+          `Don't show suggestions for avoiding to conflict with the other commands.`
       );
       return null;
     }
@@ -484,7 +506,7 @@ export class AutoCompleteSuggest
     ) {
       this.runManually = false;
       this.showDebugLog(
-        `Don't show suggestions because currentToken is TRIM_PATTERN`
+        () => `Don't show suggestions because currentToken is TRIM_PATTERN`
       );
       return null;
     }
@@ -492,19 +514,22 @@ export class AutoCompleteSuggest
     if (!this.runManually) {
       if (currentToken.length < this.minNumberTriggered) {
         this.showDebugLog(
-          "Don't show suggestions because currentToken is less than minNumberTriggered option"
+          () =>
+            "Don't show suggestions because currentToken is less than minNumberTriggered option"
         );
         return null;
       }
       if (this.tokenizer.shouldIgnore(currentToken)) {
         this.showDebugLog(
-          "Don't show suggestions because currentToken should ignored"
+          () => "Don't show suggestions because currentToken should ignored"
         );
         return null;
       }
     }
 
-    this.showDebugLog("onTrigger", performance.now() - start);
+    this.showDebugLog(() =>
+      buildLogMessage("onTrigger", performance.now() - start)
+    );
     this.runManually = false;
 
     // For multi-word completion
@@ -612,13 +637,9 @@ export class AutoCompleteSuggest
     this.debounceClose();
   }
 
-  private showDebugLog(message: string, msec?: number) {
+  private showDebugLog(toMessage: () => string) {
     if (this.settings.showLogAboutPerformanceInConsole) {
-      if (msec !== undefined) {
-        console.log(`${message}: ${Math.round(msec)}[ms]`);
-      } else {
-        console.log(message);
-      }
+      console.log(toMessage());
     }
   }
 }
