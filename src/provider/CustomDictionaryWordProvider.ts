@@ -29,6 +29,7 @@ function lineToWord(line: string, delimiter: ColumnDelimiter): Word {
     value: unescape(value),
     description,
     aliases,
+    type: "customDictionary",
   };
 }
 

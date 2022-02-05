@@ -11,39 +11,49 @@ import { IndexedWords } from "../ui/AutoCompleteSuggest";
 
 describe("pushWord", () => {
   const createWordsByFirstLetter = (): WordsByFirstLetter => ({
-    a: [{ value: "aaa" }, { value: "aa" }],
+    a: [
+      { value: "aaa", type: "currentFile" },
+      { value: "aa", type: "currentFile" },
+    ],
   });
 
   test("add", () => {
     const wordsByFirstLetter = createWordsByFirstLetter();
-    pushWord(wordsByFirstLetter, "u", { value: "uuu" });
+    pushWord(wordsByFirstLetter, "u", { value: "uuu", type: "currentFile" });
     expect(wordsByFirstLetter).toStrictEqual({
-      a: [{ value: "aaa" }, { value: "aa" }],
-      u: [{ value: "uuu" }],
+      a: [
+        { value: "aaa", type: "currentFile" },
+        { value: "aa", type: "currentFile" },
+      ],
+      u: [{ value: "uuu", type: "currentFile" }],
     });
   });
 
   test("push", () => {
     const wordsByFirstLetter = createWordsByFirstLetter();
-    pushWord(wordsByFirstLetter, "a", { value: "a" });
+    pushWord(wordsByFirstLetter, "a", { value: "a", type: "currentFile" });
     expect(wordsByFirstLetter).toStrictEqual({
-      a: [{ value: "aaa" }, { value: "aa" }, { value: "a" }],
+      a: [
+        { value: "aaa", type: "currentFile" },
+        { value: "aa", type: "currentFile" },
+        { value: "a", type: "currentFile" },
+      ],
     });
   });
 });
 
 describe.each`
-  word                                         | query   | queryStartWithUpper | expected
-  ${{ value: "abcde" }}                        | ${"ab"} | ${false}            | ${{ word: { value: "abcde" }, value: "abcde", alias: false }}
-  ${{ value: "abcde" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde" }, alias: false }}
-  ${{ value: "abcde", aliases: ["ab"] }}       | ${"ab"} | ${false}            | ${{ word: { value: "abcde", aliases: ["ab"] }, value: "abcde", alias: false }}
-  ${{ value: "abcde", internalLink: true }}    | ${"ab"} | ${false}            | ${{ word: { value: "abcde", internalLink: true }, value: "abcde", alias: false }}
-  ${{ value: "abcde" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde" }, value: "Abcde", alias: false }}
-  ${{ value: "abcde" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde" }, alias: false }}
-  ${{ value: "abcde", internalLink: true }}    | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", internalLink: true }, value: "abcde", alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc" }, value: "abc", alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"] }, alias: false }}
-  ${{ value: "abcde" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde" }, alias: false }}
+  word                                                                   | query   | queryStartWithUpper | expected
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ word: { value: "abcde", aliases: ["ab"], type: "customDictionary" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ word: { value: "abcde", type: "internalLink" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde", type: "customDictionary" }, value: "Abcde", alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", type: "internalLink" }, value: "abcde", alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc", type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
 `("judge", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judge(${JSON.stringify(
     word
@@ -53,17 +63,17 @@ describe.each`
 });
 
 describe.each`
-  word                                         | query   | queryStartWithUpper | expected
-  ${{ value: "abcde" }}                        | ${"ab"} | ${false}            | ${{ word: { value: "abcde" }, value: "abcde", alias: false }}
-  ${{ value: "abcde" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde" }, value: "abcde", alias: false }}
-  ${{ value: "abcde", aliases: ["ab"] }}       | ${"ab"} | ${false}            | ${{ word: { value: "abcde", aliases: ["ab"] }, value: "abcde", alias: false }}
-  ${{ value: "abcde", internalLink: true }}    | ${"ab"} | ${false}            | ${{ word: { value: "abcde", internalLink: true }, value: "abcde", alias: false }}
-  ${{ value: "abcde" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde" }, value: "Abcde", alias: false }}
-  ${{ value: "abcde" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde" }, value: "abcde", alias: false }}
-  ${{ value: "abcde", internalLink: true }}    | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", internalLink: true }, value: "abcde", alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc" }, value: "abc", alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"] }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc" }, value: "abc", alias: true }}
-  ${{ value: "abcde" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde" }, alias: false }}
+  word                                                                   | query   | queryStartWithUpper | expected
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ word: { value: "abcde", aliases: ["ab"], type: "customDictionary" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ word: { value: "abcde", type: "internalLink" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde", type: "customDictionary" }, value: "Abcde", alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, value: "abcde", alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", type: "internalLink" }, value: "abcde", alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc", type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc", type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
 `("judgeByPartialMatch", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judgeByPartialMatch(${JSON.stringify(
     word
@@ -77,144 +87,173 @@ describe.each`
 describe("suggestWords", () => {
   const createIndexedWords = (): IndexedWords => ({
     currentFile: {
-      a: [{ value: "ai" }, { value: "aiUEO" }],
+      a: [
+        { value: "ai", type: "currentFile" },
+        { value: "aiUEO", type: "currentFile" },
+      ],
     },
     customDictionary: {
-      a: [{ value: "uwaa", aliases: ["aaa"] }, { value: "aiUEO" }],
-      A: [{ value: "AWS" }],
-      u: [{ value: "uwaa", aliases: ["aaa"] }],
-      U: [{ value: "UFO", aliases: ["Unidentified flying object"] }],
+      a: [
+        { value: "uwaa", aliases: ["aaa"], type: "customDictionary" },
+        { value: "aiUEO", type: "customDictionary" },
+      ],
+      A: [{ value: "AWS", type: "customDictionary" }],
+      u: [{ value: "uwaa", aliases: ["aaa"], type: "customDictionary" }],
+      U: [
+        {
+          value: "UFO",
+          aliases: ["Unidentified flying object"],
+          type: "customDictionary",
+        },
+      ],
     },
     internalLink: {
       a: [
-        { value: "aiUEO", internalLink: true },
-        { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+        { value: "aiUEO", type: "internalLink" },
+        { value: "あいうえお", type: "internalLink", aliases: ["aiueo"] },
       ],
       A: [
-        { value: "AWS", internalLink: true },
-        { value: "AI", internalLink: true },
+        { value: "AWS", type: "internalLink" },
+        { value: "AI", type: "internalLink" },
       ],
-      あ: [{ value: "あいうえお", internalLink: true, aliases: ["aiueo"] }],
+      あ: [{ value: "あいうえお", type: "internalLink", aliases: ["aiueo"] }],
     },
   });
 
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "a", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "ai" },
-      { value: "AWS", internalLink: true },
-      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "ai", type: "currentFile" },
+      { value: "AWS", type: "internalLink" },
+      {
+        value: "uwaa",
+        aliases: ["aaa"],
+        matchedAlias: "aaa",
+        type: "customDictionary",
+      },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
+        type: "internalLink",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "ai", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "ai" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "ai", type: "currentFile" },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
+        type: "internalLink",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: aiu", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "aiu", 10)).toStrictEqual([
-      { value: "aiUEO", internalLink: true },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
+        type: "internalLink",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "A", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "Ai" },
-      { value: "AWS", internalLink: true },
-      { value: "AWS" },
-      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "Ai", type: "currentFile" },
+      { value: "AWS", type: "internalLink" },
+      { value: "AWS", type: "customDictionary" },
+      {
+        value: "uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        matchedAlias: "aaa",
+      },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "Ai", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "Ai" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "Ai", type: "currentFile" },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "AI", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "Ai" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "Ai", type: "currentFile" },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: AIU", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "AIU", 10)).toStrictEqual([
-      { value: "aiUEO", internalLink: true },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: u", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "u", 10)).toStrictEqual([
-      { value: "uwaa", aliases: ["aaa"] },
+      { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
     ]);
   });
 
@@ -223,23 +262,25 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "U", 10)).toStrictEqual([
       {
         value: "UFO",
+        type: "customDictionary",
         aliases: ["Unidentified flying object"],
       },
-      { value: "Uwaa", aliases: ["aaa"] },
+      { value: "Uwaa", type: "customDictionary", aliases: ["aaa"] },
     ]);
   });
 
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "a", 3)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "ai" },
-      { value: "AWS", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "ai", type: "currentFile" },
+      { value: "AWS", type: "internalLink" },
       // --- hidden ---
-      // { value: "uwaa", aliases: ["aaa"] },
-      // { value: "aiUEO", internalLink: true },
-      // { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
-      // { value: "aiUEO" },
+      // { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
+      // { value: "aiUEO", type: "internalLink" },
+      // { value: "あいうえお", type: "internalLink", aliases: ["aiueo"] },
+      // { value: "aiUEO", type: "customDictionary" },
+      // { value: "aiUEO", type: "currentFile" },
     ]);
   });
 });
@@ -247,179 +288,218 @@ describe("suggestWords", () => {
 describe("suggestWordsByPartialMatch", () => {
   const createIndexedWords = (): IndexedWords => ({
     currentFile: {
-      a: [{ value: "ai" }, { value: "aiUEO" }],
+      a: [
+        { value: "ai", type: "currentFile" },
+        { value: "aiUEO", type: "currentFile" },
+      ],
     },
     customDictionary: {
-      a: [{ value: "uwaa", aliases: ["aaa"] }, { value: "aiUEO" }],
-      A: [{ value: "AWS" }],
-      u: [{ value: "uwaa", aliases: ["aaa"] }],
-      U: [{ value: "UFO", aliases: ["Unidentified flying object"] }],
+      a: [
+        { value: "uwaa", aliases: ["aaa"], type: "customDictionary" },
+        { value: "aiUEO", type: "customDictionary" },
+      ],
+      A: [{ value: "AWS", type: "customDictionary" }],
+      u: [{ value: "uwaa", aliases: ["aaa"], type: "customDictionary" }],
+      U: [
+        {
+          value: "UFO",
+          aliases: ["Unidentified flying object"],
+          type: "customDictionary",
+        },
+      ],
     },
     internalLink: {
       a: [
-        { value: "aiUEO", internalLink: true },
-        { value: "あいうえお", internalLink: true, aliases: ["aiueo"] },
+        { value: "aiUEO", type: "internalLink" },
+        { value: "あいうえお", type: "internalLink", aliases: ["aiueo"] },
       ],
       A: [
-        { value: "AWS", internalLink: true },
-        { value: "AI", internalLink: true },
+        { value: "AWS", type: "internalLink" },
+        { value: "AI", type: "internalLink" },
       ],
-      あ: [{ value: "あいうえお", internalLink: true, aliases: ["aiueo"] }],
+      あ: [{ value: "あいうえお", type: "internalLink", aliases: ["aiueo"] }],
     },
   });
 
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "a", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "ai" },
-      { value: "AWS", internalLink: true },
-      { value: "AWS" },
-      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "ai", type: "currentFile" },
+      { value: "AWS", type: "internalLink" },
+      { value: "AWS", type: "customDictionary" },
+      {
+        value: "uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        matchedAlias: "aaa",
+      },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      // ??? currentFile
     ]);
   });
 
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "ai", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "ai" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "ai", type: "currentFile" },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: aiu", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "aiu", 10)).toStrictEqual([
-      { value: "aiUEO", internalLink: true },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "A", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "Ai" },
-      { value: "AWS", internalLink: true },
-      { value: "AWS" },
-      { value: "uwaa", aliases: ["aaa"], matchedAlias: "aaa" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "Ai", type: "currentFile" },
+      { value: "AWS", type: "internalLink" },
+      { value: "AWS", type: "customDictionary" },
+      {
+        value: "uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        matchedAlias: "aaa",
+      },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      // ??? currentFile
     ]);
   });
 
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "Ai", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "Ai" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "Ai", type: "currentFile" },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "AI", 10)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "Ai" },
-      { value: "aiUEO", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "Ai", type: "currentFile" },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: AIU", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "AIU", 10)).toStrictEqual([
-      { value: "aiUEO", internalLink: true },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "AiUEO" },
+      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: u", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "u", 10)).toStrictEqual([
-      { value: "UFO", aliases: ["Unidentified flying object"] },
-      { value: "uwaa", aliases: ["aaa"] },
-      { value: "aiUEO", internalLink: true },
+      {
+        value: "UFO",
+        type: "customDictionary",
+        aliases: ["Unidentified flying object"],
+      },
+      { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("Query: U", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "U", 10)).toStrictEqual([
-      { value: "UFO", aliases: ["Unidentified flying object"] },
-      { value: "Uwaa", aliases: ["aaa"] },
-      { value: "aiUEO", internalLink: true },
+      {
+        value: "UFO",
+        type: "customDictionary",
+        aliases: ["Unidentified flying object"],
+      },
+      { value: "Uwaa", type: "customDictionary", aliases: ["aaa"] },
+      { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
-        internalLink: true,
+        type: "internalLink",
         aliases: ["aiueo"],
         matchedAlias: "aiueo",
       },
-      { value: "aiUEO" },
+      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "currentFile" },
     ]);
   });
 
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "a", 3)).toStrictEqual([
-      { value: "AI", internalLink: true },
-      { value: "ai" },
-      { value: "AWS", internalLink: true },
+      { value: "AI", type: "internalLink" },
+      { value: "ai", type: "currentFile" },
+      { value: "AWS", type: "internalLink" },
     ]);
   });
 });

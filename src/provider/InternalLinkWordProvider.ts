@@ -1,5 +1,5 @@
 import { App } from "obsidian";
-import { pushWord, Word, WordsByFirstLetter } from "./suggester";
+import { pushWord, Word, WordsByFirstLetter, WordType } from "./suggester";
 import { AppHelper } from "../app-helper";
 import { excludeEmoji } from "../util/strings";
 
@@ -14,7 +14,7 @@ export class InternalLinkWordProvider {
 
     const resolvedInternalLinkWords = this.app.vault
       .getMarkdownFiles()
-      .map((x) => {
+      .flatMap((x) => {
         const lessEmojiValue = excludeEmoji(x.basename);
         const aliases =
           x.basename === lessEmojiValue
@@ -24,7 +24,7 @@ export class InternalLinkWordProvider {
           value: x.basename,
           aliases,
           description: x.path,
-          internalLink: true,
+          type: "internalLink" as WordType,
         };
       });
 
@@ -37,7 +37,7 @@ export class InternalLinkWordProvider {
           value: text,
           aliases,
           description: "Not created yet",
-          internalLink: true,
+          type: "internalLink" as WordType,
         };
       });
 

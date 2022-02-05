@@ -107,6 +107,7 @@ export class CustomDictionaryWordRegisterModal extends Modal {
           value: this.value,
           description: this.description,
           aliases: this.aliases,
+          type: "customDictionary",
         });
       });
     if (this.value) {

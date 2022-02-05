@@ -42,6 +42,7 @@ export class CurrentFileWordProvider {
       .filter((x) => x !== currentToken)
       .map((x) => ({
         value: x,
+        type: "currentFile",
       }));
     this.wordsByFirstLetter = groupBy(this.words, (x) => x.value.charAt(0));
   }

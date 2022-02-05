@@ -7,11 +7,13 @@ import {
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
 
+export type WordType = "currentFile" | "customDictionary" | "internalLink";
+
 export interface Word {
   value: string;
   description?: string;
   aliases?: string[];
-  internalLink?: boolean;
+  type: WordType;
   // Add after judge
   matchedAlias?: string;
   offset?: number;
@@ -45,7 +47,7 @@ export function judge(
   queryStartWithUpper: boolean
 ): Judgement {
   if (lowerStartsWithoutSpace(word.value, query)) {
-    if (queryStartWithUpper && !word.internalLink) {
+    if (queryStartWithUpper && word.type !== "internalLink") {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
     } else {
@@ -96,8 +98,8 @@ export function suggestWords(
       if (a.value!.length !== b.value!.length) {
         return a.value!.length > b.value!.length ? 1 : -1;
       }
-      if (a.word.internalLink !== b.word.internalLink) {
-        return b.word.internalLink ? 1 : -1;
+      if (a.word.type !== b.word.type) {
+        return b.word.type === "internalLink" ? 1 : -1;
       }
       if (a.alias !== b.alias) {
         return a.alias ? 1 : -1;
@@ -110,7 +112,7 @@ export function suggestWords(
   // XXX: There is no guarantee that equals with max, but it is important for performance
   return uniqWith(
     candidate,
-    (a, b) => a.value === b.value && a.internalLink === b.internalLink
+    (a, b) => a.value === b.value && a.type === b.type
   );
 }
 
@@ -122,7 +124,7 @@ export function judgeByPartialMatch(
   queryStartWithUpper: boolean
 ): Judgement {
   if (lowerStartsWithoutSpace(word.value, query)) {
-    if (queryStartWithUpper && !word.internalLink) {
+    if (queryStartWithUpper && word.type !== "internalLink") {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
     } else {
@@ -186,8 +188,8 @@ export function suggestWordsByPartialMatch(
       if (a.value!.length !== b.value!.length) {
         return a.value!.length > b.value!.length ? 1 : -1;
       }
-      if (a.word.internalLink !== b.word.internalLink) {
-        return b.word.internalLink ? 1 : -1;
+      if (a.word.type !== b.word.type) {
+        return b.word.type === "internalLink" ? 1 : -1;
       }
       if (a.alias !== b.alias) {
         return a.alias ? 1 : -1;
@@ -200,6 +202,6 @@ export function suggestWordsByPartialMatch(
   // XXX: There is no guarantee that equals with max, but it is important for performance
   return uniqWith(
     candidate,
-    (a, b) => a.value === b.value && a.internalLink === b.internalLink
+    (a, b) => a.value === b.value && a.type === b.type
   );
 }

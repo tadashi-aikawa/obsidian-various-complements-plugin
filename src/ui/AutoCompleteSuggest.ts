@@ -122,7 +122,7 @@ export class AutoCompleteSuggest
         ins.refreshInternalLinkTokens();
       }
     );
-    // Avoid to refer incomplete cache
+    // Avoid referring to incorrect cache
     const cacheResolvedRef = app.metadataCache.on("resolved", () => {
       ins.refreshInternalLinkTokens();
       ins.app.metadataCache.offref(cacheResolvedRef);
@@ -258,7 +258,7 @@ export class AutoCompleteSuggest
         cb(
           uniqWith(
             words,
-            (a, b) => a.value === b.value && a.internalLink === b.internalLink
+            (a, b) => a.value === b.value && a.type === b.type
           ).slice(0, this.settings.maxNumberOfSuggestions)
         );
 
@@ -560,7 +560,7 @@ export class AutoCompleteSuggest
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
     let text = word.value;
-    if (word.internalLink) {
+    if (word.type === "internalLink") {
       text =
         this.settings.suggestInternalLinkWithAlias && word.matchedAlias
           ? `[[${word.value}|${word.matchedAlias}]]`
@@ -591,7 +591,7 @@ export class AutoCompleteSuggest
     }
 
     let insertedText = word.value;
-    if (word.internalLink) {
+    if (word.type === "internalLink") {
       insertedText =
         this.settings.suggestInternalLinkWithAlias && word.matchedAlias
           ? `[[${insertedText}|${word.matchedAlias}]]`
