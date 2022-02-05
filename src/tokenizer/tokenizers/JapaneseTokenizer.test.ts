@@ -19,6 +19,7 @@ describe.each`
   ${"aa:bb:cc"}          | ${[{ word: "aa:bb:cc", offset: 0 }, { word: "bb:cc", offset: 3 }, { word: "cc", offset: 6 }]}
   ${"イーディス旧市街"}  | ${[{ word: "イーディス旧市街", offset: 0 }, { word: "旧市街", offset: 5 }, { word: "市街", offset: 6 }]}
   ${"イーディス 旧市街"} | ${[{ word: "イーディス 旧市街", offset: 0 }, { word: "旧市街", offset: 6 }, { word: "市街", offset: 7 }]}
+  ${"## @smi"}           | ${[{ word: "## @smi", offset: 0 }, { word: "# @smi", offset: 1 }, { word: "@smi", offset: 3 }, { word: "smi", offset: 4 }]}
 `("recursiveTokenize", ({ content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
     expect(

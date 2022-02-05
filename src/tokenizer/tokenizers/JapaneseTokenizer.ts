@@ -20,7 +20,12 @@ export class JapaneseTokenizer implements Tokenizer {
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
-    const tokens: string[] = segmenter.segment(content);
+    const tokens: string[] = segmenter
+      .segment(content)
+      // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/77
+      .flatMap((x: string) =>
+        x === " " ? x : x.split(" ").map((t) => (t === "" ? " " : t))
+      );
 
     const ret = [];
     for (let i = 0; i < tokens.length; i++) {
