@@ -583,6 +583,21 @@ export class AutoCompleteSuggest
     }
 
     el.appendChild(base);
+
+    switch (word.type) {
+      case "currentFile":
+        el.addClass("various-complements__suggestion-item-current-vault");
+        break;
+      case "customDictionary":
+        el.addClass("various-complements__suggestion-item-custom-dictionary");
+        break;
+      case "internalLink":
+        el.addClass("various-complements__suggestion-item-internal-link");
+        if (word.phantom) {
+          el.addClass("various-complements__suggestion-item-phantom");
+        }
+        break;
+    }
   }
 
   selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {

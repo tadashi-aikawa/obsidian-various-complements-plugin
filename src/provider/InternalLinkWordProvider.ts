@@ -38,6 +38,7 @@ export class InternalLinkWordProvider {
           aliases,
           description: "Not created yet",
           type: "internalLink" as WordType,
+          phantom: true,
         };
       });
 

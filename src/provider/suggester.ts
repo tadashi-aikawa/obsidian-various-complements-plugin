@@ -9,7 +9,7 @@ import { uniqWith } from "../util/collection-helper";
 
 export type WordType = "currentFile" | "customDictionary" | "internalLink";
 
-export interface Word {
+export interface DefaultWord {
   value: string;
   description?: string;
   aliases?: string[];
@@ -18,6 +18,18 @@ export interface Word {
   matchedAlias?: string;
   offset?: number;
 }
+export interface CurrentFileWord extends DefaultWord {
+  type: "currentFile";
+}
+export interface CustomDictionaryWord extends DefaultWord {
+  type: "customDictionary";
+}
+export interface InternalLinkWord extends DefaultWord {
+  type: "internalLink";
+  phantom?: boolean;
+}
+
+export type Word = CurrentFileWord | CustomDictionaryWord | InternalLinkWord;
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
