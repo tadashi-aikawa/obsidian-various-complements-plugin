@@ -15,7 +15,6 @@ export interface DefaultWord {
   aliases?: string[];
   type: WordType;
   // Add after judge
-  matchedAlias?: string;
   offset?: number;
 }
 export interface CurrentFileWord extends DefaultWord {
@@ -27,6 +26,9 @@ export interface CustomDictionaryWord extends DefaultWord {
 export interface InternalLinkWord extends DefaultWord {
   type: "internalLink";
   phantom?: boolean;
+  aliasMeta?: {
+    origin: string;
+  };
 }
 
 export type Word = CurrentFileWord | CustomDictionaryWord | InternalLinkWord;
@@ -71,7 +73,7 @@ export function judge(
   );
   if (matchedAlias) {
     return {
-      word: { ...word, matchedAlias },
+      word: { ...word },
       value: matchedAlias,
       alias: true,
     };
@@ -149,7 +151,7 @@ export function judgeByPartialMatch(
   );
   if (matchedAliasStarts) {
     return {
-      word: { ...word, matchedAlias: matchedAliasStarts },
+      word: { ...word },
       value: matchedAliasStarts,
       alias: true,
     };
@@ -164,7 +166,7 @@ export function judgeByPartialMatch(
   );
   if (matchedAliasIncluded) {
     return {
-      word: { ...word, matchedAlias: matchedAliasIncluded },
+      word: { ...word },
       value: matchedAliasIncluded,
       alias: true,
     };

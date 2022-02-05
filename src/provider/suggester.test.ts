@@ -51,7 +51,7 @@ describe.each`
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde", type: "customDictionary" }, value: "Abcde", alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", type: "internalLink" }, value: "abcde", alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc", type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
   ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
 `("judge", ({ word, query, queryStartWithUpper, expected }) => {
@@ -71,8 +71,8 @@ describe.each`
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ word: { value: "Abcde", type: "customDictionary" }, value: "Abcde", alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, value: "abcde", alias: false }}
   ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ word: { value: "abcde", type: "internalLink" }, value: "abcde", alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc", type: "customDictionary" }, value: "abc", alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], matchedAlias: "abc", type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
 `("judgeByPartialMatch", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judgeByPartialMatch(${JSON.stringify(
@@ -129,14 +129,14 @@ describe("suggestWords", () => {
       {
         value: "uwaa",
         aliases: ["aaa"],
-        matchedAlias: "aaa",
+
         type: "customDictionary",
       },
       { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
+
         type: "internalLink",
       },
       { value: "aiUEO", type: "customDictionary" },
@@ -153,7 +153,7 @@ describe("suggestWords", () => {
       {
         value: "あいうえお",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
+
         type: "internalLink",
       },
       { value: "aiUEO", type: "customDictionary" },
@@ -168,7 +168,7 @@ describe("suggestWords", () => {
       {
         value: "あいうえお",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
+
         type: "internalLink",
       },
       { value: "aiUEO", type: "customDictionary" },
@@ -187,14 +187,12 @@ describe("suggestWords", () => {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
-        matchedAlias: "aaa",
       },
       { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -211,7 +209,6 @@ describe("suggestWords", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -228,7 +225,6 @@ describe("suggestWords", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -243,7 +239,6 @@ describe("suggestWords", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -332,14 +327,12 @@ describe("suggestWordsByPartialMatch", () => {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
-        matchedAlias: "aaa",
       },
       { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "aiUEO", type: "customDictionary" },
       // ??? currentFile
@@ -356,7 +349,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "aiUEO", type: "customDictionary" },
       { value: "aiUEO", type: "currentFile" },
@@ -371,7 +363,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "aiUEO", type: "customDictionary" },
       { value: "aiUEO", type: "currentFile" },
@@ -389,14 +380,12 @@ describe("suggestWordsByPartialMatch", () => {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
-        matchedAlias: "aaa",
       },
       { value: "aiUEO", type: "internalLink" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       // ??? currentFile
@@ -413,7 +402,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -430,7 +418,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -445,7 +432,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "AiUEO", type: "customDictionary" },
       { value: "AiUEO", type: "currentFile" },
@@ -466,7 +452,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "aiUEO", type: "customDictionary" },
       { value: "aiUEO", type: "currentFile" },
@@ -487,7 +472,6 @@ describe("suggestWordsByPartialMatch", () => {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
-        matchedAlias: "aiueo",
       },
       { value: "aiUEO", type: "customDictionary" },
       { value: "aiUEO", type: "currentFile" },

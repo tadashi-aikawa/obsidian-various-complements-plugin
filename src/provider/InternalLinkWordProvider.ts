@@ -9,35 +9,61 @@ export class InternalLinkWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  refreshWords(): void {
+  refreshWords(wordAsInternalLinkAlias: boolean): void {
     this.clearWords();
+
+    const synonymAliases = (name: string): string[] => {
+      const lessEmojiValue = excludeEmoji(name);
+      return name === lessEmojiValue ? [] : [lessEmojiValue];
+    };
 
     const resolvedInternalLinkWords = this.app.vault
       .getMarkdownFiles()
       .flatMap((x) => {
-        const lessEmojiValue = excludeEmoji(x.basename);
-        const aliases =
-          x.basename === lessEmojiValue
-            ? this.appHelper.getAliases(x)
-            : [lessEmojiValue, ...this.appHelper.getAliases(x)];
-        return {
-          value: x.basename,
-          aliases,
-          description: x.path,
-          type: "internalLink" as WordType,
-        };
+        const aliases = this.appHelper.getAliases(x);
+
+        if (wordAsInternalLinkAlias) {
+          return [
+            {
+              value: x.basename,
+              type: "internalLink" as WordType,
+              aliases: synonymAliases(x.basename),
+              description: x.path,
+            },
+            ...aliases.map((a) => ({
+              value: a,
+              type: "internalLink" as WordType,
+              aliases: synonymAliases(a),
+              description: x.path,
+              aliasMeta: {
+                origin: x.basename,
+              },
+            })),
+          ];
+        } else {
+          return [
+            {
+              value: x.basename,
+              type: "internalLink" as WordType,
+              aliases: [
+                ...synonymAliases(x.basename),
+                ...aliases,
+                ...aliases.flatMap(synonymAliases),
+              ],
+              description: x.path,
+            },
+          ];
+        }
       });
 
     const unresolvedInternalLinkWords = this.appHelper
       .searchPhantomLinks()
       .map((text) => {
-        const lessEmojiValue = excludeEmoji(text);
-        const aliases = text === lessEmojiValue ? undefined : [lessEmojiValue];
         return {
           value: text,
-          aliases,
-          description: "Not created yet",
           type: "internalLink" as WordType,
+          aliases: synonymAliases(text),
+          description: "Not created yet",
           phantom: true,
         };
       });

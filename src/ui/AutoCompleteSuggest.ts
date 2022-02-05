@@ -416,7 +416,9 @@ export class AutoCompleteSuggest
       return;
     }
 
-    this.internalLinkWordProvider.refreshWords();
+    this.internalLinkWordProvider.refreshWords(
+      this.settings.suggestInternalLinkWithAlias
+    );
     this.showDebugLog(() =>
       buildLogMessage("Index internal link tokens", performance.now() - start)
     );
@@ -560,12 +562,6 @@ export class AutoCompleteSuggest
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
     let text = word.value;
-    if (word.type === "internalLink") {
-      text =
-        this.settings.suggestInternalLinkWithAlias && word.matchedAlias
-          ? `[[${word.value}|${word.matchedAlias}]]`
-          : `[[${word.value}]]`;
-    }
 
     base.createDiv({
       text:
@@ -573,11 +569,15 @@ export class AutoCompleteSuggest
         text.includes(this.settings.delimiterToHideSuggestion)
           ? `${text.split(this.settings.delimiterToHideSuggestion)[0]} ...`
           : text,
+      cls:
+        word.type === "internalLink" && word.aliasMeta
+          ? "various-complements__suggestion-item__content__alias"
+          : undefined,
     });
 
     if (word.description) {
       base.createDiv({
-        cls: "various-complements__suggest__description",
+        cls: "various-complements__suggestion-item__description",
         text: `${word.description}`,
       });
     }
@@ -586,15 +586,15 @@ export class AutoCompleteSuggest
 
     switch (word.type) {
       case "currentFile":
-        el.addClass("various-complements__suggestion-item-current-vault");
+        el.addClass("various-complements__suggestion-item__current-vault");
         break;
       case "customDictionary":
-        el.addClass("various-complements__suggestion-item-custom-dictionary");
+        el.addClass("various-complements__suggestion-item__custom-dictionary");
         break;
       case "internalLink":
-        el.addClass("various-complements__suggestion-item-internal-link");
+        el.addClass("various-complements__suggestion-item__internal-link");
         if (word.phantom) {
-          el.addClass("various-complements__suggestion-item-phantom");
+          el.addClass("various-complements__suggestion-item__phantom");
         }
         break;
     }
@@ -608,9 +608,9 @@ export class AutoCompleteSuggest
     let insertedText = word.value;
     if (word.type === "internalLink") {
       insertedText =
-        this.settings.suggestInternalLinkWithAlias && word.matchedAlias
-          ? `[[${insertedText}|${word.matchedAlias}]]`
-          : `[[${insertedText}]]`;
+        this.settings.suggestInternalLinkWithAlias && word.aliasMeta
+          ? `[[${word.aliasMeta.origin}|${word.value}]]`
+          : `[[${word.value}]]`;
     }
     if (this.settings.insertAfterCompletion) {
       insertedText = `${insertedText} `;
