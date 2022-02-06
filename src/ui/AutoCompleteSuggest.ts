@@ -25,6 +25,7 @@ import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKe
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { uniqWith } from "../util/collection-helper";
+import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -32,6 +33,7 @@ function buildLogMessage(message: string, msec: number) {
 
 export type IndexedWords = {
   currentFile: WordsByFirstLetter;
+  currentVault: WordsByFirstLetter;
   customDictionary: WordsByFirstLetter;
   internalLink: WordsByFirstLetter;
 };
@@ -56,6 +58,7 @@ export class AutoCompleteSuggest
   appHelper: AppHelper;
 
   currentFileWordProvider: CurrentFileWordProvider;
+  currentVaultWordProvider: CurrentVaultWordProvider;
   customDictionaryWordProvider: CustomDictionaryWordProvider;
   internalLinkWordProvider: InternalLinkWordProvider;
 
@@ -78,13 +81,9 @@ export class AutoCompleteSuggest
   modifyEventRef: EventRef;
   activeLeafChangeRef: EventRef;
 
-  private constructor(
-    app: App,
-    customDictionarySuggester: CustomDictionaryWordProvider
-  ) {
+  private constructor(app: App) {
     super(app);
     this.appHelper = new AppHelper(app);
-    this.customDictionaryWordProvider = customDictionarySuggester;
   }
 
   triggerComplete() {
@@ -100,17 +99,20 @@ export class AutoCompleteSuggest
   }
 
   static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
-    const ins = new AutoCompleteSuggest(
+    const ins = new AutoCompleteSuggest(app);
+
+    ins.customDictionaryWordProvider = new CustomDictionaryWordProvider(
       app,
-      new CustomDictionaryWordProvider(
-        app,
-        settings.customDictionaryPaths.split("\n").filter((x) => x),
-        ColumnDelimiter.fromName(settings.columnDelimiter)
-      )
+      settings.customDictionaryPaths.split("\n").filter((x) => x),
+      ColumnDelimiter.fromName(settings.columnDelimiter)
     );
 
-    await ins.updateSettings(settings);
-    await ins.refreshCustomDictionaryTokens();
+    await ins.updateSettings(settings, {
+      currentFile: true,
+      currentVault: true,
+      customDictionary: true,
+      internalLink: true,
+    });
 
     ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
@@ -123,8 +125,13 @@ export class AutoCompleteSuggest
       }
     );
     // Avoid referring to incorrect cache
-    const cacheResolvedRef = app.metadataCache.on("resolved", () => {
+    const cacheResolvedRef = app.metadataCache.on("resolved", async () => {
       ins.refreshInternalLinkTokens();
+      // noinspection ES6MissingAwait
+      ins.refreshCustomDictionaryTokens();
+      // noinspection ES6MissingAwait
+      ins.refreshCurrentVaultTokens();
+
       ins.app.metadataCache.offref(cacheResolvedRef);
     });
 
@@ -201,29 +208,51 @@ export class AutoCompleteSuggest
   get indexedWords(): IndexedWords {
     return {
       currentFile: this.currentFileWordProvider.wordsByFirstLetter,
+      currentVault: this.currentVaultWordProvider.wordsByFirstLetter,
       customDictionary: this.customDictionaryWordProvider.wordsByFirstLetter,
       internalLink: this.internalLinkWordProvider.wordsByFirstLetter,
     };
   }
 
-  async updateSettings(settings: Settings) {
+  async updateSettings(
+    settings: Settings,
+    needUpdate: {
+      currentFile?: boolean;
+      currentVault?: boolean;
+      customDictionary?: boolean;
+      internalLink?: boolean;
+    } = {}
+  ) {
     this.settings = settings;
-    this.customDictionaryWordProvider.update(
-      settings.customDictionaryPaths.split("\n").filter((x) => x),
-      ColumnDelimiter.fromName(settings.columnDelimiter)
-    );
+
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
-    this.currentFileWordProvider = new CurrentFileWordProvider(
-      this.app,
-      this.appHelper,
-      this.tokenizer
-    );
-    await this.refreshCurrentFileTokens();
-    this.internalLinkWordProvider = new InternalLinkWordProvider(
-      this.app,
-      this.appHelper
-    );
-    await this.refreshInternalLinkTokens();
+    if (needUpdate.currentFile) {
+      this.currentFileWordProvider = new CurrentFileWordProvider(
+        this.app,
+        this.appHelper,
+        this.tokenizer
+      );
+    }
+    if (needUpdate.currentVault) {
+      this.currentVaultWordProvider = new CurrentVaultWordProvider(
+        this.app,
+        this.appHelper,
+        this.tokenizer
+      );
+    }
+    if (needUpdate.customDictionary) {
+      this.customDictionaryWordProvider = new CustomDictionaryWordProvider(
+        this.app,
+        settings.customDictionaryPaths.split("\n").filter((x) => x),
+        ColumnDelimiter.fromName(settings.columnDelimiter)
+      );
+    }
+    if (needUpdate.internalLink) {
+      this.internalLinkWordProvider = new InternalLinkWordProvider(
+        this.app,
+        this.appHelper
+      );
+    }
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
@@ -376,6 +405,27 @@ export class AutoCompleteSuggest
     );
     this.showDebugLog(() =>
       buildLogMessage("Index current file tokens", performance.now() - start)
+    );
+  }
+
+  async refreshCurrentVaultTokens(): Promise<void> {
+    const start = performance.now();
+
+    if (!this.settings.enableCurrentVaultComplement) {
+      this.currentVaultWordProvider.clearWords();
+      this.showDebugLog(() =>
+        buildLogMessage(
+          "👢 Skip: Index current vault tokens",
+          performance.now() - start
+        )
+      );
+      return;
+    }
+
+    await this.currentVaultWordProvider.refreshWords();
+
+    this.showDebugLog(() =>
+      buildLogMessage("Index current vault tokens", performance.now() - start)
     );
   }
 
@@ -586,6 +636,9 @@ export class AutoCompleteSuggest
 
     switch (word.type) {
       case "currentFile":
+        el.addClass("various-complements__suggestion-item__current-file");
+        break;
+      case "currentVault":
         el.addClass("various-complements__suggestion-item__current-vault");
         break;
       case "customDictionary":

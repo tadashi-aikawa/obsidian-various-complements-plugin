@@ -7,7 +7,11 @@ import {
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
 
-export type WordType = "currentFile" | "customDictionary" | "internalLink";
+export type WordType =
+  | "currentFile"
+  | "currentVault"
+  | "customDictionary"
+  | "internalLink";
 
 export interface DefaultWord {
   value: string;
@@ -20,6 +24,9 @@ export interface DefaultWord {
 export interface CurrentFileWord extends DefaultWord {
   type: "currentFile";
 }
+export interface CurrentVaultWord extends DefaultWord {
+  type: "currentVault";
+}
 export interface CustomDictionaryWord extends DefaultWord {
   type: "customDictionary";
 }
@@ -31,7 +38,11 @@ export interface InternalLinkWord extends DefaultWord {
   };
 }
 
-export type Word = CurrentFileWord | CustomDictionaryWord | InternalLinkWord;
+export type Word =
+  | CurrentFileWord
+  | CurrentVaultWord
+  | CustomDictionaryWord
+  | InternalLinkWord;
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
@@ -93,6 +104,8 @@ export function suggestWords(
     ? [
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
         ...(indexedWords.currentFile[query.charAt(0).toLowerCase()] ?? []),
+        ...(indexedWords.currentVault[query.charAt(0)] ?? []),
+        ...(indexedWords.currentVault[query.charAt(0).toLowerCase()] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
@@ -100,6 +113,7 @@ export function suggestWords(
       ]
     : [
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
+        ...(indexedWords.currentVault[query.charAt(0)] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
@@ -186,6 +200,7 @@ export function suggestWordsByPartialMatch(
     Object.values(object).flat();
   const words = [
     ...flatObjectValues(indexedWords.currentFile),
+    ...flatObjectValues(indexedWords.currentVault),
     ...flatObjectValues(indexedWords.customDictionary),
     ...flatObjectValues(indexedWords.internalLink),
   ];

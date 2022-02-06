@@ -108,6 +108,7 @@ export default class VariousComponents extends Plugin {
         await navigator.clipboard.writeText(
           this.settingTab.getPluginSettingsAsJsonString()
         );
+        // noinspection ObjectAllocationIgnored
         new Notice("Copy settings of Various Complements");
       },
     });
@@ -120,14 +121,18 @@ export default class VariousComponents extends Plugin {
   async saveSettings(
     needUpdateTokens: {
       currentFile?: boolean;
+      currentVault?: boolean;
       customDictionary?: boolean;
       internalLink?: boolean;
     } = {}
   ): Promise<void> {
     await this.saveData(this.settings);
-    await this.suggester.updateSettings(this.settings);
+    await this.suggester.updateSettings(this.settings, needUpdateTokens);
     if (needUpdateTokens.currentFile) {
       await this.suggester.refreshCurrentFileTokens();
+    }
+    if (needUpdateTokens.currentVault) {
+      await this.suggester.refreshCurrentVaultTokens();
     }
     if (needUpdateTokens.customDictionary) {
       await this.suggester.refreshCustomDictionaryTokens();
@@ -150,11 +155,13 @@ export default class VariousComponents extends Plugin {
       selectedWord,
       async (dictionaryPath, word) => {
         if (provider.wordByValue[word.value]) {
+          // noinspection ObjectAllocationIgnored
           new Notice(`⚠ ${word.value} already exists`, 0);
           return;
         }
 
         await provider.addWordWithDictionary(word, dictionaryPath);
+        // noinspection ObjectAllocationIgnored
         new Notice(`Added ${word.value}`);
         modal.close();
       }

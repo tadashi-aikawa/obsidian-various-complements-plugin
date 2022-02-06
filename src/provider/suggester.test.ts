@@ -92,6 +92,7 @@ describe("suggestWords", () => {
         { value: "aiUEO", type: "currentFile" },
       ],
     },
+    currentVault: {},
     customDictionary: {
       a: [
         { value: "uwaa", aliases: ["aaa"], type: "customDictionary" },
@@ -288,6 +289,7 @@ describe("suggestWordsByPartialMatch", () => {
         { value: "aiUEO", type: "currentFile" },
       ],
     },
+    currentVault: {},
     customDictionary: {
       a: [
         { value: "uwaa", aliases: ["aaa"], type: "customDictionary" },

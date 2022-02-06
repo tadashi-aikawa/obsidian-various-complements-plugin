@@ -30,6 +30,9 @@ export interface Settings {
   enableCurrentFileComplement: boolean;
   onlyComplementEnglishOnCurrentFileComplement: boolean;
 
+  // current vault complement
+  enableCurrentVaultComplement: boolean;
+
   // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
   customDictionaryPaths: string;
@@ -67,6 +70,9 @@ export const DEFAULT_SETTINGS: Settings = {
   // current file complement
   enableCurrentFileComplement: true,
   onlyComplementEnglishOnCurrentFileComplement: false,
+
+  // current vault complement
+  enableCurrentVaultComplement: false,
 
   // custom dictionary complement
   enableCustomDictionaryComplement: false,
@@ -111,7 +117,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.strategy)
         .onChange(async (value) => {
           this.plugin.settings.strategy = value;
-          await this.plugin.saveSettings({ currentFile: true });
+          await this.plugin.saveSettings({
+            currentFile: true,
+            currentVault: true,
+          });
         })
     );
 
@@ -126,7 +135,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.matchStrategy)
         .onChange(async (value) => {
           this.plugin.settings.matchStrategy = value;
-          await this.plugin.saveSettings({ currentFile: true });
+          await this.plugin.saveSettings();
           this.display();
         })
     );
@@ -282,7 +291,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         );
       });
 
-    containerEl.createEl("h3", { text: "Current file complement" });
+    containerEl.createEl("h3", {
+      text: "Current file complement",
+      cls: "various-complements__settings__header various-complements__settings__header__current-file",
+    });
 
     new Setting(containerEl)
       .setName("Enable Current file complement")
@@ -310,7 +322,27 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
     }
 
-    containerEl.createEl("h3", { text: "Custom dictionary complement" });
+    containerEl.createEl("h3", {
+      text: "Current vault complement",
+      cls: "various-complements__settings__header various-complements__settings__header__current-vault",
+    });
+
+    new Setting(containerEl)
+      .setName("Enable Current vault complement")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.enableCurrentVaultComplement).onChange(
+          async (value) => {
+            this.plugin.settings.enableCurrentVaultComplement = value;
+            await this.plugin.saveSettings({ currentVault: true });
+            this.display();
+          }
+        );
+      });
+
+    containerEl.createEl("h3", {
+      text: "Custom dictionary complement",
+      cls: "various-complements__settings__header various-complements__settings__header__custom-dictionary",
+    });
 
     new Setting(containerEl)
       .setName("Enable Custom dictionary complement")
@@ -387,7 +419,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
     }
 
-    containerEl.createEl("h3", { text: "Internal link complement" });
+    containerEl.createEl("h3", {
+      text: "Internal link complement",
+      cls: "various-complements__settings__header various-complements__settings__header__internal-link",
+    });
 
     new Setting(containerEl)
       .setName("Enable Internal link complement")
