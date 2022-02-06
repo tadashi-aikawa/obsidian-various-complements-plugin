@@ -487,7 +487,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.suggestInternalLinkWithAlias
           ).onChange(async (value) => {
             this.plugin.settings.suggestInternalLinkWithAlias = value;
-            await this.plugin.saveSettings();
+            await this.plugin.saveSettings({ internalLink: true });
           });
         });
     }
