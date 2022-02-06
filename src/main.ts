@@ -141,7 +141,7 @@ export default class VariousComponents extends Plugin {
     } = {}
   ): Promise<void> {
     await this.saveData(this.settings);
-    await this.suggester.updateSettings(this.settings, needUpdateTokens);
+    await this.suggester.updateSettings(this.settings);
     if (needUpdateTokens.currentFile) {
       await this.suggester.refreshCurrentFileTokens();
     }

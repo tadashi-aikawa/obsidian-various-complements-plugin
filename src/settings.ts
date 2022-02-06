@@ -32,6 +32,8 @@ export interface Settings {
 
   // current vault complement
   enableCurrentVaultComplement: boolean;
+  includeCurrentVaultPathPrefixPatterns: string;
+  excludeCurrentVaultPathPrefixPatterns: string;
 
   // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
@@ -73,6 +75,8 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // current vault complement
   enableCurrentVaultComplement: false,
+  includeCurrentVaultPathPrefixPatterns: "",
+  excludeCurrentVaultPathPrefixPatterns: "",
 
   // custom dictionary complement
   enableCustomDictionaryComplement: false,
@@ -339,6 +343,45 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         );
       });
 
+    if (this.plugin.settings.enableCurrentVaultComplement) {
+      new Setting(containerEl)
+        .setName("Include prefix path patterns")
+        .setDesc("Prefix match path patterns to include files.")
+        .addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.includeCurrentVaultPathPrefixPatterns
+            )
+            .setPlaceholder("Private/")
+            .onChange(async (value) => {
+              this.plugin.settings.includeCurrentVaultPathPrefixPatterns =
+                value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      new Setting(containerEl)
+        .setName("Exclude prefix path patterns")
+        .setDesc("Prefix match path patterns to exclude files.")
+        .addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeCurrentVaultPathPrefixPatterns
+            )
+            .setPlaceholder("Private/")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentVaultPathPrefixPatterns =
+                value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+    }
+
     containerEl.createEl("h3", {
       text: "Custom dictionary complement",
       cls: "various-complements__settings__header various-complements__settings__header__custom-dictionary",
@@ -371,7 +414,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               await this.plugin.saveSettings();
             });
           el.inputEl.className =
-            "various-complements__settings__custom-dictionary-paths";
+            "various-complements__settings__text-area-path";
           return el;
         });
 

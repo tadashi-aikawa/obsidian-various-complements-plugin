@@ -6,14 +6,11 @@ import { AppHelper } from "../app-helper";
 import { allAlphabets } from "../util/strings";
 
 export class CurrentFileWordProvider {
-  private words: Word[] = [];
   wordsByFirstLetter: WordsByFirstLetter = {};
+  private words: Word[] = [];
+  private tokenizer: Tokenizer;
 
-  constructor(
-    private app: App,
-    private appHelper: AppHelper,
-    private tokenizer: Tokenizer
-  ) {}
+  constructor(private app: App, private appHelper: AppHelper) {}
 
   async refreshWords(onlyEnglish: boolean): Promise<void> {
     this.clearWords();
@@ -54,5 +51,9 @@ export class CurrentFileWordProvider {
 
   get wordCount(): number {
     return this.words.length;
+  }
+
+  setSettings(tokenizer: Tokenizer) {
+    this.tokenizer = tokenizer;
   }
 }

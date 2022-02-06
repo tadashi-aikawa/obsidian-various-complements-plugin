@@ -56,20 +56,13 @@ export class CustomDictionaryWordProvider {
   private paths: string[];
   private delimiter: ColumnDelimiter;
 
-  constructor(app: App, paths: string[], delimiter: ColumnDelimiter) {
+  constructor(app: App) {
     this.app = app;
     this.fileSystemAdapter = app.vault.adapter as FileSystemAdapter;
-    this.paths = paths;
-    this.delimiter = delimiter;
   }
 
   get editablePaths(): string[] {
     return this.paths.filter((x) => !isURL(x));
-  }
-
-  update(paths: string[], delimiter: ColumnDelimiter): void {
-    this.paths = paths;
-    this.delimiter = delimiter;
   }
 
   private async loadWords(path: string): Promise<Word[]> {
@@ -130,5 +123,10 @@ export class CustomDictionaryWordProvider {
 
   get wordCount(): number {
     return this.words.length;
+  }
+
+  setSettings(paths: string[], delimiter: ColumnDelimiter) {
+    this.paths = paths;
+    this.delimiter = delimiter;
   }
 }

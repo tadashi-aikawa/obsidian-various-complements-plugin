@@ -108,18 +108,23 @@ export class AutoCompleteSuggest
   ): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app, statusBar);
 
+    ins.currentFileWordProvider = new CurrentFileWordProvider(
+      ins.app,
+      ins.appHelper
+    );
+    ins.currentVaultWordProvider = new CurrentVaultWordProvider(
+      ins.app,
+      ins.appHelper
+    );
     ins.customDictionaryWordProvider = new CustomDictionaryWordProvider(
-      app,
-      settings.customDictionaryPaths.split("\n").filter((x) => x),
-      ColumnDelimiter.fromName(settings.columnDelimiter)
+      ins.app
+    );
+    ins.internalLinkWordProvider = new InternalLinkWordProvider(
+      ins.app,
+      ins.appHelper
     );
 
-    await ins.updateSettings(settings, {
-      currentFile: true,
-      currentVault: true,
-      customDictionary: true,
-      internalLink: true,
-    });
+    await ins.updateSettings(settings);
 
     ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
@@ -221,45 +226,24 @@ export class AutoCompleteSuggest
     };
   }
 
-  async updateSettings(
-    settings: Settings,
-    needUpdate: {
-      currentFile?: boolean;
-      currentVault?: boolean;
-      customDictionary?: boolean;
-      internalLink?: boolean;
-    } = {}
-  ) {
+  async updateSettings(settings: Settings) {
     this.settings = settings;
 
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
-    if (needUpdate.currentFile) {
-      this.currentFileWordProvider = new CurrentFileWordProvider(
-        this.app,
-        this.appHelper,
-        this.tokenizer
-      );
-    }
-    if (needUpdate.currentVault) {
-      this.currentVaultWordProvider = new CurrentVaultWordProvider(
-        this.app,
-        this.appHelper,
-        this.tokenizer
-      );
-    }
-    if (needUpdate.customDictionary) {
-      this.customDictionaryWordProvider = new CustomDictionaryWordProvider(
-        this.app,
-        settings.customDictionaryPaths.split("\n").filter((x) => x),
-        ColumnDelimiter.fromName(settings.columnDelimiter)
-      );
-    }
-    if (needUpdate.internalLink) {
-      this.internalLinkWordProvider = new InternalLinkWordProvider(
-        this.app,
-        this.appHelper
-      );
-    }
+    this.currentFileWordProvider.setSettings(this.tokenizer);
+    this.currentVaultWordProvider.setSettings(
+      this.tokenizer,
+      settings.includeCurrentVaultPathPrefixPatterns
+        .split("\n")
+        .filter((x) => x),
+      settings.excludeCurrentVaultPathPrefixPatterns
+        .split("\n")
+        .filter((x) => x)
+    );
+    this.customDictionaryWordProvider.setSettings(
+      settings.customDictionaryPaths.split("\n").filter((x) => x),
+      ColumnDelimiter.fromName(settings.columnDelimiter)
+    );
 
     this.debounceGetSuggestions = debounce(
       (context: EditorSuggestContext, cb: (words: Word[]) => void) => {
