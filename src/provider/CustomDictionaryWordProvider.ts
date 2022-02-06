@@ -48,8 +48,8 @@ function wordToLine(word: Word, delimiter: ColumnDelimiter): string {
 
 export class CustomDictionaryWordProvider {
   private words: Word[] = [];
-  wordByValue: { [value: string]: Word };
-  wordsByFirstLetter: WordsByFirstLetter;
+  wordByValue: { [value: string]: Word } = {};
+  wordsByFirstLetter: WordsByFirstLetter = {};
 
   private app: App;
   private fileSystemAdapter: FileSystemAdapter;
@@ -126,5 +126,9 @@ export class CustomDictionaryWordProvider {
     this.words = [];
     this.wordByValue = {};
     this.wordsByFirstLetter = {};
+  }
+
+  get wordCount(): number {
+    return this.words.length;
   }
 }

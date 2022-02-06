@@ -7,12 +7,14 @@ import {
 } from "./settings";
 import { CustomDictionaryWordRegisterModal } from "./ui/CustomDictionaryWordRegisterModal";
 import { AppHelper } from "./app-helper";
+import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 
 export default class VariousComponents extends Plugin {
   appHelper: AppHelper;
   settings: Settings;
   settingTab: VariousComplementsSettingTab;
   suggester: AutoCompleteSuggest;
+  statusBar: ProviderStatusBar;
 
   onunload() {
     super.onunload();
@@ -44,7 +46,13 @@ export default class VariousComponents extends Plugin {
     this.settingTab = new VariousComplementsSettingTab(this.app, this);
     this.addSettingTab(this.settingTab);
 
-    this.suggester = await AutoCompleteSuggest.new(this.app, this.settings);
+    this.statusBar = ProviderStatusBar.new(this.addStatusBarItem());
+
+    this.suggester = await AutoCompleteSuggest.new(
+      this.app,
+      this.settings,
+      this.statusBar
+    );
     this.registerEditorSuggest(this.suggester);
 
     this.addCommand({

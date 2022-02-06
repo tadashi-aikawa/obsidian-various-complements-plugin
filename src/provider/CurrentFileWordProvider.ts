@@ -7,7 +7,7 @@ import { allAlphabets } from "../util/strings";
 
 export class CurrentFileWordProvider {
   private words: Word[] = [];
-  wordsByFirstLetter: WordsByFirstLetter;
+  wordsByFirstLetter: WordsByFirstLetter = {};
 
   constructor(
     private app: App,
@@ -50,5 +50,9 @@ export class CurrentFileWordProvider {
   clearWords(): void {
     this.words = [];
     this.wordsByFirstLetter = {};
+  }
+
+  get wordCount(): number {
+    return this.words.length;
   }
 }

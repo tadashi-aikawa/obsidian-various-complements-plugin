@@ -6,7 +6,7 @@ import { AppHelper } from "../app-helper";
 
 export class CurrentVaultWordProvider {
   private words: Word[] = [];
-  wordsByFirstLetter: WordsByFirstLetter;
+  wordsByFirstLetter: WordsByFirstLetter = {};
 
   constructor(
     private app: App,
@@ -42,5 +42,9 @@ export class CurrentVaultWordProvider {
   clearWords(): void {
     this.words = [];
     this.wordsByFirstLetter = {};
+  }
+
+  get wordCount(): number {
+    return this.words.length;
   }
 }

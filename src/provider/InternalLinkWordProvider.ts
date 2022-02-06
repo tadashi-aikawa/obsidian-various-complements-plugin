@@ -5,7 +5,7 @@ import { excludeEmoji } from "../util/strings";
 
 export class InternalLinkWordProvider {
   private words: Word[] = [];
-  wordsByFirstLetter: WordsByFirstLetter;
+  wordsByFirstLetter: WordsByFirstLetter = {};
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
@@ -80,5 +80,9 @@ export class InternalLinkWordProvider {
   clearWords(): void {
     this.words = [];
     this.wordsByFirstLetter = {};
+  }
+
+  get wordCount(): number {
+    return this.words.length;
   }
 }

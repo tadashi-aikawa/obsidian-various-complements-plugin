@@ -26,6 +26,7 @@ import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
+import { ProviderStatusBar } from "./ProviderStatusBar";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -56,6 +57,7 @@ export class AutoCompleteSuggest
   app: App;
   settings: Settings;
   appHelper: AppHelper;
+  statusBar: ProviderStatusBar;
 
   currentFileWordProvider: CurrentFileWordProvider;
   currentVaultWordProvider: CurrentVaultWordProvider;
@@ -81,9 +83,10 @@ export class AutoCompleteSuggest
   modifyEventRef: EventRef;
   activeLeafChangeRef: EventRef;
 
-  private constructor(app: App) {
+  private constructor(app: App, statusBar: ProviderStatusBar) {
     super(app);
     this.appHelper = new AppHelper(app);
+    this.statusBar = statusBar;
   }
 
   triggerComplete() {
@@ -98,8 +101,12 @@ export class AutoCompleteSuggest
     (this as any).trigger(editor, activeFile, true);
   }
 
-  static async new(app: App, settings: Settings): Promise<AutoCompleteSuggest> {
-    const ins = new AutoCompleteSuggest(app);
+  static async new(
+    app: App,
+    settings: Settings,
+    statusBar: ProviderStatusBar
+  ): Promise<AutoCompleteSuggest> {
+    const ins = new AutoCompleteSuggest(app, statusBar);
 
     ins.customDictionaryWordProvider = new CustomDictionaryWordProvider(
       app,
@@ -388,8 +395,10 @@ export class AutoCompleteSuggest
 
   async refreshCurrentFileTokens(): Promise<void> {
     const start = performance.now();
+    this.statusBar.setCurrentFileIndexing();
 
     if (!this.settings.enableCurrentFileComplement) {
+      this.statusBar.setCurrentFileDisabled();
       this.currentFileWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -403,6 +412,10 @@ export class AutoCompleteSuggest
     await this.currentFileWordProvider.refreshWords(
       this.settings.onlyComplementEnglishOnCurrentFileComplement
     );
+
+    this.statusBar.setCurrentFileIndexed(
+      this.currentFileWordProvider.wordCount
+    );
     this.showDebugLog(() =>
       buildLogMessage("Index current file tokens", performance.now() - start)
     );
@@ -410,8 +423,10 @@ export class AutoCompleteSuggest
 
   async refreshCurrentVaultTokens(): Promise<void> {
     const start = performance.now();
+    this.statusBar.setCurrentVaultIndexing();
 
     if (!this.settings.enableCurrentVaultComplement) {
+      this.statusBar.setCurrentVaultDisabled();
       this.currentVaultWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -424,6 +439,9 @@ export class AutoCompleteSuggest
 
     await this.currentVaultWordProvider.refreshWords();
 
+    this.statusBar.setCurrentVaultIndexed(
+      this.currentVaultWordProvider.wordCount
+    );
     this.showDebugLog(() =>
       buildLogMessage("Index current vault tokens", performance.now() - start)
     );
@@ -431,8 +449,10 @@ export class AutoCompleteSuggest
 
   async refreshCustomDictionaryTokens(): Promise<void> {
     const start = performance.now();
+    this.statusBar.setCustomDictionaryIndexing();
 
     if (!this.settings.enableCustomDictionaryComplement) {
+      this.statusBar.setCustomDictionaryDisabled();
       this.customDictionaryWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -444,6 +464,10 @@ export class AutoCompleteSuggest
     }
 
     await this.customDictionaryWordProvider.refreshCustomWords();
+
+    this.statusBar.setCustomDictionaryIndexed(
+      this.customDictionaryWordProvider.wordCount
+    );
     this.showDebugLog(() =>
       buildLogMessage(
         "Index custom dictionary tokens",
@@ -454,8 +478,10 @@ export class AutoCompleteSuggest
 
   refreshInternalLinkTokens(): void {
     const start = performance.now();
+    this.statusBar.setInternalLinkIndexing();
 
     if (!this.settings.enableInternalLinkComplement) {
+      this.statusBar.setInternalLinkDisabled();
       this.internalLinkWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -468,6 +494,10 @@ export class AutoCompleteSuggest
 
     this.internalLinkWordProvider.refreshWords(
       this.settings.suggestInternalLinkWithAlias
+    );
+
+    this.statusBar.setInternalLinkIndexed(
+      this.internalLinkWordProvider.wordCount
     );
     this.showDebugLog(() =>
       buildLogMessage("Index internal link tokens", performance.now() - start)
