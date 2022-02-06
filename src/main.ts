@@ -60,9 +60,15 @@ export default class VariousComponents extends Plugin {
       name: "Reload custom dictionaries",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: "r" }],
       callback: async () => {
-        await this.reloadCustomDictionaries();
-        // noinspection ObjectAllocationIgnored
-        new Notice(`Finish reload custom dictionaries`);
+        await this.suggester.refreshCustomDictionaryTokens();
+      },
+    });
+
+    this.addCommand({
+      id: "reload-current-vault",
+      name: "Reload current vault",
+      callback: async () => {
+        await this.suggester.refreshCurrentVaultTokens();
       },
     });
 
@@ -148,10 +154,6 @@ export default class VariousComponents extends Plugin {
     if (needUpdateTokens.internalLink) {
       await this.suggester.refreshInternalLinkTokens();
     }
-  }
-
-  async reloadCustomDictionaries(): Promise<void> {
-    await this.suggester.refreshCustomDictionaryTokens();
   }
 
   addWordToCustomDictionary() {
