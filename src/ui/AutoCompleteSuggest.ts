@@ -448,7 +448,7 @@ export class AutoCompleteSuggest
     }
 
     await this.customDictionaryWordProvider.refreshCustomWords(
-      this.settings.customDictionaryValueRegexPattern
+      this.settings.customDictionaryWordRegexPattern
     );
 
     this.statusBar.setCustomDictionaryIndexed(
