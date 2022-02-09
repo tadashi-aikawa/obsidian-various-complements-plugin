@@ -38,6 +38,7 @@ export interface Settings {
   // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
   customDictionaryPaths: string;
+  customDictionaryValueRegexPattern: string;
   columnDelimiter: string;
   delimiterToHideSuggestion: string;
   caretLocationSymbolAfterComplement: string;
@@ -81,6 +82,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // custom dictionary complement
   enableCustomDictionaryComplement: false,
   customDictionaryPaths: `https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt`,
+  customDictionaryValueRegexPattern: "",
   columnDelimiter: "Tab",
   delimiterToHideSuggestion: "",
   caretLocationSymbolAfterComplement: "",
@@ -416,6 +418,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           el.inputEl.className =
             "various-complements__settings__text-area-path";
           return el;
+        });
+
+      new Setting(containerEl)
+        .setName("Regex pattern")
+        .setDesc("Only load words that match the regular expression pattern.")
+        .addText((cb) => {
+          cb.setValue(
+            this.plugin.settings.customDictionaryValueRegexPattern
+          ).onChange(async (value) => {
+            this.plugin.settings.customDictionaryValueRegexPattern = value;
+            await this.plugin.saveSettings();
+          });
         });
 
       new Setting(containerEl).setName("Column delimiter").addDropdown((tc) =>

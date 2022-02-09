@@ -65,7 +65,7 @@ export class CustomDictionaryWordProvider {
     return this.paths.filter((x) => !isURL(x));
   }
 
-  private async loadWords(path: string): Promise<Word[]> {
+  private async loadWords(path: string, regexp: string): Promise<Word[]> {
     const contents = isURL(path)
       ? await request({ url: path })
       : await this.fileSystemAdapter.read(path);
@@ -74,15 +74,16 @@ export class CustomDictionaryWordProvider {
       .split(/\r\n|\n/)
       .map((x) => x.replace(/%%.*%%/g, ""))
       .filter((x) => x)
-      .map((x) => lineToWord(x, this.delimiter));
+      .map((x) => lineToWord(x, this.delimiter))
+      .filter((x) => !regexp || x.value.match(new RegExp(regexp)));
   }
 
-  async refreshCustomWords(): Promise<void> {
+  async refreshCustomWords(regexp: string): Promise<void> {
     this.clearWords();
 
     for (const path of this.paths) {
       try {
-        const words = await this.loadWords(path);
+        const words = await this.loadWords(path, regexp);
         words.forEach((x) => this.words.push(x));
       } catch (e) {
         // noinspection ObjectAllocationIgnored

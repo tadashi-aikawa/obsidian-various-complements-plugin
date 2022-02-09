@@ -447,7 +447,9 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.customDictionaryWordProvider.refreshCustomWords();
+    await this.customDictionaryWordProvider.refreshCustomWords(
+      this.settings.customDictionaryValueRegexPattern
+    );
 
     this.statusBar.setCustomDictionaryIndexed(
       this.customDictionaryWordProvider.wordCount
