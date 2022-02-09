@@ -38,8 +38,8 @@ export interface Settings {
   // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
   customDictionaryPaths: string;
-  customDictionaryWordRegexPattern: string;
   columnDelimiter: string;
+  customDictionaryWordRegexPattern: string;
   delimiterToHideSuggestion: string;
   caretLocationSymbolAfterComplement: string;
 
@@ -82,8 +82,8 @@ export const DEFAULT_SETTINGS: Settings = {
   // custom dictionary complement
   enableCustomDictionaryComplement: false,
   customDictionaryPaths: `https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt`,
-  customDictionaryWordRegexPattern: "",
   columnDelimiter: "Tab",
+  customDictionaryWordRegexPattern: "",
   delimiterToHideSuggestion: "",
   caretLocationSymbolAfterComplement: "",
 
@@ -420,18 +420,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           return el;
         });
 
-      new Setting(containerEl)
-        .setName("Word regex pattern")
-        .setDesc("Only load words that match the regular expression pattern.")
-        .addText((cb) => {
-          cb.setValue(
-            this.plugin.settings.customDictionaryWordRegexPattern
-          ).onChange(async (value) => {
-            this.plugin.settings.customDictionaryWordRegexPattern = value;
-            await this.plugin.saveSettings();
-          });
-        });
-
       new Setting(containerEl).setName("Column delimiter").addDropdown((tc) =>
         tc
           .addOptions(
@@ -446,6 +434,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+      new Setting(containerEl)
+        .setName("Word regex pattern")
+        .setDesc("Only load words that match the regular expression pattern.")
+        .addText((cb) => {
+          cb.setValue(
+            this.plugin.settings.customDictionaryWordRegexPattern
+          ).onChange(async (value) => {
+            this.plugin.settings.customDictionaryWordRegexPattern = value;
+            await this.plugin.saveSettings();
+          });
+        });
 
       new Setting(containerEl)
         .setName("Delimiter to hide a suggestion")
