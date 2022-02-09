@@ -73,6 +73,10 @@
     filter: invert(0.5) hue-rotate(180deg);
 }
 
+.various-complements__suggestion-item {
+    padding-left: 30px!important;
+}
+
 .various-complements__suggestion-item__description {
     font-size: 0.75em;
     /*noinspection CssUnresolvedCustomProperty*/

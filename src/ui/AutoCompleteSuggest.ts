@@ -650,6 +650,7 @@ export class AutoCompleteSuggest
 
     el.appendChild(base);
 
+    el.addClass("various-complements__suggestion-item");
     switch (word.type) {
       case "currentFile":
         el.addClass("various-complements__suggestion-item__current-file");
