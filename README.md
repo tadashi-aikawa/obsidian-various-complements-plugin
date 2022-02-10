@@ -6,7 +6,7 @@
 
 This plugin for [Obsidian] enables you complete words like the auto-completion of IDE.
 
-![](https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/resources/2022-01-22.gif)
+![](https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/resources/various-complements.gif)
 
 ## 📚Documentation
 
