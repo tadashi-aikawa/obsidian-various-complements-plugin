@@ -9,6 +9,7 @@ import {
   EditorSuggestTriggerInfo,
   EventRef,
   KeymapEventHandler,
+  Notice,
   Scope,
   TFile,
 } from "obsidian";
@@ -28,6 +29,7 @@ import { uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import { ProviderStatusBar } from "./ProviderStatusBar";
 import { Word } from "../model/Word";
+import { MoveToSourceFileKeys } from "../option/MoveToSourceFileKeys";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -47,6 +49,7 @@ interface UnsafeEditorSuggestInterface {
     selectedItem: number;
     useSelectedItem(ev: Partial<KeyboardEvent>): void;
     setSelectedItem(selected: number, scroll: boolean): void;
+    values: Word[];
   };
   isOpen: boolean;
 }
@@ -216,6 +219,7 @@ export class AutoCompleteSuggest
       this.tokenizerStrategy.triggerThreshold
     );
   }
+
   // --- end ---
 
   get indexedWords(): IndexedWords {
@@ -303,36 +307,6 @@ export class AutoCompleteSuggest
     this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
     this.keymapEventHandler = [];
 
-    const cycleThroughSuggestionsKeys = CycleThroughSuggestionsKeys.fromName(
-      this.settings.additionalCycleThroughSuggestionsKeys
-    );
-    if (cycleThroughSuggestionsKeys !== CycleThroughSuggestionsKeys.NONE) {
-      this.keymapEventHandler.push(
-        this.scope.register(
-          cycleThroughSuggestionsKeys.nextKey.modifiers,
-          cycleThroughSuggestionsKeys.nextKey.key,
-          () => {
-            this.suggestions.setSelectedItem(
-              this.suggestions.selectedItem + 1,
-              true
-            );
-            return false;
-          }
-        ),
-        this.scope.register(
-          cycleThroughSuggestionsKeys.previousKey.modifiers,
-          cycleThroughSuggestionsKeys.previousKey.key,
-          () => {
-            this.suggestions.setSelectedItem(
-              this.suggestions.selectedItem - 1,
-              true
-            );
-            return false;
-          }
-        )
-      );
-    }
-
     this.scope.unregister(this.scope.keys.find((x) => x.key === "Enter")!);
     const selectSuggestionKey = SelectSuggestionKey.fromName(
       this.settings.selectSuggestionKeys
@@ -376,6 +350,64 @@ export class AutoCompleteSuggest
       this.close();
       return this.settings.propagateEsc;
     };
+
+    const cycleThroughSuggestionsKeys = CycleThroughSuggestionsKeys.fromName(
+      this.settings.additionalCycleThroughSuggestionsKeys
+    );
+    if (cycleThroughSuggestionsKeys !== CycleThroughSuggestionsKeys.NONE) {
+      this.keymapEventHandler.push(
+        this.scope.register(
+          cycleThroughSuggestionsKeys.nextKey.modifiers,
+          cycleThroughSuggestionsKeys.nextKey.key,
+          () => {
+            this.suggestions.setSelectedItem(
+              this.suggestions.selectedItem + 1,
+              true
+            );
+            return false;
+          }
+        ),
+        this.scope.register(
+          cycleThroughSuggestionsKeys.previousKey.modifiers,
+          cycleThroughSuggestionsKeys.previousKey.key,
+          () => {
+            this.suggestions.setSelectedItem(
+              this.suggestions.selectedItem - 1,
+              true
+            );
+            return false;
+          }
+        )
+      );
+    }
+
+    const moveToSourceFileKey = MoveToSourceFileKeys.fromName(
+      this.settings.moveToSourceFileKey
+    );
+    if (moveToSourceFileKey !== MoveToSourceFileKeys.NONE) {
+      this.keymapEventHandler.push(
+        this.scope.register(
+          moveToSourceFileKey.keyBind.modifiers,
+          moveToSourceFileKey.keyBind.key,
+          () => {
+            const item = this.suggestions.values[this.suggestions.selectedItem];
+            if (item.type !== "currentVault" && item.type !== "internalLink") {
+              return false;
+            }
+
+            const markdownFile = this.appHelper.getMarkdownFileByPath(
+              item.createdPath
+            );
+            if (!markdownFile) {
+              new Notice(`Can't open ${item.createdPath}`);
+              return false;
+            }
+            this.appHelper.openMarkdownFile(markdownFile, true);
+            return false;
+          }
+        )
+      );
+    }
   }
 
   async refreshCurrentFileTokens(): Promise<void> {

@@ -12,14 +12,18 @@ import { IndexedWords } from "../ui/AutoCompleteSuggest";
 describe("pushWord", () => {
   const createWordsByFirstLetter = (): WordsByFirstLetter => ({
     a: [
-      { value: "aaa", type: "currentFile" },
-      { value: "aa", type: "currentFile" },
+      { value: "aaa", type: "currentFile", createdPath: "" },
+      { value: "aa", type: "currentFile", createdPath: "" },
     ],
   });
 
   test("add", () => {
     const wordsByFirstLetter = createWordsByFirstLetter();
-    pushWord(wordsByFirstLetter, "u", { value: "uuu", type: "currentFile" });
+    pushWord(wordsByFirstLetter, "u", {
+      value: "uuu",
+      type: "currentFile",
+      createdPath: "",
+    });
     expect(wordsByFirstLetter).toStrictEqual({
       a: [
         { value: "aaa", type: "currentFile" },
@@ -31,7 +35,11 @@ describe("pushWord", () => {
 
   test("push", () => {
     const wordsByFirstLetter = createWordsByFirstLetter();
-    pushWord(wordsByFirstLetter, "a", { value: "a", type: "currentFile" });
+    pushWord(wordsByFirstLetter, "a", {
+      value: "a",
+      type: "currentFile",
+      createdPath: "",
+    });
     expect(wordsByFirstLetter).toStrictEqual({
       a: [
         { value: "aaa", type: "currentFile" },
@@ -88,36 +96,62 @@ describe("suggestWords", () => {
   const createIndexedWords = (): IndexedWords => ({
     currentFile: {
       a: [
-        { value: "ai", type: "currentFile" },
-        { value: "aiUEO", type: "currentFile" },
+        { value: "ai", type: "currentFile", createdPath: "" },
+        { value: "aiUEO", type: "currentFile", createdPath: "" },
       ],
     },
     currentVault: {},
     customDictionary: {
       a: [
-        { value: "uwaa", aliases: ["aaa"], type: "customDictionary" },
-        { value: "aiUEO", type: "customDictionary" },
+        {
+          value: "uwaa",
+          aliases: ["aaa"],
+          type: "customDictionary",
+          createdPath: "",
+        },
+        { value: "aiUEO", type: "customDictionary", createdPath: "" },
       ],
-      A: [{ value: "AWS", type: "customDictionary" }],
-      u: [{ value: "uwaa", aliases: ["aaa"], type: "customDictionary" }],
+      A: [{ value: "AWS", type: "customDictionary", createdPath: "" }],
+      u: [
+        {
+          value: "uwaa",
+          aliases: ["aaa"],
+          type: "customDictionary",
+          createdPath: "",
+        },
+      ],
       U: [
         {
           value: "UFO",
           aliases: ["Unidentified flying object"],
+
+          createdPath: "",
           type: "customDictionary",
         },
       ],
     },
     internalLink: {
       a: [
-        { value: "aiUEO", type: "internalLink" },
-        { value: "あいうえお", type: "internalLink", aliases: ["aiueo"] },
+        { value: "aiUEO", type: "internalLink", createdPath: "" },
+        {
+          value: "あいうえお",
+          type: "internalLink",
+          aliases: ["aiueo"],
+          createdPath: "",
+        },
       ],
       A: [
-        { value: "AWS", type: "internalLink" },
-        { value: "AI", type: "internalLink" },
+        { value: "AWS", type: "internalLink", createdPath: "" },
+        { value: "AI", type: "internalLink", createdPath: "" },
       ],
-      あ: [{ value: "あいうえお", type: "internalLink", aliases: ["aiueo"] }],
+      あ: [
+        {
+          value: "あいうえお",
+          type: "internalLink",
+          aliases: ["aiueo"],
+          createdPath: "",
+        },
+      ],
     },
   });
 
@@ -285,36 +319,61 @@ describe("suggestWordsByPartialMatch", () => {
   const createIndexedWords = (): IndexedWords => ({
     currentFile: {
       a: [
-        { value: "ai", type: "currentFile" },
-        { value: "aiUEO", type: "currentFile" },
+        { value: "ai", type: "currentFile", createdPath: "" },
+        { value: "aiUEO", type: "currentFile", createdPath: "" },
       ],
     },
     currentVault: {},
     customDictionary: {
       a: [
-        { value: "uwaa", aliases: ["aaa"], type: "customDictionary" },
-        { value: "aiUEO", type: "customDictionary" },
+        {
+          value: "uwaa",
+          aliases: ["aaa"],
+          type: "customDictionary",
+          createdPath: "",
+        },
+        { value: "aiUEO", type: "customDictionary", createdPath: "" },
       ],
-      A: [{ value: "AWS", type: "customDictionary" }],
-      u: [{ value: "uwaa", aliases: ["aaa"], type: "customDictionary" }],
+      A: [{ value: "AWS", type: "customDictionary", createdPath: "" }],
+      u: [
+        {
+          value: "uwaa",
+          aliases: ["aaa"],
+          type: "customDictionary",
+          createdPath: "",
+        },
+      ],
       U: [
         {
           value: "UFO",
           aliases: ["Unidentified flying object"],
+          createdPath: "",
           type: "customDictionary",
         },
       ],
     },
     internalLink: {
       a: [
-        { value: "aiUEO", type: "internalLink" },
-        { value: "あいうえお", type: "internalLink", aliases: ["aiueo"] },
+        { value: "aiUEO", type: "internalLink", createdPath: "" },
+        {
+          value: "あいうえお",
+          type: "internalLink",
+          aliases: ["aiueo"],
+          createdPath: "",
+        },
       ],
       A: [
-        { value: "AWS", type: "internalLink" },
-        { value: "AI", type: "internalLink" },
+        { value: "AWS", type: "internalLink", createdPath: "" },
+        { value: "AI", type: "internalLink", createdPath: "" },
       ],
-      あ: [{ value: "あいうえお", type: "internalLink", aliases: ["aiueo"] }],
+      あ: [
+        {
+          value: "あいうえお",
+          type: "internalLink",
+          aliases: ["aiueo"],
+          createdPath: "",
+        },
+      ],
     },
   });
 

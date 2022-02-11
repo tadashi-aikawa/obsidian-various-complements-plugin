@@ -9,6 +9,7 @@ export interface DefaultWord {
   description?: string;
   aliases?: string[];
   type: WordType;
+  createdPath: string;
   // Add after judge
   offset?: number;
 }

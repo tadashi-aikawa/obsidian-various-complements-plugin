@@ -31,6 +31,7 @@ export class CurrentVaultWordProvider {
         wordByValue[token] = {
           value: token,
           type: "currentVault",
+          createdPath: path,
           description: path,
         };
       }

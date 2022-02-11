@@ -106,6 +106,7 @@ export class CustomDictionaryWordRegisterModal extends Modal {
         onClickAdd(this.currentDictionaryPath, {
           value: this.value,
           description: this.description,
+          createdPath: this.currentDictionaryPath,
           aliases: this.aliases,
           type: "customDictionary",
         });

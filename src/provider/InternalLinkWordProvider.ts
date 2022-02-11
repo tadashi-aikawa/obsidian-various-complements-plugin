@@ -28,12 +28,14 @@ export class InternalLinkWordProvider {
             {
               value: x.basename,
               type: "internalLink" as WordType,
+              createdPath: x.path,
               aliases: synonymAliases(x.basename),
               description: x.path,
             },
             ...aliases.map((a) => ({
               value: a,
               type: "internalLink" as WordType,
+              createdPath: x.path,
               aliases: synonymAliases(a),
               description: x.path,
               aliasMeta: {
@@ -46,6 +48,7 @@ export class InternalLinkWordProvider {
             {
               value: x.basename,
               type: "internalLink" as WordType,
+              createdPath: x.path,
               aliases: [
                 ...synonymAliases(x.basename),
                 ...aliases,
@@ -59,12 +62,13 @@ export class InternalLinkWordProvider {
 
     const unresolvedInternalLinkWords = this.appHelper
       .searchPhantomLinks()
-      .map((text) => {
+      .map(({ path, link }) => {
         return {
-          value: text,
+          value: link,
           type: "internalLink" as WordType,
-          aliases: synonymAliases(text),
-          description: "Not created yet",
+          createdPath: path,
+          aliases: synonymAliases(link),
+          description: `Appeared in -> ${path}`,
           phantom: true,
         };
       });

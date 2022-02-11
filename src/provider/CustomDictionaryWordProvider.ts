@@ -24,13 +24,18 @@ function unescape(value: string): string {
     .replace(/__VariousComplementsEscape__/g, "\\");
 }
 
-function lineToWord(line: string, delimiter: ColumnDelimiter): Word {
+function lineToWord(
+  line: string,
+  delimiter: ColumnDelimiter,
+  path: string
+): Word {
   const [value, description, ...aliases] = line.split(delimiter.value);
   return {
     value: unescape(value),
     description,
     aliases,
     type: "customDictionary",
+    createdPath: path,
   };
 }
 
@@ -75,7 +80,7 @@ export class CustomDictionaryWordProvider {
       .split(/\r\n|\n/)
       .map((x) => x.replace(/%%.*%%/g, ""))
       .filter((x) => x)
-      .map((x) => lineToWord(x, this.delimiter))
+      .map((x) => lineToWord(x, this.delimiter, path))
       .filter((x) => !regexp || x.value.match(new RegExp(regexp)));
   }
 

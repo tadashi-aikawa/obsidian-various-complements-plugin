@@ -6,6 +6,7 @@ import { CycleThroughSuggestionsKeys } from "./option/CycleThroughSuggestionsKey
 import { ColumnDelimiter } from "./option/ColumnDelimiter";
 import { SelectSuggestionKey } from "./option/SelectSuggestionKey";
 import { mirrorMap } from "./util/collection-helper";
+import { MoveToSourceFileKeys } from "./option/MoveToSourceFileKeys";
 
 export interface Settings {
   // general
@@ -27,6 +28,7 @@ export interface Settings {
   // key customization
   selectSuggestionKeys: string;
   additionalCycleThroughSuggestionsKeys: string;
+  moveToSourceFileKey: string;
   propagateEsc: boolean;
 
   // current file complement
@@ -74,6 +76,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // key customization
   selectSuggestionKeys: "Enter",
   additionalCycleThroughSuggestionsKeys: "None",
+  moveToSourceFileKey: "None",
   propagateEsc: false,
 
   // current file complement
@@ -301,6 +304,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.additionalCycleThroughSuggestionsKeys)
           .onChange(async (value) => {
             this.plugin.settings.additionalCycleThroughSuggestionsKeys = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Move to source file key")
+      .addDropdown((tc) =>
+        tc
+          .addOptions(mirrorMap(MoveToSourceFileKeys.values(), (x) => x.name))
+          .setValue(this.plugin.settings.moveToSourceFileKey)
+          .onChange(async (value) => {
+            this.plugin.settings.moveToSourceFileKey = value;
             await this.plugin.saveSettings();
           })
       );

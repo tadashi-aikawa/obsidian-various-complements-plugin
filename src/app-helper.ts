@@ -5,7 +5,6 @@ import {
   parseFrontMatterAliases,
   TFile,
 } from "obsidian";
-import { uniq } from "./util/collection-helper";
 
 export class AppHelper {
   constructor(private app: App) {}
@@ -42,11 +41,9 @@ export class AppHelper {
     return this.getCurrentLine(editor).slice(0, editor.getCursor().ch);
   }
 
-  searchPhantomLinks(): string[] {
-    return uniq(
-      Object.values(this.app.metadataCache.unresolvedLinks)
-        .map(Object.keys)
-        .flat()
+  searchPhantomLinks(): { path: string; link: string }[] {
+    return Object.entries(this.app.metadataCache.unresolvedLinks).flatMap(
+      ([path, obj]) => Object.keys(obj).map((link) => ({ path, link }))
     );
   }
 
