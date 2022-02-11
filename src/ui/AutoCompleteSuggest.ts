@@ -30,6 +30,7 @@ import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import { ProviderStatusBar } from "./ProviderStatusBar";
 import { Word } from "../model/Word";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
+import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -217,6 +218,12 @@ export class AutoCompleteSuggest
     return (
       this.settings.minNumberOfCharactersTriggered ||
       this.tokenizerStrategy.triggerThreshold
+    );
+  }
+
+  get descriptionOnSuggestion(): DescriptionOnSuggestion {
+    return DescriptionOnSuggestion.fromName(
+      this.settings.descriptionOnSuggestion
     );
   }
 
@@ -675,10 +682,11 @@ export class AutoCompleteSuggest
           : undefined,
     });
 
-    if (word.description) {
+    const description = this.descriptionOnSuggestion.toDisplay(word);
+    if (description) {
       base.createDiv({
         cls: "various-complements__suggestion-item__description",
-        text: `${word.description}`,
+        text: `${description}`,
       });
     }
 

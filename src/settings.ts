@@ -7,6 +7,7 @@ import { ColumnDelimiter } from "./option/ColumnDelimiter";
 import { SelectSuggestionKey } from "./option/SelectSuggestionKey";
 import { mirrorMap } from "./util/collection-helper";
 import { OpenSourceFileKeys } from "./option/OpenSourceFileKeys";
+import { DescriptionOnSuggestion } from "./option/DescriptionOnSuggestion";
 
 export interface Settings {
   // general
@@ -24,6 +25,7 @@ export interface Settings {
 
   // appearance
   showIndexingStatus: boolean;
+  descriptionOnSuggestion: string;
 
   // key customization
   selectSuggestionKeys: string;
@@ -73,6 +75,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // appearance
   showIndexingStatus: true,
+  descriptionOnSuggestion: "Short",
 
   // key customization
   selectSuggestionKeys: "Enter",
@@ -278,6 +281,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }
         );
       });
+
+    new Setting(containerEl)
+      .setName("Description on a suggestion")
+      .addDropdown((tc) =>
+        tc
+          .addOptions(
+            mirrorMap(DescriptionOnSuggestion.values(), (x) => x.name)
+          )
+          .setValue(this.plugin.settings.descriptionOnSuggestion)
+          .onChange(async (value) => {
+            this.plugin.settings.descriptionOnSuggestion = value;
+            await this.plugin.saveSettings();
+          })
+      );
 
     containerEl.createEl("h3", { text: "Key customization" });
 
