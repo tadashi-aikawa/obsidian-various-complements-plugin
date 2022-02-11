@@ -14,7 +14,7 @@ export default class VariousComponents extends Plugin {
   settings: Settings;
   settingTab: VariousComplementsSettingTab;
   suggester: AutoCompleteSuggest;
-  statusBar: ProviderStatusBar;
+  statusBar?: ProviderStatusBar;
 
   onunload() {
     super.onunload();
@@ -46,7 +46,9 @@ export default class VariousComponents extends Plugin {
     this.settingTab = new VariousComplementsSettingTab(this.app, this);
     this.addSettingTab(this.settingTab);
 
-    this.statusBar = ProviderStatusBar.new(this.addStatusBarItem());
+    this.statusBar = this.settings.showIndexingStatus
+      ? ProviderStatusBar.new(this.addStatusBarItem())
+      : undefined;
 
     this.suggester = await AutoCompleteSuggest.new(
       this.app,

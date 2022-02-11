@@ -21,6 +21,9 @@ export interface Settings {
   // FIXME: Rename at next major version up
   insertAfterCompletion: boolean;
 
+  // appearance
+  showIndexingStatus: boolean;
+
   // key customization
   selectSuggestionKeys: string;
   additionalCycleThroughSuggestionsKeys: string;
@@ -64,6 +67,9 @@ export const DEFAULT_SETTINGS: Settings = {
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
   insertAfterCompletion: true,
+
+  // appearance
+  showIndexingStatus: true,
 
   // key customization
   selectSuggestionKeys: "Enter",
@@ -247,6 +253,22 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         tc.setValue(this.plugin.settings.insertAfterCompletion).onChange(
           async (value) => {
             this.plugin.settings.insertAfterCompletion = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
+
+    containerEl.createEl("h3", { text: "Appearance" });
+
+    new Setting(containerEl)
+      .setName("Show Indexing status")
+      .setDesc(
+        "Show indexing status at the status bar. Changing this option requires a restart to take effect."
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.showIndexingStatus).onChange(
+          async (value) => {
+            this.plugin.settings.showIndexingStatus = value;
             await this.plugin.saveSettings();
           }
         );
