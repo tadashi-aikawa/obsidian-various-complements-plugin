@@ -26,10 +26,10 @@ describe("pushWord", () => {
     });
     expect(wordsByFirstLetter).toStrictEqual({
       a: [
-        { value: "aaa", type: "currentFile" },
-        { value: "aa", type: "currentFile" },
+        { value: "aaa", type: "currentFile", createdPath: "" },
+        { value: "aa", type: "currentFile", createdPath: "" },
       ],
-      u: [{ value: "uuu", type: "currentFile" }],
+      u: [{ value: "uuu", type: "currentFile", createdPath: "" }],
     });
   });
 
@@ -42,9 +42,9 @@ describe("pushWord", () => {
     });
     expect(wordsByFirstLetter).toStrictEqual({
       a: [
-        { value: "aaa", type: "currentFile" },
-        { value: "aa", type: "currentFile" },
-        { value: "a", type: "currentFile" },
+        { value: "aaa", type: "currentFile", createdPath: "" },
+        { value: "aa", type: "currentFile", createdPath: "" },
+        { value: "a", type: "currentFile", createdPath: "" },
       ],
     });
   });
@@ -158,132 +158,146 @@ describe("suggestWords", () => {
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "a", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "ai", type: "currentFile" },
-      { value: "AWS", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "ai", type: "currentFile", createdPath: "" },
+      { value: "AWS", type: "internalLink", createdPath: "" },
       {
         value: "uwaa",
         aliases: ["aaa"],
 
         type: "customDictionary",
+        createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         aliases: ["aiueo"],
 
         type: "internalLink",
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "ai", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "ai", type: "currentFile" },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "ai", type: "currentFile", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         aliases: ["aiueo"],
 
         type: "internalLink",
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: aiu", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "aiu", 10)).toStrictEqual([
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         aliases: ["aiueo"],
 
         type: "internalLink",
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "A", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "Ai", type: "currentFile" },
-      { value: "AWS", type: "internalLink" },
-      { value: "AWS", type: "customDictionary" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "Ai", type: "currentFile", createdPath: "" },
+      { value: "AWS", type: "internalLink", createdPath: "" },
+      { value: "AWS", type: "customDictionary", createdPath: "" },
       {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "Ai", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "Ai", type: "currentFile" },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "Ai", type: "currentFile", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "AI", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "Ai", type: "currentFile" },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "Ai", type: "currentFile", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: AIU", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "AIU", 10)).toStrictEqual([
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: u", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "u", 10)).toStrictEqual([
-      { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
+      {
+        value: "uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        createdPath: "",
+      },
     ]);
   });
 
@@ -294,17 +308,23 @@ describe("suggestWords", () => {
         value: "UFO",
         type: "customDictionary",
         aliases: ["Unidentified flying object"],
+        createdPath: "",
       },
-      { value: "Uwaa", type: "customDictionary", aliases: ["aaa"] },
+      {
+        value: "Uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        createdPath: "",
+      },
     ]);
   });
 
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "a", 3)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "ai", type: "currentFile" },
-      { value: "AWS", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "ai", type: "currentFile", createdPath: "" },
+      { value: "AWS", type: "internalLink", createdPath: "" },
       // --- hidden ---
       // { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
       // { value: "aiUEO", type: "internalLink" },
@@ -380,22 +400,24 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "a", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "ai", type: "currentFile" },
-      { value: "AWS", type: "internalLink" },
-      { value: "AWS", type: "customDictionary" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "ai", type: "currentFile", createdPath: "" },
+      { value: "AWS", type: "internalLink", createdPath: "" },
+      { value: "AWS", type: "customDictionary", createdPath: "" },
       {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
       // ??? currentFile
     ]);
   });
@@ -403,52 +425,56 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "ai", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "ai", type: "currentFile" },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "ai", type: "currentFile", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: aiu", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "aiu", 10)).toStrictEqual([
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "A", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "Ai", type: "currentFile" },
-      { value: "AWS", type: "internalLink" },
-      { value: "AWS", type: "customDictionary" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "Ai", type: "currentFile", createdPath: "" },
+      { value: "AWS", type: "internalLink", createdPath: "" },
+      { value: "AWS", type: "customDictionary", createdPath: "" },
       {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
       // ??? currentFile
     ]);
   });
@@ -456,46 +482,49 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "Ai", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "Ai", type: "currentFile" },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "Ai", type: "currentFile", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "AI", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "Ai", type: "currentFile" },
-      { value: "aiUEO", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "Ai", type: "currentFile", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("Query: AIU", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "AIU", 10)).toStrictEqual([
-      { value: "aiUEO", type: "internalLink" },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary" },
-      { value: "AiUEO", type: "currentFile" },
+      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -506,16 +535,23 @@ describe("suggestWordsByPartialMatch", () => {
         value: "UFO",
         type: "customDictionary",
         aliases: ["Unidentified flying object"],
+        createdPath: "",
       },
-      { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
-      { value: "aiUEO", type: "internalLink" },
+      {
+        value: "uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        createdPath: "",
+      },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -526,25 +562,32 @@ describe("suggestWordsByPartialMatch", () => {
         value: "UFO",
         type: "customDictionary",
         aliases: ["Unidentified flying object"],
+        createdPath: "",
       },
-      { value: "Uwaa", type: "customDictionary", aliases: ["aaa"] },
-      { value: "aiUEO", type: "internalLink" },
+      {
+        value: "Uwaa",
+        type: "customDictionary",
+        aliases: ["aaa"],
+        createdPath: "",
+      },
+      { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
         aliases: ["aiueo"],
+        createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary" },
-      { value: "aiUEO", type: "currentFile" },
+      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "a", 3)).toStrictEqual([
-      { value: "AI", type: "internalLink" },
-      { value: "ai", type: "currentFile" },
-      { value: "AWS", type: "internalLink" },
+      { value: "AI", type: "internalLink", createdPath: "" },
+      { value: "ai", type: "currentFile", createdPath: "" },
+      { value: "AWS", type: "internalLink", createdPath: "" },
     ]);
   });
 });
