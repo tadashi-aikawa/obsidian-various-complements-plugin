@@ -1,5 +1,6 @@
 import { IndexedWords } from "../ui/AutoCompleteSuggest";
-import { suggestWords, suggestWordsByPartialMatch, Word } from "./suggester";
+import { suggestWords, suggestWordsByPartialMatch } from "./suggester";
+import { Word } from "../model/Word";
 
 type Name = "prefix" | "partial";
 

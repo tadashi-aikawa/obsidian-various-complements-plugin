@@ -16,7 +16,7 @@ import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { Settings } from "../settings";
 import { AppHelper } from "../app-helper";
-import { Word, WordsByFirstLetter } from "../provider/suggester";
+import { WordsByFirstLetter } from "../provider/suggester";
 import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
@@ -27,6 +27,7 @@ import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import { ProviderStatusBar } from "./ProviderStatusBar";
+import { Word } from "../model/Word";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;

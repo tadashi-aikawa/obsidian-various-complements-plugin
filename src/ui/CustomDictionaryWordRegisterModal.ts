@@ -9,8 +9,8 @@ import {
   TextComponent,
 } from "obsidian";
 import { mirrorMap } from "../util/collection-helper";
-import { Word } from "../provider/suggester";
 import { AppHelper } from "../app-helper";
+import { Word } from "../model/Word";
 
 export class CustomDictionaryWordRegisterModal extends Modal {
   currentDictionaryPath: string;

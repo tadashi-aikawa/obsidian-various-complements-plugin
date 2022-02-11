@@ -1,8 +1,9 @@
 import { App } from "obsidian";
 import { groupBy } from "../util/collection-helper";
-import { Word, WordsByFirstLetter } from "./suggester";
+import { WordsByFirstLetter } from "./suggester";
 import { Tokenizer } from "../tokenizer/tokenizer";
 import { AppHelper } from "../app-helper";
+import { Word } from "../model/Word";
 
 export class CurrentVaultWordProvider {
   wordsByFirstLetter: WordsByFirstLetter = {};

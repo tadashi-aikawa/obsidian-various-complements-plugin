@@ -1,7 +1,8 @@
 import { App, FileSystemAdapter, Notice, request } from "obsidian";
-import { pushWord, Word, WordsByFirstLetter } from "./suggester";
+import { pushWord, WordsByFirstLetter } from "./suggester";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
+import { Word } from "../model/Word";
 
 function escape(value: string): string {
   // This tricky logics for Safari
