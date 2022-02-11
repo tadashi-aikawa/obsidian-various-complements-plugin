@@ -39,6 +39,7 @@ export interface Settings {
   enableCurrentVaultComplement: boolean;
   includeCurrentVaultPathPrefixPatterns: string;
   excludeCurrentVaultPathPrefixPatterns: string;
+  includeCurrentVaultOnlyFilesUnderCurrentDirectory: boolean;
 
   // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
@@ -87,6 +88,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableCurrentVaultComplement: false,
   includeCurrentVaultPathPrefixPatterns: "",
   excludeCurrentVaultPathPrefixPatterns: "",
+  includeCurrentVaultOnlyFilesUnderCurrentDirectory: false,
 
   // custom dictionary complement
   enableCustomDictionaryComplement: false,
@@ -416,6 +418,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           el.inputEl.className =
             "various-complements__settings__text-area-path";
           return el;
+        });
+      new Setting(containerEl)
+        .setName("Include only files under current directory")
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings
+              .includeCurrentVaultOnlyFilesUnderCurrentDirectory
+          ).onChange(async (value) => {
+            this.plugin.settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory =
+              value;
+            await this.plugin.saveSettings();
+          });
         });
     }
 

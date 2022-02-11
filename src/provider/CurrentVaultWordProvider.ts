@@ -4,6 +4,7 @@ import { WordsByFirstLetter } from "./suggester";
 import { Tokenizer } from "../tokenizer/tokenizer";
 import { AppHelper } from "../app-helper";
 import { Word } from "../model/Word";
+import { dirname } from "../util/path";
 
 export class CurrentVaultWordProvider {
   wordsByFirstLetter: WordsByFirstLetter = {};
@@ -11,17 +12,23 @@ export class CurrentVaultWordProvider {
   private tokenizer: Tokenizer;
   private includePrefixPatterns: string[];
   private excludePrefixPatterns: string[];
+  private onlyUnderCurrentDirectory: boolean;
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
   async refreshWords(): Promise<void> {
     this.clearWords();
 
+    const currentDirname = this.appHelper.getCurrentDirname();
+
     const markdownFilePaths = this.app.vault
       .getMarkdownFiles()
       .map((x) => x.path)
       .filter((p) => this.includePrefixPatterns.every((x) => p.startsWith(x)))
-      .filter((p) => this.excludePrefixPatterns.every((x) => !p.startsWith(x)));
+      .filter((p) => this.excludePrefixPatterns.every((x) => !p.startsWith(x)))
+      .filter(
+        (p) => !this.onlyUnderCurrentDirectory || dirname(p) === currentDirname
+      );
 
     let wordByValue: { [value: string]: Word } = {};
     for (const path of markdownFilePaths) {
@@ -53,10 +60,12 @@ export class CurrentVaultWordProvider {
   setSettings(
     tokenizer: Tokenizer,
     includePrefixPatterns: string[],
-    excludePrefixPatterns: string[]
+    excludePrefixPatterns: string[],
+    onlyUnderCurrentDirectory: boolean
   ) {
     this.tokenizer = tokenizer;
     this.includePrefixPatterns = includePrefixPatterns;
     this.excludePrefixPatterns = excludePrefixPatterns;
+    this.onlyUnderCurrentDirectory = onlyUnderCurrentDirectory;
   }
 }

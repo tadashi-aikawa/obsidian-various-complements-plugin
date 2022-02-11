@@ -25,6 +25,10 @@ export class AppHelper {
     return this.app.workspace.activeLeaf!.view as MarkdownView;
   }
 
+  getCurrentDirname(): string | null {
+    return this.app.workspace.getActiveFile()?.parent.path ?? null;
+  }
+
   getCurrentEditor(): Editor | null {
     return this.getMarkdownViewInActiveLeaf()?.editor ?? null;
   }

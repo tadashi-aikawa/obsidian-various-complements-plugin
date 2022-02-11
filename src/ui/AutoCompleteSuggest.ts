@@ -243,7 +243,8 @@ export class AutoCompleteSuggest
         .filter((x) => x),
       settings.excludeCurrentVaultPathPrefixPatterns
         .split("\n")
-        .filter((x) => x)
+        .filter((x) => x),
+      settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory
     );
     this.customDictionaryWordProvider.setSettings(
       settings.customDictionaryPaths.split("\n").filter((x) => x),
