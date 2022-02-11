@@ -29,7 +29,7 @@ import { uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import { ProviderStatusBar } from "./ProviderStatusBar";
 import { Word } from "../model/Word";
-import { MoveToSourceFileKeys } from "../option/MoveToSourceFileKeys";
+import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -381,14 +381,14 @@ export class AutoCompleteSuggest
       );
     }
 
-    const moveToSourceFileKey = MoveToSourceFileKeys.fromName(
-      this.settings.moveToSourceFileKey
+    const openSourceFileKey = OpenSourceFileKeys.fromName(
+      this.settings.openSourceFileKey
     );
-    if (moveToSourceFileKey !== MoveToSourceFileKeys.NONE) {
+    if (openSourceFileKey !== OpenSourceFileKeys.NONE) {
       this.keymapEventHandler.push(
         this.scope.register(
-          moveToSourceFileKey.keyBind.modifiers,
-          moveToSourceFileKey.keyBind.key,
+          openSourceFileKey.keyBind.modifiers,
+          openSourceFileKey.keyBind.key,
           () => {
             const item = this.suggestions.values[this.suggestions.selectedItem];
             if (item.type !== "currentVault" && item.type !== "internalLink") {
