@@ -52,6 +52,10 @@ export class AppHelper {
     return this.getCurrentEditor()?.getSelection();
   }
 
+  getCurrentOffset(editor: Editor): number {
+    return editor.posToOffset(editor.getCursor());
+  }
+
   getCurrentLine(editor: Editor): string {
     return editor.getLine(editor.getCursor().line);
   }
@@ -94,6 +98,25 @@ export class AppHelper {
           editor.scrollIntoView({ from: pos, to: pos }, true);
         }
       });
+  }
+
+  inFrontMatter(): boolean {
+    const editor = this.getCurrentEditor();
+    if (!editor) {
+      return false;
+    }
+
+    const activeFile = this.app.workspace.getActiveFile();
+    if (!activeFile) {
+      return false;
+    }
+
+    if (editor.getLine(0) !== "---") {
+      return false;
+    }
+    const endPosition = editor.getValue().indexOf("---", 3);
+
+    return endPosition === -1 || this.getCurrentOffset(editor) < endPosition;
   }
 
   /**

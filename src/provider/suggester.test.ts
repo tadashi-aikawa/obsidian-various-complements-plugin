@@ -158,7 +158,7 @@ describe("suggestWords", () => {
 
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "a", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "a", 10, false)).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },
@@ -184,7 +184,7 @@ describe("suggestWords", () => {
 
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "ai", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "ai", 10, false)).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "aiUEO", type: "internalLink", createdPath: "" },
@@ -202,7 +202,7 @@ describe("suggestWords", () => {
 
   test("Query: aiu", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "aiu", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "aiu", 10, false)).toStrictEqual([
       { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
@@ -218,7 +218,7 @@ describe("suggestWords", () => {
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "A", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "A", 10, false)).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "Ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },
@@ -243,7 +243,7 @@ describe("suggestWords", () => {
 
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "Ai", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "Ai", 10, false)).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "Ai", type: "currentFile", createdPath: "" },
       { value: "aiUEO", type: "internalLink", createdPath: "" },
@@ -260,7 +260,7 @@ describe("suggestWords", () => {
 
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "AI", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "AI", 10, false)).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "Ai", type: "currentFile", createdPath: "" },
       { value: "aiUEO", type: "internalLink", createdPath: "" },
@@ -277,7 +277,7 @@ describe("suggestWords", () => {
 
   test("Query: AIU", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "AIU", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "AIU", 10, false)).toStrictEqual([
       { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
@@ -292,7 +292,7 @@ describe("suggestWords", () => {
 
   test("Query: u", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "u", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "u", 10, false)).toStrictEqual([
       {
         value: "uwaa",
         type: "customDictionary",
@@ -304,7 +304,7 @@ describe("suggestWords", () => {
 
   test("Query: U", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "U", 10)).toStrictEqual([
+    expect(suggestWords(indexedWords, "U", 10, false)).toStrictEqual([
       {
         value: "UFO",
         type: "customDictionary",
@@ -322,7 +322,7 @@ describe("suggestWords", () => {
 
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWords(indexedWords, "a", 3)).toStrictEqual([
+    expect(suggestWords(indexedWords, "a", 3, false)).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },
@@ -401,7 +401,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "a", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "a", 10, false)
+    ).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },
@@ -426,7 +428,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "ai", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "ai", 10, false)
+    ).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "aiUEO", type: "internalLink", createdPath: "" },
@@ -443,7 +447,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: aiu", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "aiu", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "aiu", 10, false)
+    ).toStrictEqual([
       { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
@@ -458,7 +464,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "A", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "A", 10, false)
+    ).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "Ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },
@@ -483,7 +491,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "Ai", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "Ai", 10, false)
+    ).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "Ai", type: "currentFile", createdPath: "" },
       { value: "aiUEO", type: "internalLink", createdPath: "" },
@@ -500,7 +510,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "AI", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "AI", 10, false)
+    ).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "Ai", type: "currentFile", createdPath: "" },
       { value: "aiUEO", type: "internalLink", createdPath: "" },
@@ -517,7 +529,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: AIU", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "AIU", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "AIU", 10, false)
+    ).toStrictEqual([
       { value: "aiUEO", type: "internalLink", createdPath: "" },
       {
         value: "あいうえお",
@@ -532,7 +546,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: u", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "u", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "u", 10, false)
+    ).toStrictEqual([
       {
         value: "UFO",
         type: "customDictionary",
@@ -559,7 +575,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: U", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "U", 10)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "U", 10, false)
+    ).toStrictEqual([
       {
         value: "UFO",
         type: "customDictionary",
@@ -586,7 +604,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
-    expect(suggestWordsByPartialMatch(indexedWords, "a", 3)).toStrictEqual([
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "a", 3, false)
+    ).toStrictEqual([
       { value: "AI", type: "internalLink", createdPath: "" },
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },

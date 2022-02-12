@@ -7,7 +7,8 @@ type Name = "prefix" | "partial";
 type Handler = (
   indexedWords: IndexedWords,
   query: string,
-  max: number
+  max: number,
+  inFrontMatter: boolean
 ) => Word[];
 
 export class MatchStrategy {

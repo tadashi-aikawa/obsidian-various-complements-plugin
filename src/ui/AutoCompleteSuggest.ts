@@ -289,7 +289,8 @@ export class AutoCompleteSuggest
               .handler(
                 this.indexedWords,
                 q.word,
-                this.settings.maxNumberOfSuggestions
+                this.settings.maxNumberOfSuggestions,
+                this.appHelper.inFrontMatter()
               )
               .map((word) => ({ ...word, offset: q.offset }))
           )

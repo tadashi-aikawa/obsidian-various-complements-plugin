@@ -18,16 +18,21 @@ export class TagWordProvider {
       return name === lessEmojiValue ? [] : [lessEmojiValue];
     };
 
-    this.words = this.app.vault.getMarkdownFiles().flatMap((f) =>
-      this.appHelper.getTags(f).map((t) => ({
-        value: t.slice(1), // Cut #
-        type: "tag" as WordType,
-        createdPath: f.path,
-        description: f.path,
-        aliases: synonymAliases(t.slice(1)), // Cut #
-      }))
+    let wordByValue: { [value: string]: Word } = {};
+    this.app.vault.getMarkdownFiles().forEach((f) =>
+      this.appHelper.getTags(f).forEach((t) => {
+        const value = t.slice(1); // Cut #
+        wordByValue[value] = {
+          value,
+          type: "tag" as WordType,
+          createdPath: f.path,
+          description: f.path,
+          aliases: synonymAliases(value),
+        };
+      })
     );
 
+    this.words = Object.values(wordByValue);
     for (const word of this.words) {
       pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
       word.aliases?.forEach((a) =>
