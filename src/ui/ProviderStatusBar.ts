@@ -3,7 +3,8 @@ export class ProviderStatusBar {
     public currentFile: HTMLElement,
     public currentVault: HTMLElement,
     public customDictionary: HTMLElement,
-    public internalLink: HTMLElement
+    public internalLink: HTMLElement,
+    public tag: HTMLElement
   ) {}
 
   static new(statusBar: HTMLElement): ProviderStatusBar {
@@ -23,12 +24,17 @@ export class ProviderStatusBar {
       text: "---",
       cls: "various-complements__footer various-complements__footer__internal-link",
     });
+    const tag = statusBar.createEl("span", {
+      text: "---",
+      cls: "various-complements__footer various-complements__footer__tag",
+    });
 
     return new ProviderStatusBar(
       currentFile,
       currentVault,
       customDictionary,
-      internalLink
+      internalLink,
+      tag
     );
   }
 
@@ -44,6 +50,9 @@ export class ProviderStatusBar {
   setInternalLinkDisabled() {
     this.internalLink.setText("---");
   }
+  setTagDisabled() {
+    this.tag.setText("---");
+  }
 
   setCurrentFileIndexing() {
     this.currentFile.setText("indexing...");
@@ -57,6 +66,9 @@ export class ProviderStatusBar {
   setInternalLinkIndexing() {
     this.internalLink.setText("indexing...");
   }
+  setTagIndexing() {
+    this.tag.setText("indexing...");
+  }
 
   setCurrentFileIndexed(count: any) {
     this.currentFile.setText(String(count));
@@ -69,5 +81,8 @@ export class ProviderStatusBar {
   }
   setInternalLinkIndexed(count: any) {
     this.internalLink.setText(String(count));
+  }
+  setTagIndexed(count: any) {
+    this.tag.setText(String(count));
   }
 }

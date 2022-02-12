@@ -153,6 +153,7 @@ describe("suggestWords", () => {
         },
       ],
     },
+    tag: {}, // TODO: Add value
   });
 
   test("Query: a", () => {
@@ -395,6 +396,7 @@ describe("suggestWordsByPartialMatch", () => {
         },
       ],
     },
+    tag: {}, // TODO: Add value
   });
 
   test("Query: a", () => {

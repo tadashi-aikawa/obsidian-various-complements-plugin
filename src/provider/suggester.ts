@@ -35,7 +35,11 @@ export function judge(
   queryStartWithUpper: boolean
 ): Judgement {
   if (lowerStartsWith(word.value, query)) {
-    if (queryStartWithUpper && word.type !== "internalLink") {
+    if (
+      queryStartWithUpper &&
+      word.type !== "internalLink" &&
+      word.type !== "tag"
+    ) {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
     } else {
@@ -71,6 +75,8 @@ export function suggestWords(
         ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
+        ...(indexedWords.tag[query.charAt(0)] ?? []),
+        ...(indexedWords.tag[query.charAt(0).toLowerCase()] ?? []),
       ]
     : [
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
@@ -78,6 +84,8 @@ export function suggestWords(
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
+        ...(indexedWords.tag[query.charAt(0)] ?? []),
+        ...(indexedWords.tag[query.charAt(0).toUpperCase()] ?? []),
       ];
 
   const candidate = Array.from(words)
@@ -113,7 +121,11 @@ export function judgeByPartialMatch(
   queryStartWithUpper: boolean
 ): Judgement {
   if (lowerStartsWith(word.value, query)) {
-    if (queryStartWithUpper && word.type !== "internalLink") {
+    if (
+      queryStartWithUpper &&
+      word.type !== "internalLink" &&
+      word.type !== "tag"
+    ) {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
     } else {
@@ -164,6 +176,7 @@ export function suggestWordsByPartialMatch(
     ...flatObjectValues(indexedWords.currentVault),
     ...flatObjectValues(indexedWords.customDictionary),
     ...flatObjectValues(indexedWords.internalLink),
+    ...flatObjectValues(indexedWords.tag),
   ];
 
   const candidate = Array.from(words)

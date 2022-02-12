@@ -55,6 +55,9 @@ export interface Settings {
   enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
 
+  // tag complement
+  enableTagComplement: boolean;
+
   // debug
   showLogAboutPerformanceInConsole: boolean;
 }
@@ -104,6 +107,9 @@ export const DEFAULT_SETTINGS: Settings = {
   // internal link complement
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
+
+  // tag complement
+  enableTagComplement: true,
 
   // debug
   showLogAboutPerformanceInConsole: false,
@@ -571,6 +577,23 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
     }
+
+    containerEl.createEl("h3", {
+      text: "Tag complement",
+      cls: "various-complements__settings__header various-complements__settings__header__tag",
+    });
+
+    new Setting(containerEl)
+      .setName("Enable Tag complement")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.enableTagComplement).onChange(
+          async (value) => {
+            this.plugin.settings.enableTagComplement = value;
+            await this.plugin.saveSettings({ tag: true });
+            this.display();
+          }
+        );
+      });
 
     containerEl.createEl("h3", { text: "Debug" });
 

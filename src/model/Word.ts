@@ -2,7 +2,8 @@ export type WordType =
   | "currentFile"
   | "currentVault"
   | "customDictionary"
-  | "internalLink";
+  | "internalLink"
+  | "tag";
 
 export interface DefaultWord {
   value: string;
@@ -29,9 +30,13 @@ export interface InternalLinkWord extends DefaultWord {
     origin: string;
   };
 }
+export interface TagWord extends DefaultWord {
+  type: "tag";
+}
 
 export type Word =
   | CurrentFileWord
   | CurrentVaultWord
   | CustomDictionaryWord
-  | InternalLinkWord;
+  | InternalLinkWord
+  | TagWord;

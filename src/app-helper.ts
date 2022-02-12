@@ -3,6 +3,7 @@ import {
   Editor,
   MarkdownView,
   parseFrontMatterAliases,
+  parseFrontMatterTags,
   TFile,
 } from "obsidian";
 
@@ -14,6 +15,20 @@ export class AppHelper {
       parseFrontMatterAliases(
         this.app.metadataCache.getFileCache(file)?.frontmatter
       ) ?? []
+    );
+  }
+
+  getFrontMatterTags(file: TFile): string[] {
+    return (
+      parseFrontMatterTags(
+        this.app.metadataCache.getFileCache(file)?.frontmatter
+      ) ?? []
+    );
+  }
+
+  getTags(file: TFile): string[] {
+    return this.getFrontMatterTags(file).concat(
+      this.app.metadataCache.getFileCache(file)?.tags?.map((x) => x.tag) ?? []
     );
   }
 

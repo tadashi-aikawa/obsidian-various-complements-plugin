@@ -31,6 +31,7 @@ import { ProviderStatusBar } from "./ProviderStatusBar";
 import { Word } from "../model/Word";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
+import { TagWordProvider } from "../provider/TagWordProvider";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -41,6 +42,7 @@ export type IndexedWords = {
   currentVault: WordsByFirstLetter;
   customDictionary: WordsByFirstLetter;
   internalLink: WordsByFirstLetter;
+  tag: WordsByFirstLetter;
 };
 
 // This is an unsafe code..!!
@@ -68,6 +70,7 @@ export class AutoCompleteSuggest
   currentVaultWordProvider: CurrentVaultWordProvider;
   customDictionaryWordProvider: CustomDictionaryWordProvider;
   internalLinkWordProvider: InternalLinkWordProvider;
+  tagWordProvider: TagWordProvider;
 
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
@@ -128,6 +131,7 @@ export class AutoCompleteSuggest
       ins.app,
       ins.appHelper
     );
+    ins.tagWordProvider = new TagWordProvider(ins.app, ins.appHelper);
 
     await ins.updateSettings(settings);
 
@@ -139,11 +143,13 @@ export class AutoCompleteSuggest
       async (_) => {
         await ins.refreshCurrentFileTokens();
         ins.refreshInternalLinkTokens();
+        ins.refreshTagTokens();
       }
     );
     // Avoid referring to incorrect cache
     const cacheResolvedRef = app.metadataCache.on("resolved", async () => {
       ins.refreshInternalLinkTokens();
+      ins.refreshTagTokens();
       // noinspection ES6MissingAwait
       ins.refreshCustomDictionaryTokens();
       // noinspection ES6MissingAwait
@@ -235,6 +241,7 @@ export class AutoCompleteSuggest
       currentVault: this.currentVaultWordProvider.wordsByFirstLetter,
       customDictionary: this.customDictionaryWordProvider.wordsByFirstLetter,
       internalLink: this.internalLinkWordProvider.wordsByFirstLetter,
+      tag: this.tagWordProvider.wordsByFirstLetter,
     };
   }
 
@@ -399,7 +406,11 @@ export class AutoCompleteSuggest
           openSourceFileKey.keyBind.key,
           () => {
             const item = this.suggestions.values[this.suggestions.selectedItem];
-            if (item.type !== "currentVault" && item.type !== "internalLink") {
+            if (
+              item.type !== "currentVault" &&
+              item.type !== "internalLink" &&
+              item.type !== "tag"
+            ) {
               return false;
             }
 
@@ -528,6 +539,27 @@ export class AutoCompleteSuggest
     );
     this.showDebugLog(() =>
       buildLogMessage("Index internal link tokens", performance.now() - start)
+    );
+  }
+
+  refreshTagTokens(): void {
+    const start = performance.now();
+    this.statusBar?.setTagIndexing();
+
+    if (!this.settings.enableTagComplement) {
+      this.statusBar?.setTagDisabled();
+      this.tagWordProvider.clearWords();
+      this.showDebugLog(() =>
+        buildLogMessage("👢Skip: Index tag tokens", performance.now() - start)
+      );
+      return;
+    }
+
+    this.tagWordProvider.refreshWords();
+
+    this.statusBar?.setTagIndexed(this.tagWordProvider.wordCount);
+    this.showDebugLog(() =>
+      buildLogMessage("Index tag tokens", performance.now() - start)
     );
   }
 
@@ -708,6 +740,9 @@ export class AutoCompleteSuggest
         if (word.phantom) {
           el.addClass("various-complements__suggestion-item__phantom");
         }
+        break;
+      case "tag":
+        el.addClass("various-complements__suggestion-item__tag");
         break;
     }
   }
