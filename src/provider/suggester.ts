@@ -74,12 +74,8 @@ export function suggestWords(
         ...(indexedWords.currentVault[query.charAt(0).toLowerCase()] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ?? []),
-        ...(inFrontMatter
-          ? []
-          : indexedWords.internalLink[query.charAt(0)] ?? []),
-        ...(inFrontMatter
-          ? []
-          : indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
+        ...(indexedWords.internalLink[query.charAt(0)] ?? []),
+        ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
         ...(inFrontMatter ? indexedWords.tag[query.charAt(0)] ?? [] : []),
         ...(inFrontMatter
           ? indexedWords.tag[query.charAt(0).toLowerCase()] ?? []
@@ -89,12 +85,8 @@ export function suggestWords(
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
         ...(indexedWords.currentVault[query.charAt(0)] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
-        ...(inFrontMatter
-          ? []
-          : indexedWords.internalLink[query.charAt(0)] ?? []),
-        ...(inFrontMatter
-          ? []
-          : indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
+        ...(indexedWords.internalLink[query.charAt(0)] ?? []),
+        ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
         ...(inFrontMatter ? indexedWords.tag[query.charAt(0)] ?? [] : []),
         ...(inFrontMatter
           ? indexedWords.tag[query.charAt(0).toUpperCase()] ?? []
@@ -192,7 +184,7 @@ export function suggestWordsByPartialMatch(
     ...flatObjectValues(indexedWords.currentFile),
     ...flatObjectValues(indexedWords.currentVault),
     ...flatObjectValues(indexedWords.customDictionary),
-    ...(inFrontMatter ? [] : flatObjectValues(indexedWords.internalLink)),
+    ...flatObjectValues(indexedWords.internalLink),
     ...(inFrontMatter ? flatObjectValues(indexedWords.tag) : []),
   ];
 
