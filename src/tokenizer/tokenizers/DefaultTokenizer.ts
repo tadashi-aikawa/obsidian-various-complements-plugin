@@ -16,7 +16,7 @@ export class DefaultTokenizer implements Tokenizer {
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
-    const trimIndexes = Array.from(content.matchAll(TRIM_CHAR_PATTERN))
+    const trimIndexes = Array.from(content.matchAll(this.getTrimPattern()))
       .sort((a, b) => a.index! - b.index!)
       .map((x) => x.index!);
     return [
