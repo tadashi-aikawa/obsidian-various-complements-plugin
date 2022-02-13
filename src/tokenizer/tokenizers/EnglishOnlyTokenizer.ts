@@ -4,7 +4,9 @@ type PreviousType = "none" | "trim" | "english" | "others";
 const ENGLISH_PATTERN = /[a-zA-Z0-9_\-]/;
 export class EnglishOnlyTokenizer extends DefaultTokenizer {
   tokenize(content: string, raw?: boolean): string[] {
-    const tokenized = Array.from(this._tokenize(content));
+    const tokenized = Array.from(this._tokenize(content)).filter((x) =>
+      x.word.match(ENGLISH_PATTERN)
+    );
     return raw
       ? tokenized.map((x) => x.word)
       : tokenized

@@ -4,11 +4,11 @@ import { TokenizeStrategy } from "../TokenizeStrategy";
 describe.each`
   content                 | raw      | expected
   ${"aa bb cc"}           | ${false} | ${["aa", "bb", "cc"]}
-  ${"Edith旧市街"}        | ${false} | ${["Edith", "旧市街"]}
-  ${"Edith旧city"}        | ${false} | ${["Edith", "旧", "city"]}
-  ${"イーディスold city"} | ${false} | ${["イーディス", "old", "city"]}
-  ${"イーディスold市街"}  | ${false} | ${["イーディス", "old", "市街"]}
-  ${"イーディス旧市街"}   | ${false} | ${["イーディス旧市街"]}
+  ${"Edith旧市街"}        | ${false} | ${["Edith"]}
+  ${"Edith旧city"}        | ${false} | ${["Edith", "city"]}
+  ${"イーディスold city"} | ${false} | ${["old", "city"]}
+  ${"イーディスold市街"}  | ${false} | ${["old"]}
+  ${"イーディス旧市街"}   | ${false} | ${[]}
 `("tokenize", ({ content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(
