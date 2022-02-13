@@ -39,8 +39,9 @@ describe.each`
 });
 
 describe.each`
-  arr                    | fn                                                 | expected
-  ${["aa", "iii", "uu"]} | ${(a: string, b: string) => a.length === b.length} | ${["aa", "iii"]}
+  arr                     | fn                                                 | expected
+  ${["aa", "iii", "uu"]}  | ${(a: string, b: string) => a.length === b.length} | ${["aa", "iii"]}
+  ${[11, 21, 31, 40, 51]} | ${(a: number, b: number) => a % 10 === b % 10}     | ${[11, 40]}
 `("uniqWith", ({ arr, fn, expected }) => {
   test(`uniqWith(${arr}, ${fn}) = ${expected}`, () => {
     expect(uniqWith(arr, fn)).toStrictEqual(expected);
