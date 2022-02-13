@@ -178,7 +178,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -196,7 +195,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -212,7 +210,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -237,7 +234,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -254,7 +250,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -271,7 +266,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -286,7 +280,6 @@ describe("suggestWords", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -441,7 +434,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -458,7 +450,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -485,7 +476,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      // ??? currentFile
     ]);
   });
 
@@ -504,7 +494,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -523,7 +512,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -540,7 +528,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "AiUEO", type: "customDictionary", createdPath: "" },
-      { value: "AiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -569,7 +556,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
@@ -598,7 +584,6 @@ describe("suggestWordsByPartialMatch", () => {
         createdPath: "",
       },
       { value: "aiUEO", type: "customDictionary", createdPath: "" },
-      { value: "aiUEO", type: "currentFile", createdPath: "" },
     ]);
   });
 
