@@ -327,6 +327,78 @@ describe("suggestWords", () => {
       // { value: "aiUEO", type: "currentFile" },
     ]);
   });
+
+  const indexedWords2: IndexedWords = {
+    tag: {
+      a: [
+        { value: "a", type: "tag", createdPath: "" },
+        { value: "a", type: "tag", createdPath: "" },
+      ],
+    },
+    internalLink: {
+      a: [
+        { value: "a", type: "internalLink", createdPath: "" },
+        { value: "a", type: "internalLink", createdPath: "" },
+      ],
+    },
+    customDictionary: {
+      a: [
+        { value: "a", type: "customDictionary", createdPath: "" },
+        { value: "a", type: "customDictionary", createdPath: "" },
+      ],
+    },
+    currentFile: {
+      a: [
+        { value: "a", type: "currentFile", createdPath: "" },
+        { value: "a", type: "currentFile", createdPath: "" },
+      ],
+    },
+    currentVault: {
+      a: [
+        { value: "a", type: "currentVault", createdPath: "" },
+        { value: "a", type: "currentVault", createdPath: "" },
+      ],
+    },
+  };
+
+  test("word type priority order in front matter", () => {
+    expect(suggestWords(indexedWords2, "a", 10, true)).toStrictEqual([
+      { value: "a", type: "tag", createdPath: "" },
+      { value: "a", type: "internalLink", createdPath: "" },
+      { value: "a", type: "customDictionary", createdPath: "" },
+    ]);
+  });
+
+  test("word type priority order not in front matter", () => {
+    expect(suggestWords(indexedWords2, "a", 10, false)).toStrictEqual([
+      { value: "a", type: "internalLink", createdPath: "" },
+      { value: "a", type: "customDictionary", createdPath: "" },
+    ]);
+  });
+
+  const indexedWords3: IndexedWords = {
+    tag: {},
+    internalLink: {},
+    customDictionary: {},
+    currentFile: {
+      a: [
+        { value: "a", type: "currentFile", createdPath: "" },
+        { value: "a", type: "currentFile", createdPath: "" },
+      ],
+    },
+    currentVault: {
+      a: [
+        { value: "a", type: "currentVault", createdPath: "" },
+        { value: "a", type: "currentVault", createdPath: "" },
+      ],
+    },
+  };
+
+  test("word type priority order (currentFile & currentVault)", () => {
+    expect(suggestWords(indexedWords3, "a", 10, false)).toStrictEqual([
+      { value: "a", type: "currentFile", createdPath: "" },
+    ]);
+  });
 });
 
 describe("suggestWordsByPartialMatch", () => {
@@ -596,5 +668,81 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "ai", type: "currentFile", createdPath: "" },
       { value: "AWS", type: "internalLink", createdPath: "" },
     ]);
+  });
+
+  const indexedWords2: IndexedWords = {
+    tag: {
+      a: [
+        { value: "a", type: "tag", createdPath: "" },
+        { value: "a", type: "tag", createdPath: "" },
+      ],
+    },
+    internalLink: {
+      a: [
+        { value: "a", type: "internalLink", createdPath: "" },
+        { value: "a", type: "internalLink", createdPath: "" },
+      ],
+    },
+    customDictionary: {
+      a: [
+        { value: "a", type: "customDictionary", createdPath: "" },
+        { value: "a", type: "customDictionary", createdPath: "" },
+      ],
+    },
+    currentFile: {
+      a: [
+        { value: "a", type: "currentFile", createdPath: "" },
+        { value: "a", type: "currentFile", createdPath: "" },
+      ],
+    },
+    currentVault: {
+      a: [
+        { value: "a", type: "currentVault", createdPath: "" },
+        { value: "a", type: "currentVault", createdPath: "" },
+      ],
+    },
+  };
+
+  test("word type priority order in front matter", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords2, "a", 10, true)
+    ).toStrictEqual([
+      { value: "a", type: "tag", createdPath: "" },
+      { value: "a", type: "internalLink", createdPath: "" },
+      { value: "a", type: "customDictionary", createdPath: "" },
+    ]);
+  });
+
+  test("word type priority order not in front matter", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords2, "a", 10, false)
+    ).toStrictEqual([
+      { value: "a", type: "internalLink", createdPath: "" },
+      { value: "a", type: "customDictionary", createdPath: "" },
+    ]);
+  });
+
+  const indexedWords3: IndexedWords = {
+    tag: {},
+    internalLink: {},
+    customDictionary: {},
+    currentFile: {
+      a: [
+        { value: "a", type: "currentFile", createdPath: "" },
+        { value: "a", type: "currentFile", createdPath: "" },
+      ],
+    },
+    currentVault: {
+      a: [
+        { value: "a", type: "currentVault", createdPath: "" },
+        { value: "a", type: "currentVault", createdPath: "" },
+      ],
+    },
+  };
+
+  test("word type priority order (currentFile & currentVault)", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords3, "a", 10, false)
+    ).toStrictEqual([{ value: "a", type: "currentFile", createdPath: "" }]);
   });
 });
