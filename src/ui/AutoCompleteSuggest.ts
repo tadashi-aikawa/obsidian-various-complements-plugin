@@ -273,21 +273,23 @@ export class AutoCompleteSuggest
         const start = performance.now();
 
         this.showDebugLog(() => `[context.query]: ${context.query}`);
-        const queries = JSON.parse(context.query) as {
-          word: string;
-          offset: number;
-        }[];
+        const parsedQuery = JSON.parse(context.query) as {
+          currentFrontMatter: string | null;
+          queries: {
+            word: string;
+            offset: number;
+          }[];
+        };
 
-        const currentFrontMatter = this.appHelper.getCurrentFrontMatter();
-
-        const words = queries
+        const words = parsedQuery.queries
           .filter(
             (x, i, xs) =>
-              this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
+              parsedQuery.currentFrontMatter ||
+              (this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
                 xs.length &&
-              x.word.length >= this.minNumberTriggered &&
-              !this.tokenizer.shouldIgnore(x.word) &&
-              !x.word.endsWith(" ")
+                x.word.length >= this.minNumberTriggered &&
+                !this.tokenizer.shouldIgnore(x.word) &&
+                !x.word.endsWith(" "))
           )
           .map((q) =>
             this.matchStrategy
@@ -295,7 +297,7 @@ export class AutoCompleteSuggest
                 this.indexedWords,
                 q.word,
                 this.settings.maxNumberOfSuggestions,
-                currentFrontMatter
+                parsedQuery.currentFrontMatter
               )
               .map((word) => ({ ...word, offset: q.offset }))
           )
@@ -663,7 +665,10 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    if (!this.runManually) {
+    const currentFrontMatter = this.appHelper.getCurrentFrontMatter();
+    this.showDebugLog(() => `Current front matter is ${currentFrontMatter}`);
+
+    if (!this.runManually && !currentFrontMatter) {
       if (currentToken.length < this.minNumberTriggered) {
         this.showDebugLog(
           () =>
@@ -692,12 +697,13 @@ export class AutoCompleteSuggest
         line: cursor.line,
       },
       end: cursor,
-      query: JSON.stringify(
-        currentTokens.map((x) => ({
+      query: JSON.stringify({
+        currentFrontMatter,
+        queries: currentTokens.map((x) => ({
           ...x,
           offset: x.offset - currentTokens[0].offset,
-        }))
-      ),
+        })),
+      }),
     };
   }
 
