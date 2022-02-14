@@ -3,7 +3,7 @@ import { WordsByFirstLetter } from "./suggester";
 import { AppHelper, FrontMatterValue } from "../app-helper";
 import { FrontMatterWord } from "../model/Word";
 import { excludeEmoji } from "../util/strings";
-import { groupBy } from "../util/collection-helper";
+import { groupBy, uniqWith } from "../util/collection-helper";
 
 function synonymAliases(name: string): string[] {
   const lessEmojiValue = excludeEmoji(name);
@@ -35,7 +35,7 @@ export class FrontMatterWordProvider {
 
     const activeFile = this.appHelper.getActiveFile();
 
-    this.words = this.app.vault.getMarkdownFiles().flatMap((f) => {
+    const words = this.app.vault.getMarkdownFiles().flatMap((f) => {
       const fm = this.appHelper.getFrontMatter(f);
       if (!fm || activeFile?.path === f.path) {
         return [];
@@ -49,6 +49,11 @@ export class FrontMatterWordProvider {
         )
         .flatMap(([key, value]) => frontMatterToWords(f, key, value));
     });
+
+    this.words = uniqWith(
+      words,
+      (a, b) => a.key === b.key && a.value === b.value
+    );
 
     const wordsByKey = groupBy(this.words, (x) => x.key);
     this.wordsByFirstLetterByKey = Object.fromEntries(
