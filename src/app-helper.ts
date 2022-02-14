@@ -21,21 +21,23 @@ export class AppHelper {
   }
 
   getFrontMatter(file: TFile): { [key: string]: FrontMatterValue } | undefined {
-    return this.app.metadataCache.getFileCache(file)?.frontmatter;
-  }
+    const frontMatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+    if (!frontMatter) {
+      return undefined;
+    }
 
-  getFrontMatterTags(file: TFile): string[] {
-    return (
-      parseFrontMatterTags(
-        this.app.metadataCache.getFileCache(file)?.frontmatter
-      ) ?? []
-    );
-  }
-
-  getTags(file: TFile): string[] {
-    return this.getFrontMatterTags(file).concat(
-      this.app.metadataCache.getFileCache(file)?.tags?.map((x) => x.tag) ?? []
-    );
+    // remove #
+    const tags =
+      parseFrontMatterTags(frontMatter)?.map((x) => x.slice(1)) ?? [];
+    const aliases = parseFrontMatterAliases(frontMatter) ?? [];
+    const { position, ...rest } = frontMatter;
+    return {
+      ...rest,
+      tags,
+      tag: tags,
+      aliases,
+      alias: aliases,
+    };
   }
 
   getMarkdownViewInActiveLeaf(): MarkdownView | null {
