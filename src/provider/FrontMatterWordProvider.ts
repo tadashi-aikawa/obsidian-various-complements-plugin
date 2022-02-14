@@ -1,6 +1,6 @@
 import { App, TFile } from "obsidian";
 import { WordsByFirstLetter } from "./suggester";
-import { AppHelper } from "../app-helper";
+import { AppHelper, FrontMatterValue } from "../app-helper";
 import { FrontMatterWord } from "../model/Word";
 import { excludeEmoji } from "../util/strings";
 import { groupBy } from "../util/collection-helper";
@@ -13,9 +13,8 @@ function synonymAliases(name: string): string[] {
 function frontMatterToWords(
   file: TFile,
   key: string,
-  value: string | string[]
+  values: FrontMatterValue
 ): FrontMatterWord[] {
-  const values = typeof value === "string" ? [value] : value;
   return values.map((x) => ({
     key,
     value: x,
@@ -36,20 +35,20 @@ export class FrontMatterWordProvider {
 
     const activeFile = this.appHelper.getActiveFile();
 
-    this.words = this.app.vault
-      .getMarkdownFiles()
-      .filter(
-        (f) => this.appHelper.getFrontMatter(f) && activeFile?.path !== f.path
-      )
-      .flatMap((f) =>
-        Object.entries(this.appHelper.getFrontMatter(f))
-          .filter(
-            ([key, value]) =>
-              value != null &&
-              (typeof value === "string" || typeof value[0] === "string")
-          )
-          .flatMap(([key, value]) => frontMatterToWords(f, key, value))
-      );
+    this.words = this.app.vault.getMarkdownFiles().flatMap((f) => {
+      const fm = this.appHelper.getFrontMatter(f);
+      if (!fm || activeFile?.path === f.path) {
+        return [];
+      }
+
+      return Object.entries(fm)
+        .filter(
+          ([_key, value]) =>
+            value != null &&
+            (typeof value === "string" || typeof value[0] === "string")
+        )
+        .flatMap(([key, value]) => frontMatterToWords(f, key, value));
+    });
 
     const wordsByKey = groupBy(this.words, (x) => x.key);
     this.wordsByFirstLetterByKey = Object.fromEntries(

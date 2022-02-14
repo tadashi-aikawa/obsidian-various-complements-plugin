@@ -3,11 +3,12 @@ import {
   Editor,
   MarkdownView,
   parseFrontMatterAliases,
+  parseFrontMatterStringArray,
   parseFrontMatterTags,
   TFile,
 } from "obsidian";
 
-export type FrontMatterValue = string | number | string[] | number[] | null;
+export type FrontMatterValue = string[];
 
 export class AppHelper {
   constructor(private app: App) {}
@@ -32,7 +33,12 @@ export class AppHelper {
     const aliases = parseFrontMatterAliases(frontMatter) ?? [];
     const { position, ...rest } = frontMatter;
     return {
-      ...rest,
+      ...Object.fromEntries(
+        Object.entries(rest).map(([k, _v]) => [
+          k,
+          parseFrontMatterStringArray(frontMatter, k),
+        ])
+      ),
       tags,
       tag: tags,
       aliases,
