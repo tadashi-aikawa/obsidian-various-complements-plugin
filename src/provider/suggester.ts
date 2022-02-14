@@ -66,24 +66,34 @@ export function suggestWords(
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
+  const shouldSuggestIndividual =
+    frontMatter && frontMatter !== "alias" && frontMatter !== "aliases";
+
   const words = queryStartWithUpper
+    ? shouldSuggestIndividual
+      ? [
+          ...(indexedWords.frontMatter?.[frontMatter]?.[query.charAt(0)] ?? []),
+          ...(indexedWords.frontMatter?.[frontMatter]?.[
+            query.charAt(0).toLowerCase()
+          ] ?? []),
+        ]
+      : [
+          ...(indexedWords.currentFile[query.charAt(0)] ?? []),
+          ...(indexedWords.currentFile[query.charAt(0).toLowerCase()] ?? []),
+          ...(indexedWords.currentVault[query.charAt(0)] ?? []),
+          ...(indexedWords.currentVault[query.charAt(0).toLowerCase()] ?? []),
+          ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
+          ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ??
+            []),
+          ...(indexedWords.internalLink[query.charAt(0)] ?? []),
+          ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
+        ]
+    : shouldSuggestIndividual
     ? [
-        ...(indexedWords.currentFile[query.charAt(0)] ?? []),
-        ...(indexedWords.currentFile[query.charAt(0).toLowerCase()] ?? []),
-        ...(indexedWords.currentVault[query.charAt(0)] ?? []),
-        ...(indexedWords.currentVault[query.charAt(0).toLowerCase()] ?? []),
-        ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
-        ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ?? []),
-        ...(indexedWords.internalLink[query.charAt(0)] ?? []),
-        ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
-        ...(frontMatter
-          ? indexedWords.frontMatter?.[frontMatter]?.[query.charAt(0)] ?? []
-          : []),
-        ...(frontMatter
-          ? indexedWords.frontMatter?.[frontMatter]?.[
-              query.charAt(0).toLowerCase()
-            ] ?? []
-          : []),
+        ...(indexedWords.frontMatter?.[frontMatter]?.[query.charAt(0)] ?? []),
+        ...(indexedWords.frontMatter?.[frontMatter]?.[
+          query.charAt(0).toUpperCase()
+        ] ?? []),
       ]
     : [
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
@@ -91,14 +101,6 @@ export function suggestWords(
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
-        ...(frontMatter
-          ? indexedWords.frontMatter?.[frontMatter]?.[query.charAt(0)] ?? []
-          : []),
-        ...(frontMatter
-          ? indexedWords.frontMatter?.[frontMatter]?.[
-              query.charAt(0).toUpperCase()
-            ] ?? []
-          : []),
       ];
 
   const candidate = Array.from(words)
@@ -193,17 +195,19 @@ export function suggestWordsByPartialMatch(
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
+  const shouldSuggestIndividual =
+    frontMatter && frontMatter !== "alias" && frontMatter !== "aliases";
   const flatObjectValues = (object: { [firstLetter: string]: Word[] }) =>
     Object.values(object).flat();
-  const words = [
-    ...flatObjectValues(indexedWords.currentFile),
-    ...flatObjectValues(indexedWords.currentVault),
-    ...flatObjectValues(indexedWords.customDictionary),
-    ...flatObjectValues(indexedWords.internalLink),
-    ...(frontMatter
-      ? flatObjectValues(indexedWords.frontMatter?.[frontMatter] ?? [])
-      : []),
-  ];
+
+  const words = shouldSuggestIndividual
+    ? flatObjectValues(indexedWords.frontMatter?.[frontMatter] ?? [])
+    : [
+        ...flatObjectValues(indexedWords.currentFile),
+        ...flatObjectValues(indexedWords.currentVault),
+        ...flatObjectValues(indexedWords.customDictionary),
+        ...flatObjectValues(indexedWords.internalLink),
+      ];
 
   const candidate = Array.from(words)
     .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper))

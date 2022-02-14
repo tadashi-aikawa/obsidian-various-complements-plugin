@@ -336,6 +336,18 @@ describe("suggestWords", () => {
           { key: "tags", value: "a", type: "frontMatter", createdPath: "" },
         ],
       },
+      alias: {
+        a: [
+          { key: "alias", value: "a", type: "frontMatter", createdPath: "" },
+          { key: "alias", value: "a", type: "frontMatter", createdPath: "" },
+        ],
+      },
+      aliases: {
+        a: [
+          { key: "aliases", value: "a", type: "frontMatter", createdPath: "" },
+          { key: "aliases", value: "a", type: "frontMatter", createdPath: "" },
+        ],
+      },
     },
     internalLink: {
       a: [
@@ -363,9 +375,21 @@ describe("suggestWords", () => {
     },
   };
 
-  test("word type priority order in front matter", () => {
+  test("word type priority order in front matter tags", () => {
     expect(suggestWords(indexedWords2, "a", 10, "tags")).toStrictEqual([
       { key: "tags", value: "a", type: "frontMatter", createdPath: "" },
+    ]);
+  });
+
+  test("word type priority order in front matter alias", () => {
+    expect(suggestWords(indexedWords2, "a", 10, "alias")).toStrictEqual([
+      { value: "a", type: "internalLink", createdPath: "" },
+      { value: "a", type: "customDictionary", createdPath: "" },
+    ]);
+  });
+
+  test("word type priority order in front matter aliases", () => {
+    expect(suggestWords(indexedWords2, "a", 10, "aliases")).toStrictEqual([
       { value: "a", type: "internalLink", createdPath: "" },
       { value: "a", type: "customDictionary", createdPath: "" },
     ]);
@@ -680,6 +704,18 @@ describe("suggestWordsByPartialMatch", () => {
           { key: "tags", value: "a", type: "frontMatter", createdPath: "" },
         ],
       },
+      alias: {
+        a: [
+          { key: "alias", value: "a", type: "frontMatter", createdPath: "" },
+          { key: "alias", value: "a", type: "frontMatter", createdPath: "" },
+        ],
+      },
+      aliases: {
+        a: [
+          { key: "aliases", value: "a", type: "frontMatter", createdPath: "" },
+          { key: "aliases", value: "a", type: "frontMatter", createdPath: "" },
+        ],
+      },
     },
     internalLink: {
       a: [
@@ -707,11 +743,27 @@ describe("suggestWordsByPartialMatch", () => {
     },
   };
 
-  test("word type priority order in front matter", () => {
+  test("word type priority order in front matter tags", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, "tags")
     ).toStrictEqual([
       { key: "tags", value: "a", type: "frontMatter", createdPath: "" },
+    ]);
+  });
+
+  test("word type priority order in front matter alias", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords2, "a", 10, "alias")
+    ).toStrictEqual([
+      { value: "a", type: "internalLink", createdPath: "" },
+      { value: "a", type: "customDictionary", createdPath: "" },
+    ]);
+  });
+
+  test("word type priority order in front matter aliases", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords2, "a", 10, "alias")
+    ).toStrictEqual([
       { value: "a", type: "internalLink", createdPath: "" },
       { value: "a", type: "customDictionary", createdPath: "" },
     ]);
