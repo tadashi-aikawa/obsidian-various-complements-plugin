@@ -21,7 +21,6 @@ function frontMatterToWords(
     value: x,
     type: "frontMatter",
     createdPath: file.path,
-    description: file.path,
     aliases: synonymAliases(x),
   }));
 }
