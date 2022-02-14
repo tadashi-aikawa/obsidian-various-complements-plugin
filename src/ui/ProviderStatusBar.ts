@@ -4,7 +4,7 @@ export class ProviderStatusBar {
     public currentVault: HTMLElement,
     public customDictionary: HTMLElement,
     public internalLink: HTMLElement,
-    public tag: HTMLElement
+    public frontMatter: HTMLElement
   ) {}
 
   static new(statusBar: HTMLElement): ProviderStatusBar {
@@ -24,9 +24,9 @@ export class ProviderStatusBar {
       text: "---",
       cls: "various-complements__footer various-complements__footer__internal-link",
     });
-    const tag = statusBar.createEl("span", {
+    const frontMatter = statusBar.createEl("span", {
       text: "---",
-      cls: "various-complements__footer various-complements__footer__tag",
+      cls: "various-complements__footer various-complements__footer__front-matter",
     });
 
     return new ProviderStatusBar(
@@ -34,7 +34,7 @@ export class ProviderStatusBar {
       currentVault,
       customDictionary,
       internalLink,
-      tag
+      frontMatter
     );
   }
 
@@ -50,8 +50,8 @@ export class ProviderStatusBar {
   setInternalLinkDisabled() {
     this.internalLink.setText("---");
   }
-  setTagDisabled() {
-    this.tag.setText("---");
+  setFrontMatterDisabled() {
+    this.frontMatter.setText("---");
   }
 
   setCurrentFileIndexing() {
@@ -66,8 +66,8 @@ export class ProviderStatusBar {
   setInternalLinkIndexing() {
     this.internalLink.setText("indexing...");
   }
-  setTagIndexing() {
-    this.tag.setText("indexing...");
+  setFrontMatterIndexing() {
+    this.frontMatter.setText("indexing...");
   }
 
   setCurrentFileIndexed(count: any) {
@@ -82,7 +82,7 @@ export class ProviderStatusBar {
   setInternalLinkIndexed(count: any) {
     this.internalLink.setText(String(count));
   }
-  setTagIndexed(count: any) {
-    this.tag.setText(String(count));
+  setFrontMatterIndexed(count: any) {
+    this.frontMatter.setText(String(count));
   }
 }

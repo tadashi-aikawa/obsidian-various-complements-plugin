@@ -31,7 +31,7 @@ import { ProviderStatusBar } from "./ProviderStatusBar";
 import { Word } from "../model/Word";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
-import { TagWordProvider } from "../provider/TagWordProvider";
+import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -42,7 +42,7 @@ export type IndexedWords = {
   currentVault: WordsByFirstLetter;
   customDictionary: WordsByFirstLetter;
   internalLink: WordsByFirstLetter;
-  tag: WordsByFirstLetter;
+  frontMatter: { [key: string]: WordsByFirstLetter };
 };
 
 // This is an unsafe code..!!
@@ -70,7 +70,7 @@ export class AutoCompleteSuggest
   currentVaultWordProvider: CurrentVaultWordProvider;
   customDictionaryWordProvider: CustomDictionaryWordProvider;
   internalLinkWordProvider: InternalLinkWordProvider;
-  tagWordProvider: TagWordProvider;
+  frontMatterWordProvider: FrontMatterWordProvider;
 
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
@@ -131,7 +131,10 @@ export class AutoCompleteSuggest
       ins.app,
       ins.appHelper
     );
-    ins.tagWordProvider = new TagWordProvider(ins.app, ins.appHelper);
+    ins.frontMatterWordProvider = new FrontMatterWordProvider(
+      ins.app,
+      ins.appHelper
+    );
 
     await ins.updateSettings(settings);
 
@@ -143,13 +146,13 @@ export class AutoCompleteSuggest
       async (_) => {
         await ins.refreshCurrentFileTokens();
         ins.refreshInternalLinkTokens();
-        ins.refreshTagTokens();
+        ins.refreshFrontMatterTokens();
       }
     );
     // Avoid referring to incorrect cache
     const cacheResolvedRef = app.metadataCache.on("resolved", async () => {
       ins.refreshInternalLinkTokens();
-      ins.refreshTagTokens();
+      ins.refreshFrontMatterTokens();
       // noinspection ES6MissingAwait
       ins.refreshCustomDictionaryTokens();
       // noinspection ES6MissingAwait
@@ -241,7 +244,7 @@ export class AutoCompleteSuggest
       currentVault: this.currentVaultWordProvider.wordsByFirstLetter,
       customDictionary: this.customDictionaryWordProvider.wordsByFirstLetter,
       internalLink: this.internalLinkWordProvider.wordsByFirstLetter,
-      tag: this.tagWordProvider.wordsByFirstLetter,
+      frontMatter: this.frontMatterWordProvider.wordsByFirstLetterByKey,
     };
   }
 
@@ -275,6 +278,8 @@ export class AutoCompleteSuggest
           offset: number;
         }[];
 
+        const currentFrontMatter = this.appHelper.getCurrentFrontMatter();
+
         const words = queries
           .filter(
             (x, i, xs) =>
@@ -290,7 +295,7 @@ export class AutoCompleteSuggest
                 this.indexedWords,
                 q.word,
                 this.settings.maxNumberOfSuggestions,
-                this.appHelper.inFrontMatter()
+                currentFrontMatter
               )
               .map((word) => ({ ...word, offset: q.offset }))
           )
@@ -410,7 +415,7 @@ export class AutoCompleteSuggest
             if (
               item.type !== "currentVault" &&
               item.type !== "internalLink" &&
-              item.type !== "tag"
+              item.type !== "frontMatter"
             ) {
               return false;
             }
@@ -543,24 +548,29 @@ export class AutoCompleteSuggest
     );
   }
 
-  refreshTagTokens(): void {
+  refreshFrontMatterTokens(): void {
     const start = performance.now();
-    this.statusBar?.setTagIndexing();
+    this.statusBar?.setFrontMatterIndexing();
 
-    if (!this.settings.enableTagComplement) {
-      this.statusBar?.setTagDisabled();
-      this.tagWordProvider.clearWords();
+    if (!this.settings.enableFrontMatterComplement) {
+      this.statusBar?.setFrontMatterDisabled();
+      this.frontMatterWordProvider.clearWords();
       this.showDebugLog(() =>
-        buildLogMessage("👢Skip: Index tag tokens", performance.now() - start)
+        buildLogMessage(
+          "👢Skip: Index front matter tokens",
+          performance.now() - start
+        )
       );
       return;
     }
 
-    this.tagWordProvider.refreshWords();
+    this.frontMatterWordProvider.refreshWords();
 
-    this.statusBar?.setTagIndexed(this.tagWordProvider.wordCount);
+    this.statusBar?.setFrontMatterIndexed(
+      this.frontMatterWordProvider.wordCount
+    );
     this.showDebugLog(() =>
-      buildLogMessage("Index tag tokens", performance.now() - start)
+      buildLogMessage("Index front matter tokens", performance.now() - start)
     );
   }
 
@@ -742,8 +752,8 @@ export class AutoCompleteSuggest
           el.addClass("various-complements__suggestion-item__phantom");
         }
         break;
-      case "tag":
-        el.addClass("various-complements__suggestion-item__tag");
+      case "frontMatter":
+        el.addClass("various-complements__suggestion-item__front-matter");
         break;
     }
   }

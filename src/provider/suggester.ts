@@ -38,7 +38,7 @@ export function judge(
     if (
       queryStartWithUpper &&
       word.type !== "internalLink" &&
-      word.type !== "tag"
+      word.type !== "frontMatter"
     ) {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
@@ -62,7 +62,7 @@ export function suggestWords(
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  inFrontMatter: boolean
+  frontMatter: string | null
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
@@ -76,9 +76,13 @@ export function suggestWords(
         ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
-        ...(inFrontMatter ? indexedWords.tag[query.charAt(0)] ?? [] : []),
-        ...(inFrontMatter
-          ? indexedWords.tag[query.charAt(0).toLowerCase()] ?? []
+        ...(frontMatter
+          ? indexedWords.frontMatter?.[frontMatter]?.[query.charAt(0)] ?? []
+          : []),
+        ...(frontMatter
+          ? indexedWords.frontMatter?.[frontMatter]?.[
+              query.charAt(0).toLowerCase()
+            ] ?? []
           : []),
       ]
     : [
@@ -87,9 +91,13 @@ export function suggestWords(
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
-        ...(inFrontMatter ? indexedWords.tag[query.charAt(0)] ?? [] : []),
-        ...(inFrontMatter
-          ? indexedWords.tag[query.charAt(0).toUpperCase()] ?? []
+        ...(frontMatter
+          ? indexedWords.frontMatter?.[frontMatter]?.[query.charAt(0)] ?? []
+          : []),
+        ...(frontMatter
+          ? indexedWords.frontMatter?.[frontMatter]?.[
+              query.charAt(0).toUpperCase()
+            ] ?? []
           : []),
       ];
 
@@ -98,8 +106,8 @@ export function suggestWords(
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
       const notSameWordType = a.word.type !== b.word.type;
-      if (inFrontMatter && notSameWordType) {
-        return b.word.type === "tag" ? 1 : -1;
+      if (frontMatter && notSameWordType) {
+        return b.word.type === "frontMatter" ? 1 : -1;
       }
 
       if (a.value!.length !== b.value!.length) {
@@ -139,7 +147,7 @@ export function judgeByPartialMatch(
     if (
       queryStartWithUpper &&
       word.type !== "internalLink" &&
-      word.type !== "tag"
+      word.type !== "frontMatter"
     ) {
       const c = capitalizeFirstLetter(word.value);
       return { word: { ...word, value: c }, value: c, alias: false };
@@ -181,7 +189,7 @@ export function suggestWordsByPartialMatch(
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  inFrontMatter: boolean
+  frontMatter: string | null
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
@@ -192,7 +200,9 @@ export function suggestWordsByPartialMatch(
     ...flatObjectValues(indexedWords.currentVault),
     ...flatObjectValues(indexedWords.customDictionary),
     ...flatObjectValues(indexedWords.internalLink),
-    ...(inFrontMatter ? flatObjectValues(indexedWords.tag) : []),
+    ...(frontMatter
+      ? flatObjectValues(indexedWords.frontMatter?.[frontMatter] ?? [])
+      : []),
   ];
 
   const candidate = Array.from(words)
@@ -200,8 +210,8 @@ export function suggestWordsByPartialMatch(
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
       const notSameWordType = a.word.type !== b.word.type;
-      if (inFrontMatter && notSameWordType) {
-        return b.word.type === "tag" ? 1 : -1;
+      if (frontMatter && notSameWordType) {
+        return b.word.type === "frontMatter" ? 1 : -1;
       }
 
       const as = lowerStartsWith(a.value!, query);

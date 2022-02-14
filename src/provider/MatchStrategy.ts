@@ -8,7 +8,7 @@ type Handler = (
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  inFrontMatter: boolean
+  frontMatter: string | null
 ) => Word[];
 
 export class MatchStrategy {

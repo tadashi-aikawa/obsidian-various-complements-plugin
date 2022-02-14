@@ -3,7 +3,7 @@ export type WordType =
   | "currentVault"
   | "customDictionary"
   | "internalLink"
-  | "tag";
+  | "frontMatter";
 
 export interface DefaultWord {
   value: string;
@@ -30,8 +30,9 @@ export interface InternalLinkWord extends DefaultWord {
     origin: string;
   };
 }
-export interface TagWord extends DefaultWord {
-  type: "tag";
+export interface FrontMatterWord extends DefaultWord {
+  type: "frontMatter";
+  key: string;
 }
 
 export type Word =
@@ -39,13 +40,17 @@ export type Word =
   | CurrentVaultWord
   | CustomDictionaryWord
   | InternalLinkWord
-  | TagWord;
+  | FrontMatterWord;
 
 export class WordTypeMeta {
   private static readonly _values: WordTypeMeta[] = [];
   private static readonly _dict: { [type: string]: WordTypeMeta } = {};
 
-  static readonly TAG = new WordTypeMeta("tag", 100, "tag");
+  static readonly FRONT_MATTER = new WordTypeMeta(
+    "frontMatter",
+    100,
+    "frontMatter"
+  );
   static readonly INTERNAL_LINK = new WordTypeMeta(
     "internalLink",
     90,

@@ -7,6 +7,8 @@ import {
   TFile,
 } from "obsidian";
 
+export type FrontMatterValue = string | number | string[] | number[] | null;
+
 export class AppHelper {
   constructor(private app: App) {}
 
@@ -16,6 +18,10 @@ export class AppHelper {
         this.app.metadataCache.getFileCache(file)?.frontmatter
       ) ?? []
     );
+  }
+
+  getFrontMatter(file: TFile): { [key: string]: FrontMatterValue } | undefined {
+    return this.app.metadataCache.getFileCache(file)?.frontmatter;
   }
 
   getFrontMatterTags(file: TFile): string[] {
@@ -40,8 +46,12 @@ export class AppHelper {
     return this.app.workspace.activeLeaf!.view as MarkdownView;
   }
 
+  getActiveFile(): TFile | null {
+    return this.app.workspace.getActiveFile();
+  }
+
   getCurrentDirname(): string | null {
-    return this.app.workspace.getActiveFile()?.parent.path ?? null;
+    return this.getActiveFile()?.parent.path ?? null;
   }
 
   getCurrentEditor(): Editor | null {
@@ -100,23 +110,39 @@ export class AppHelper {
       });
   }
 
-  inFrontMatter(): boolean {
+  getCurrentFrontMatter(): string | null {
     const editor = this.getCurrentEditor();
     if (!editor) {
-      return false;
+      return null;
     }
 
-    const activeFile = this.app.workspace.getActiveFile();
-    if (!activeFile) {
-      return false;
+    if (!this.getActiveFile()) {
+      return null;
     }
 
     if (editor.getLine(0) !== "---") {
-      return false;
+      return null;
     }
     const endPosition = editor.getValue().indexOf("---", 3);
 
-    return endPosition === -1 || this.getCurrentOffset(editor) < endPosition;
+    const currentOffset = this.getCurrentOffset(editor);
+    if (endPosition !== -1 && currentOffset >= endPosition) {
+      return null;
+    }
+
+    const keyLocations = Array.from(editor.getValue().matchAll(/.+:/g));
+    if (keyLocations.length === 0) {
+      return null;
+    }
+
+    const currentKeyLocation = keyLocations
+      .filter((x) => x.index! < currentOffset)
+      .last();
+    if (!currentKeyLocation) {
+      return null;
+    }
+
+    return currentKeyLocation[0].split(":")[0];
   }
 
   /**

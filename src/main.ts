@@ -140,7 +140,7 @@ export default class VariousComponents extends Plugin {
       currentVault?: boolean;
       customDictionary?: boolean;
       internalLink?: boolean;
-      tag?: boolean;
+      frontMatter?: boolean;
     } = {}
   ): Promise<void> {
     await this.saveData(this.settings);
@@ -157,8 +157,8 @@ export default class VariousComponents extends Plugin {
     if (needUpdateTokens.internalLink) {
       await this.suggester.refreshInternalLinkTokens();
     }
-    if (needUpdateTokens.tag) {
-      await this.suggester.refreshTagTokens();
+    if (needUpdateTokens.frontMatter) {
+      await this.suggester.refreshFrontMatterTokens();
     }
   }
 
