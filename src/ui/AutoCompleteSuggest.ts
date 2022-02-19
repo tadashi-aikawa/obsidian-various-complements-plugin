@@ -64,7 +64,7 @@ export class AutoCompleteSuggest
   app: App;
   settings: Settings;
   appHelper: AppHelper;
-  statusBar?: ProviderStatusBar;
+  statusBar: ProviderStatusBar;
 
   currentFileWordProvider: CurrentFileWordProvider;
   currentVaultWordProvider: CurrentVaultWordProvider;
@@ -91,7 +91,7 @@ export class AutoCompleteSuggest
   modifyEventRef: EventRef;
   activeLeafChangeRef: EventRef;
 
-  private constructor(app: App, statusBar?: ProviderStatusBar) {
+  private constructor(app: App, statusBar: ProviderStatusBar) {
     super(app);
     this.appHelper = new AppHelper(app);
     this.statusBar = statusBar;
@@ -112,7 +112,7 @@ export class AutoCompleteSuggest
   static async new(
     app: App,
     settings: Settings,
-    statusBar?: ProviderStatusBar
+    statusBar: ProviderStatusBar
   ): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app, statusBar);
 
@@ -250,6 +250,8 @@ export class AutoCompleteSuggest
 
   async updateSettings(settings: Settings) {
     this.settings = settings;
+
+    this.statusBar.setMatchStrategy(this.matchStrategy);
 
     this.tokenizer = createTokenizer(this.tokenizerStrategy);
     this.currentFileWordProvider.setSettings(this.tokenizer);
@@ -439,10 +441,10 @@ export class AutoCompleteSuggest
 
   async refreshCurrentFileTokens(): Promise<void> {
     const start = performance.now();
-    this.statusBar?.setCurrentFileIndexing();
+    this.statusBar.setCurrentFileIndexing();
 
     if (!this.settings.enableCurrentFileComplement) {
-      this.statusBar?.setCurrentFileDisabled();
+      this.statusBar.setCurrentFileDisabled();
       this.currentFileWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -457,7 +459,7 @@ export class AutoCompleteSuggest
       this.settings.onlyComplementEnglishOnCurrentFileComplement
     );
 
-    this.statusBar?.setCurrentFileIndexed(
+    this.statusBar.setCurrentFileIndexed(
       this.currentFileWordProvider.wordCount
     );
     this.showDebugLog(() =>
@@ -467,10 +469,10 @@ export class AutoCompleteSuggest
 
   async refreshCurrentVaultTokens(): Promise<void> {
     const start = performance.now();
-    this.statusBar?.setCurrentVaultIndexing();
+    this.statusBar.setCurrentVaultIndexing();
 
     if (!this.settings.enableCurrentVaultComplement) {
-      this.statusBar?.setCurrentVaultDisabled();
+      this.statusBar.setCurrentVaultDisabled();
       this.currentVaultWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -483,7 +485,7 @@ export class AutoCompleteSuggest
 
     await this.currentVaultWordProvider.refreshWords();
 
-    this.statusBar?.setCurrentVaultIndexed(
+    this.statusBar.setCurrentVaultIndexed(
       this.currentVaultWordProvider.wordCount
     );
     this.showDebugLog(() =>
@@ -493,10 +495,10 @@ export class AutoCompleteSuggest
 
   async refreshCustomDictionaryTokens(): Promise<void> {
     const start = performance.now();
-    this.statusBar?.setCustomDictionaryIndexing();
+    this.statusBar.setCustomDictionaryIndexing();
 
     if (!this.settings.enableCustomDictionaryComplement) {
-      this.statusBar?.setCustomDictionaryDisabled();
+      this.statusBar.setCustomDictionaryDisabled();
       this.customDictionaryWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -511,7 +513,7 @@ export class AutoCompleteSuggest
       this.settings.customDictionaryWordRegexPattern
     );
 
-    this.statusBar?.setCustomDictionaryIndexed(
+    this.statusBar.setCustomDictionaryIndexed(
       this.customDictionaryWordProvider.wordCount
     );
     this.showDebugLog(() =>
@@ -524,10 +526,10 @@ export class AutoCompleteSuggest
 
   refreshInternalLinkTokens(): void {
     const start = performance.now();
-    this.statusBar?.setInternalLinkIndexing();
+    this.statusBar.setInternalLinkIndexing();
 
     if (!this.settings.enableInternalLinkComplement) {
-      this.statusBar?.setInternalLinkDisabled();
+      this.statusBar.setInternalLinkDisabled();
       this.internalLinkWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -542,7 +544,7 @@ export class AutoCompleteSuggest
       this.settings.suggestInternalLinkWithAlias
     );
 
-    this.statusBar?.setInternalLinkIndexed(
+    this.statusBar.setInternalLinkIndexed(
       this.internalLinkWordProvider.wordCount
     );
     this.showDebugLog(() =>
@@ -552,10 +554,10 @@ export class AutoCompleteSuggest
 
   refreshFrontMatterTokens(): void {
     const start = performance.now();
-    this.statusBar?.setFrontMatterIndexing();
+    this.statusBar.setFrontMatterIndexing();
 
     if (!this.settings.enableFrontMatterComplement) {
-      this.statusBar?.setFrontMatterDisabled();
+      this.statusBar.setFrontMatterDisabled();
       this.frontMatterWordProvider.clearWords();
       this.showDebugLog(() =>
         buildLogMessage(
@@ -568,7 +570,7 @@ export class AutoCompleteSuggest
 
     this.frontMatterWordProvider.refreshWords();
 
-    this.statusBar?.setFrontMatterIndexed(
+    this.statusBar.setFrontMatterIndexed(
       this.frontMatterWordProvider.wordCount
     );
     this.showDebugLog(() =>

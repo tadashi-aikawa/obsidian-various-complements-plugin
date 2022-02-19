@@ -46,9 +46,14 @@ export default class VariousComponents extends Plugin {
     this.settingTab = new VariousComplementsSettingTab(this.app, this);
     this.addSettingTab(this.settingTab);
 
-    this.statusBar = this.settings.showIndexingStatus
-      ? ProviderStatusBar.new(this.addStatusBarItem())
-      : undefined;
+    this.statusBar = ProviderStatusBar.new(
+      this.addStatusBarItem(),
+      this.settings.showMatchStrategy,
+      this.settings.showIndexingStatus
+    );
+    this.statusBar.setOnClickStrategyListener(async () => {
+      await this.settingTab.toggleMatchStrategy();
+    });
 
     this.suggester = await AutoCompleteSuggest.new(
       this.app,

@@ -24,6 +24,7 @@ export interface Settings {
   insertAfterCompletion: boolean;
 
   // appearance
+  showMatchStrategy: boolean;
   showIndexingStatus: boolean;
   descriptionOnSuggestion: string;
 
@@ -77,6 +78,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertAfterCompletion: true,
 
   // appearance
+  showMatchStrategy: true,
   showIndexingStatus: true,
   descriptionOnSuggestion: "Short",
 
@@ -273,6 +275,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       });
 
     containerEl.createEl("h3", { text: "Appearance" });
+
+    new Setting(containerEl)
+      .setName("Show Match strategy")
+      .setDesc(
+        "Show Match strategy at the status bar. Changing this option requires a restart to take effect."
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.showMatchStrategy).onChange(
+          async (value) => {
+            this.plugin.settings.showMatchStrategy = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
 
     new Setting(containerEl)
       .setName("Show Indexing status")
