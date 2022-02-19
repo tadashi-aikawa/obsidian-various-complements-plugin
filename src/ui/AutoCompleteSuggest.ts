@@ -778,9 +778,18 @@ export class AutoCompleteSuggest
           ? `[[${word.aliasMeta.origin}|${word.value}]]`
           : `[[${word.value}]]`;
     }
-    if (this.settings.insertAfterCompletion) {
-      insertedText = `${insertedText} `;
+
+    if (
+      word.type === "frontMatter" &&
+      this.settings.insertCommaAfterFrontMatterCompletion
+    ) {
+      insertedText = `${insertedText}, `;
+    } else {
+      if (this.settings.insertAfterCompletion) {
+        insertedText = `${insertedText} `;
+      }
     }
+
     if (this.settings.delimiterToHideSuggestion) {
       insertedText = insertedText.replace(
         this.settings.delimiterToHideSuggestion,

@@ -58,6 +58,7 @@ export interface Settings {
 
   // front matter complement
   enableFrontMatterComplement: boolean;
+  insertCommaAfterFrontMatterCompletion: boolean;
 
   // debug
   showLogAboutPerformanceInConsole: boolean;
@@ -112,6 +113,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // front matter complement
   enableFrontMatterComplement: true,
+  insertCommaAfterFrontMatterCompletion: false,
 
   // debug
   showLogAboutPerformanceInConsole: false,
@@ -610,6 +612,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }
         );
       });
+
+    if (this.plugin.settings.enableFrontMatterComplement) {
+      new Setting(containerEl)
+        .setName("Insert comma after completion")
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.insertCommaAfterFrontMatterCompletion
+          ).onChange(async (value) => {
+            this.plugin.settings.insertCommaAfterFrontMatterCompletion = value;
+            await this.plugin.saveSettings();
+          });
+        });
+    }
 
     containerEl.createEl("h3", { text: "Debug" });
 
