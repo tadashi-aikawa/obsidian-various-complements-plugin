@@ -667,7 +667,9 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    const currentFrontMatter = this.appHelper.getCurrentFrontMatter();
+    const currentFrontMatter = this.settings.enableFrontMatterComplement
+      ? this.appHelper.getCurrentFrontMatter()
+      : null;
     this.showDebugLog(() => `Current front matter is ${currentFrontMatter}`);
 
     if (!this.runManually && !currentFrontMatter) {
@@ -691,11 +693,16 @@ export class AutoCompleteSuggest
     );
     this.runManually = false;
 
+    // Hack implementation for Front matter complement
+    if (currentFrontMatter && currentTokens.last()?.word.match(/[^ ] $/)) {
+      currentTokens.push({ word: "", offset: currentLineUntilCursor.length });
+    }
+
     // For multi-word completion
     this.contextStartCh = cursor.ch - currentToken.length;
     return {
       start: {
-        ch: cursor.ch - (tokenized.last()?.word?.length ?? 0), // For multi-word completion
+        ch: cursor.ch - (currentTokens.last()?.word?.length ?? 0), // For multi-word completion
         line: cursor.line,
       },
       end: cursor,
