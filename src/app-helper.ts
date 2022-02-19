@@ -1,6 +1,7 @@
 import {
   App,
   Editor,
+  EditorPosition,
   MarkdownView,
   parseFrontMatterAliases,
   parseFrontMatterStringArray,
@@ -12,6 +13,10 @@ export type FrontMatterValue = string[];
 
 export class AppHelper {
   constructor(private app: App) {}
+
+  equalsAsEditorPostion(one: EditorPosition, other: EditorPosition): boolean {
+    return one.line === other.line && one.ch === other.ch;
+  }
 
   getAliases(file: TFile): string[] {
     return (

@@ -830,6 +830,17 @@ export class AutoCompleteSuggest
       );
     }
 
+    // The workaround of strange behavior for that cursor doesn't move after completion only if it doesn't input any word.
+    if (
+      this.appHelper.equalsAsEditorPostion(this.context.start, this.context.end)
+    ) {
+      editor.setCursor(
+        editor.offsetToPos(
+          editor.posToOffset(editor.getCursor()) + insertedText.length
+        )
+      );
+    }
+
     this.close();
     this.debounceClose();
   }
