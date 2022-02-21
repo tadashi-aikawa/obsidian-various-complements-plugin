@@ -380,6 +380,11 @@ export class AutoCompleteSuggest
       this.settings.additionalCycleThroughSuggestionsKeys
     );
     if (cycleThroughSuggestionsKeys !== CycleThroughSuggestionsKeys.NONE) {
+      if (cycleThroughSuggestionsKeys === CycleThroughSuggestionsKeys.TAB) {
+        this.scope.unregister(
+          this.scope.keys.find((x) => x.modifiers === "" && x.key === "Tab")!
+        );
+      }
       this.keymapEventHandler.push(
         this.scope.register(
           cycleThroughSuggestionsKeys.nextKey.modifiers,
