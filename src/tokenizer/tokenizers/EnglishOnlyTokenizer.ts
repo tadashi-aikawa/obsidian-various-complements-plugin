@@ -15,9 +15,6 @@ export class EnglishOnlyTokenizer extends DefaultTokenizer {
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
-    console.log("----");
-    console.log(Array.from(this._tokenize(content)));
-    console.log("----");
     const offsets = Array.from(this._tokenize(content))
       .filter((x) => !x.word.match(this.getTrimPattern()))
       .map((x) => x.offset);
