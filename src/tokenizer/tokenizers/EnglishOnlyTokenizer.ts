@@ -1,7 +1,7 @@
 import { DefaultTokenizer } from "./DefaultTokenizer";
 
 type PreviousType = "none" | "trim" | "english" | "others";
-const ENGLISH_PATTERN = /[a-zA-Z0-9_\-]/;
+const ENGLISH_PATTERN = /[a-zA-Z0-9_\-\\]/;
 export class EnglishOnlyTokenizer extends DefaultTokenizer {
   tokenize(content: string, raw?: boolean): string[] {
     const tokenized = Array.from(this._tokenize(content)).filter((x) =>
@@ -15,6 +15,9 @@ export class EnglishOnlyTokenizer extends DefaultTokenizer {
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
+    console.log("----");
+    console.log(Array.from(this._tokenize(content)));
+    console.log("----");
     const offsets = Array.from(this._tokenize(content))
       .filter((x) => !x.word.match(this.getTrimPattern()))
       .map((x) => x.offset);

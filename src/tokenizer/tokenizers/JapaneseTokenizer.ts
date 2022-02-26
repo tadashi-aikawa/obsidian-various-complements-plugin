@@ -30,6 +30,7 @@ export class JapaneseTokenizer implements Tokenizer {
     const ret = [];
     for (let i = 0; i < tokens.length; i++) {
       if (
+        i === 0 ||
         tokens[i].length !== 1 ||
         !Boolean(tokens[i].match(this.getTrimPattern()))
       ) {
