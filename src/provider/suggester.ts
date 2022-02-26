@@ -70,16 +70,18 @@ export function suggestWords(
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
-  const shouldSuggestIndividual =
-    frontMatter && frontMatter !== "alias" && frontMatter !== "aliases";
-
-  const flattenFrontMatterWords = () =>
-    frontMatter && indexedWords.frontMatter?.[frontMatter]
-      ? Object.values(indexedWords.frontMatter?.[frontMatter]).flat()
-      : [];
+  const flattenFrontMatterWords = () => {
+    if (frontMatter === "alias" || frontMatter === "aliases") {
+      return [];
+    }
+    if (frontMatter && indexedWords.frontMatter?.[frontMatter]) {
+      return Object.values(indexedWords.frontMatter?.[frontMatter]).flat();
+    }
+    return [];
+  };
 
   const words = queryStartWithUpper
-    ? shouldSuggestIndividual
+    ? frontMatter
       ? flattenFrontMatterWords()
       : [
           ...(indexedWords.currentFile[query.charAt(0)] ?? []),
@@ -92,7 +94,7 @@ export function suggestWords(
           ...(indexedWords.internalLink[query.charAt(0)] ?? []),
           ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
         ]
-    : shouldSuggestIndividual
+    : frontMatter
     ? flattenFrontMatterWords()
     : [
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
@@ -198,17 +200,20 @@ export function suggestWordsByPartialMatch(
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
-  const shouldSuggestIndividual =
-    frontMatter && frontMatter !== "alias" && frontMatter !== "aliases";
   const flatObjectValues = (object: { [firstLetter: string]: Word[] }) =>
     Object.values(object).flat();
 
-  const flattenFrontMatterWords = () =>
-    frontMatter && indexedWords.frontMatter?.[frontMatter]
-      ? Object.values(indexedWords.frontMatter?.[frontMatter]).flat()
-      : [];
+  const flattenFrontMatterWords = () => {
+    if (frontMatter === "alias" || frontMatter === "aliases") {
+      return [];
+    }
+    if (frontMatter && indexedWords.frontMatter?.[frontMatter]) {
+      return Object.values(indexedWords.frontMatter?.[frontMatter]).flat();
+    }
+    return [];
+  };
 
-  const words = shouldSuggestIndividual
+  const words = frontMatter
     ? flattenFrontMatterWords()
     : [
         ...flatObjectValues(indexedWords.currentFile),

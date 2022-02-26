@@ -385,25 +385,19 @@ describe("suggestWords", () => {
     ]);
   });
 
-  test("word type priority order in front matter alias", () => {
-    expect(suggestWords(indexedWords2, "a", 10, "alias")).toStrictEqual([
-      { value: "a", type: "internalLink", createdPath: "" },
-      { value: "a", type: "customDictionary", createdPath: "" },
-    ]);
-  });
-
-  test("word type priority order in front matter aliases", () => {
-    expect(suggestWords(indexedWords2, "a", 10, "aliases")).toStrictEqual([
-      { value: "a", type: "internalLink", createdPath: "" },
-      { value: "a", type: "customDictionary", createdPath: "" },
-    ]);
-  });
-
   test("word type priority order not in front matter", () => {
     expect(suggestWords(indexedWords2, "a", 10, null)).toStrictEqual([
       { value: "a", type: "internalLink", createdPath: "" },
       { value: "a", type: "customDictionary", createdPath: "" },
     ]);
+  });
+
+  test("empty in front matter alias", () => {
+    expect(suggestWords(indexedWords2, "a", 10, "alias")).toStrictEqual([]);
+  });
+
+  test("empty in front matter aliases", () => {
+    expect(suggestWords(indexedWords2, "a", 10, "aliases")).toStrictEqual([]);
   });
 
   const indexedWords3: IndexedWords = {
@@ -755,24 +749,6 @@ describe("suggestWordsByPartialMatch", () => {
     ]);
   });
 
-  test("word type priority order in front matter alias", () => {
-    expect(
-      suggestWordsByPartialMatch(indexedWords2, "a", 10, "alias")
-    ).toStrictEqual([
-      { value: "a", type: "internalLink", createdPath: "" },
-      { value: "a", type: "customDictionary", createdPath: "" },
-    ]);
-  });
-
-  test("word type priority order in front matter aliases", () => {
-    expect(
-      suggestWordsByPartialMatch(indexedWords2, "a", 10, "alias")
-    ).toStrictEqual([
-      { value: "a", type: "internalLink", createdPath: "" },
-      { value: "a", type: "customDictionary", createdPath: "" },
-    ]);
-  });
-
   test("word type priority order not in front matter", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, null)
@@ -780,6 +756,18 @@ describe("suggestWordsByPartialMatch", () => {
       { value: "a", type: "internalLink", createdPath: "" },
       { value: "a", type: "customDictionary", createdPath: "" },
     ]);
+  });
+
+  test("empty in front matter alias", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords2, "a", 10, "alias")
+    ).toStrictEqual([]);
+  });
+
+  test("empty in front matter aliases", () => {
+    expect(
+      suggestWordsByPartialMatch(indexedWords2, "a", 10, "alias")
+    ).toStrictEqual([]);
   });
 
   const indexedWords3: IndexedWords = {
