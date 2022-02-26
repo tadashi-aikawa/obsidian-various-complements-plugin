@@ -8,6 +8,7 @@ import { SelectSuggestionKey } from "./option/SelectSuggestionKey";
 import { mirrorMap } from "./util/collection-helper";
 import { OpenSourceFileKeys } from "./option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "./option/DescriptionOnSuggestion";
+import { SpecificMatchStrategy } from "./provider/SpecificMatchStrategy";
 
 export interface Settings {
   // general
@@ -58,6 +59,7 @@ export interface Settings {
 
   // front matter complement
   enableFrontMatterComplement: boolean;
+  frontMatterComplementMatchStrategy: string;
   insertCommaAfterFrontMatterCompletion: boolean;
 
   // debug
@@ -113,6 +115,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // front matter complement
   enableFrontMatterComplement: true,
+  frontMatterComplementMatchStrategy: "inherit",
   insertCommaAfterFrontMatterCompletion: false,
 
   // debug
@@ -614,6 +617,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       });
 
     if (this.plugin.settings.enableFrontMatterComplement) {
+      new Setting(containerEl)
+        .setName("Match strategy in the front matter")
+        .addDropdown((tc) =>
+          tc
+            .addOptions(
+              mirrorMap(SpecificMatchStrategy.values(), (x) => x.name)
+            )
+            .setValue(this.plugin.settings.frontMatterComplementMatchStrategy)
+            .onChange(async (value) => {
+              this.plugin.settings.frontMatterComplementMatchStrategy = value;
+              await this.plugin.saveSettings();
+            })
+        );
+
       new Setting(containerEl)
         .setName("Insert comma after completion")
         .addToggle((tc) => {

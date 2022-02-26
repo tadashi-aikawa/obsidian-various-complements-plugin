@@ -32,6 +32,7 @@ import { Word } from "../model/Word";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
+import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -223,6 +224,12 @@ export class AutoCompleteSuggest
     return MatchStrategy.fromName(this.settings.matchStrategy);
   }
 
+  get frontMatterComplementStrategy(): SpecificMatchStrategy {
+    return SpecificMatchStrategy.fromName(
+      this.settings.frontMatterComplementMatchStrategy
+    );
+  }
+
   get minNumberTriggered(): number {
     return (
       this.settings.minNumberOfCharactersTriggered ||
@@ -293,16 +300,20 @@ export class AutoCompleteSuggest
                 !this.tokenizer.shouldIgnore(x.word) &&
                 !x.word.endsWith(" "))
           )
-          .map((q) =>
-            this.matchStrategy
-              .handler(
-                this.indexedWords,
-                q.word,
-                this.settings.maxNumberOfSuggestions,
-                parsedQuery.currentFrontMatter
-              )
-              .map((word) => ({ ...word, offset: q.offset }))
-          )
+          .map((q) => {
+            const handler =
+              parsedQuery.currentFrontMatter &&
+              this.frontMatterComplementStrategy !==
+                SpecificMatchStrategy.INHERIT
+                ? this.frontMatterComplementStrategy.handler
+                : this.matchStrategy.handler;
+            return handler(
+              this.indexedWords,
+              q.word,
+              this.settings.maxNumberOfSuggestions,
+              parsedQuery.currentFrontMatter
+            ).map((word) => ({ ...word, offset: q.offset }));
+          })
           .flat();
 
         cb(
