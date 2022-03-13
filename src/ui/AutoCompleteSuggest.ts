@@ -15,7 +15,7 @@ import {
 } from "obsidian";
 import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
-import { Settings } from "../settings";
+import { Settings } from "../setting/settings";
 import { AppHelper } from "../app-helper";
 import { WordsByFirstLetter } from "../provider/suggester";
 import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";

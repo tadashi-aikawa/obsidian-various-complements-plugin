@@ -1,14 +1,14 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
-import VariousComponents from "./main";
-import { TokenizeStrategy } from "./tokenizer/TokenizeStrategy";
-import { MatchStrategy } from "./provider/MatchStrategy";
-import { CycleThroughSuggestionsKeys } from "./option/CycleThroughSuggestionsKeys";
-import { ColumnDelimiter } from "./option/ColumnDelimiter";
-import { SelectSuggestionKey } from "./option/SelectSuggestionKey";
-import { mirrorMap } from "./util/collection-helper";
-import { OpenSourceFileKeys } from "./option/OpenSourceFileKeys";
-import { DescriptionOnSuggestion } from "./option/DescriptionOnSuggestion";
-import { SpecificMatchStrategy } from "./provider/SpecificMatchStrategy";
+import VariousComponents from "../main";
+import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
+import { MatchStrategy } from "../provider/MatchStrategy";
+import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
+import { ColumnDelimiter } from "../option/ColumnDelimiter";
+import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
+import { mirrorMap } from "../util/collection-helper";
+import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
+import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
+import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 
 export interface Settings {
   // general
@@ -138,17 +138,23 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     containerEl.createEl("h2", { text: "Various Complements - Settings" });
+    this.addMainSettings(containerEl);
+    this.addAppearanceSettings(containerEl);
+    this.addKeyCustomizationSettings(containerEl);
+    this.addCurrentFileComplementSettings(containerEl);
+    this.addCurrentVaultComplementSettings(containerEl);
+    this.addCustomDictionaryComplementSettings(containerEl);
+    this.addInternalLinkComplementSettings(containerEl);
+    this.addFrontMatterComplementSettings(containerEl);
+    this.addDebugSettings(containerEl);
+  }
 
+  private addMainSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", { text: "Main" });
 
     new Setting(containerEl).setName("Strategy").addDropdown((tc) =>
       tc
-        .addOptions(
-          TokenizeStrategy.values().reduce(
-            (p, c) => ({ ...p, [c.name]: c.name }),
-            {}
-          )
-        )
+        .addOptions(mirrorMap(TokenizeStrategy.values(), (x) => x.name))
         .setValue(this.plugin.settings.strategy)
         .onChange(async (value) => {
           this.plugin.settings.strategy = value;
@@ -161,12 +167,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     new Setting(containerEl).setName("Match strategy").addDropdown((tc) =>
       tc
-        .addOptions(
-          MatchStrategy.values().reduce(
-            (p, c) => ({ ...p, [c.name]: c.name }),
-            {}
-          )
-        )
+        .addOptions(mirrorMap(MatchStrategy.values(), (x) => x.name))
         .setValue(this.plugin.settings.matchStrategy)
         .onChange(async (value) => {
           this.plugin.settings.matchStrategy = value;
@@ -280,7 +281,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }
         );
       });
+  }
 
+  private addAppearanceSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", { text: "Appearance" });
 
     new Setting(containerEl)
@@ -324,7 +327,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+  }
 
+  private addKeyCustomizationSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", { text: "Key customization" });
 
     new Setting(containerEl)
@@ -344,10 +349,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .addDropdown((tc) =>
         tc
           .addOptions(
-            CycleThroughSuggestionsKeys.values().reduce(
-              (p, c) => ({ ...p, [c.name]: c.name }),
-              {}
-            )
+            mirrorMap(CycleThroughSuggestionsKeys.values(), (x) => x.name)
           )
           .setValue(this.plugin.settings.additionalCycleThroughSuggestionsKeys)
           .onChange(async (value) => {
@@ -379,7 +381,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }
         );
       });
+  }
 
+  private addCurrentFileComplementSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Current file complement",
       cls: "various-complements__settings__header various-complements__settings__header__current-file",
@@ -410,7 +414,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
     }
+  }
 
+  private addCurrentVaultComplementSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Current vault complement",
       cls: "various-complements__settings__header various-complements__settings__header__current-vault",
@@ -478,7 +484,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
     }
+  }
 
+  private addCustomDictionaryComplementSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Custom dictionary complement",
       cls: "various-complements__settings__header various-complements__settings__header__custom-dictionary",
@@ -517,12 +525,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(containerEl).setName("Column delimiter").addDropdown((tc) =>
         tc
-          .addOptions(
-            ColumnDelimiter.values().reduce(
-              (p, c) => ({ ...p, [c.name]: c.name }),
-              {}
-            )
-          )
+          .addOptions(mirrorMap(ColumnDelimiter.values(), (x) => x.name))
           .setValue(this.plugin.settings.columnDelimiter)
           .onChange(async (value) => {
             this.plugin.settings.columnDelimiter = value;
@@ -570,7 +573,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
     }
+  }
 
+  private addInternalLinkComplementSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Internal link complement",
       cls: "various-complements__settings__header various-complements__settings__header__internal-link",
@@ -618,7 +623,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           return el;
         });
     }
+  }
 
+  private addFrontMatterComplementSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Front matter complement",
       cls: "various-complements__settings__header various-complements__settings__header__front-matter",
@@ -662,7 +669,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
     }
+  }
 
+  private addDebugSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", { text: "Debug" });
 
     new Setting(containerEl)

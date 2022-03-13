@@ -4,7 +4,7 @@ import {
   DEFAULT_SETTINGS,
   Settings,
   VariousComplementsSettingTab,
-} from "./settings";
+} from "./setting/settings";
 import { CustomDictionaryWordRegisterModal } from "./ui/CustomDictionaryWordRegisterModal";
 import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
