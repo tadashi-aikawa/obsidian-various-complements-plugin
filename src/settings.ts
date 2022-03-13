@@ -56,6 +56,7 @@ export interface Settings {
   // internal link complement
   enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
+  excludeInternalLinkPathPrefixPatterns: string;
 
   // front matter complement
   enableFrontMatterComplement: boolean;
@@ -112,6 +113,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // internal link complement
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
+  excludeInternalLinkPathPrefixPatterns: "",
 
   // front matter complement
   enableFrontMatterComplement: true,
@@ -596,6 +598,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.suggestInternalLinkWithAlias = value;
             await this.plugin.saveSettings({ internalLink: true });
           });
+        });
+      new Setting(containerEl)
+        .setName("Exclude prefix path patterns")
+        .setDesc("Prefix match path patterns to exclude files.")
+        .addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeInternalLinkPathPrefixPatterns
+            )
+            .setPlaceholder("Private/")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeInternalLinkPathPrefixPatterns =
+                value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
         });
     }
 

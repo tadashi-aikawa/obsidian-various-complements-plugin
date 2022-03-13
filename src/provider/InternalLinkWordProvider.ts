@@ -10,7 +10,10 @@ export class InternalLinkWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  refreshWords(wordAsInternalLinkAlias: boolean): void {
+  refreshWords(
+    wordAsInternalLinkAlias: boolean,
+    excludePathPrefixPatterns: string[]
+  ): void {
     this.clearWords();
 
     const synonymAliases = (name: string): string[] => {
@@ -20,6 +23,9 @@ export class InternalLinkWordProvider {
 
     const resolvedInternalLinkWords: InternalLinkWord[] = this.app.vault
       .getMarkdownFiles()
+      .filter((f) =>
+        excludePathPrefixPatterns.every((x) => !f.path.startsWith(x))
+      )
       .flatMap((x) => {
         const aliases = this.appHelper.getAliases(x);
 

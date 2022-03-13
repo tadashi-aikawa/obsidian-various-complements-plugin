@@ -245,6 +245,12 @@ export class AutoCompleteSuggest
     );
   }
 
+  get excludeInternalLinkPrefixPathPatterns(): string[] {
+    return this.settings.excludeInternalLinkPathPrefixPatterns
+      .split("\n")
+      .filter((x) => x);
+  }
+
   // --- end ---
 
   get indexedWords(): IndexedWords {
@@ -559,7 +565,8 @@ export class AutoCompleteSuggest
     }
 
     this.internalLinkWordProvider.refreshWords(
-      this.settings.suggestInternalLinkWithAlias
+      this.settings.suggestInternalLinkWithAlias,
+      this.excludeInternalLinkPrefixPathPatterns
     );
 
     this.statusBar.setInternalLinkIndexed(
