@@ -84,6 +84,8 @@ export class AutoCompleteSuggest
 
   contextStartCh: number;
 
+  previousCurrentLine = "";
+
   // unsafe!!
   scope: UnsafeEditorSuggestInterface["scope"];
   suggestions: UnsafeEditorSuggestInterface["suggestions"];
@@ -618,6 +620,16 @@ export class AutoCompleteSuggest
       this.showDebugLog(() => "Don't show suggestions for IME");
       return null;
     }
+
+    const cl = this.appHelper.getCurrentLine(editor);
+    if (this.previousCurrentLine === cl && !this.runManually) {
+      this.previousCurrentLine = cl;
+      this.showDebugLog(
+        () => "Don't show suggestions because there are no changes"
+      );
+      return null;
+    }
+    this.previousCurrentLine = cl;
 
     const currentLineUntilCursor =
       this.appHelper.getCurrentLineUntilCursor(editor);
