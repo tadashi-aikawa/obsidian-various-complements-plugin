@@ -759,16 +759,35 @@ export class AutoCompleteSuggest
     });
   }
 
+  createRenderSuggestion(word: Word): string {
+    const text = word.value;
+
+    if (
+      this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion &&
+      text.includes(
+        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
+      )
+    ) {
+      return text.split(
+        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
+      )[0];
+    }
+
+    if (
+      this.settings.delimiterToHideSuggestion &&
+      text.includes(this.settings.delimiterToHideSuggestion)
+    ) {
+      return `${text.split(this.settings.delimiterToHideSuggestion)[0]} ...`;
+    }
+
+    return text;
+  }
+
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
-    let text = word.value;
 
     base.createDiv({
-      text:
-        this.settings.delimiterToHideSuggestion &&
-        text.includes(this.settings.delimiterToHideSuggestion)
-          ? `${text.split(this.settings.delimiterToHideSuggestion)[0]} ...`
-          : text,
+      text: this.createRenderSuggestion(word),
       cls:
         word.type === "internalLink" && word.aliasMeta
           ? "various-complements__suggestion-item__content__alias"
@@ -830,6 +849,17 @@ export class AutoCompleteSuggest
       if (this.settings.insertAfterCompletion) {
         insertedText = `${insertedText} `;
       }
+    }
+
+    if (
+      this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion &&
+      insertedText.includes(
+        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
+      )
+    ) {
+      insertedText = insertedText.split(
+        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
+      )[1];
     }
 
     if (this.settings.delimiterToHideSuggestion) {

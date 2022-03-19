@@ -51,6 +51,7 @@ export interface Settings {
   columnDelimiter: string;
   customDictionaryWordRegexPattern: string;
   delimiterToHideSuggestion: string;
+  delimiterToDivideSuggestionsForDisplayFromInsertion: string;
   caretLocationSymbolAfterComplement: string;
 
   // internal link complement
@@ -108,6 +109,7 @@ export const DEFAULT_SETTINGS: Settings = {
   columnDelimiter: "Tab",
   customDictionaryWordRegexPattern: "",
   delimiterToHideSuggestion: "",
+  delimiterToDivideSuggestionsForDisplayFromInsertion: "",
   caretLocationSymbolAfterComplement: "",
 
   // internal link complement
@@ -548,7 +550,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Delimiter to hide a suggestion")
         .setDesc(
-          "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but complements to 'abcdefg'."
+          "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but completes to 'abcdefg'."
         )
         .addText((cb) => {
           cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
@@ -557,6 +559,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               await this.plugin.saveSettings();
             }
           );
+        });
+
+      new Setting(containerEl)
+        .setName(
+          "Delimiter to divide suggestions for display from ones for insertion"
+        )
+        .setDesc(
+          "If set ' >>> ', 'displayed >>> inserted' is shown as 'displayed' on suggestions, but completes to 'inserted'."
+        )
+        .addText((cb) => {
+          cb.setValue(
+            this.plugin.settings
+              .delimiterToDivideSuggestionsForDisplayFromInsertion
+          ).onChange(async (value) => {
+            this.plugin.settings.delimiterToDivideSuggestionsForDisplayFromInsertion =
+              value;
+            await this.plugin.saveSettings();
+          });
         });
 
       new Setting(containerEl)
