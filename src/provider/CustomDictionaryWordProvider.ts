@@ -3,6 +3,7 @@ import { pushWord, WordsByFirstLetter } from "./suggester";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
 import { Word } from "../model/Word";
+import { excludeEmoji } from "../util/strings";
 
 function escape(value: string): string {
   // This tricky logics for Safari
@@ -50,6 +51,11 @@ function wordToLine(word: Word, delimiter: ColumnDelimiter): string {
   return [escapedValue, word.description, ...word.aliases].join(
     delimiter.value
   );
+}
+
+function synonymAliases(name: string): string[] {
+  const lessEmojiValue = excludeEmoji(name);
+  return name === lessEmojiValue ? [] : [lessEmojiValue];
 }
 
 export class CustomDictionaryWordProvider {
@@ -115,10 +121,20 @@ export class CustomDictionaryWordProvider {
   }
 
   private addWord(word: Word) {
-    this.wordByValue[word.value] = word;
-    pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
-    word.aliases?.forEach((a) =>
-      pushWord(this.wordsByFirstLetter, a.charAt(0), word)
+    // Add aliases as a synonym
+    const wordWithSynonym = {
+      ...word,
+      aliases: [...(word.aliases ?? []), ...synonymAliases(word.value)],
+    };
+
+    this.wordByValue[wordWithSynonym.value] = wordWithSynonym;
+    pushWord(
+      this.wordsByFirstLetter,
+      wordWithSynonym.value.charAt(0),
+      wordWithSynonym
+    );
+    wordWithSynonym.aliases?.forEach((a) =>
+      pushWord(this.wordsByFirstLetter, a.charAt(0), wordWithSynonym)
     );
   }
 
