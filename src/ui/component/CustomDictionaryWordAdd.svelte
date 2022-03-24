@@ -3,7 +3,7 @@
   import ObsidianButton from "./ObsidianButton.svelte";
   import { File } from "svelte-lucide-icons";
   import ObsidianIconButton from "./ObsidianIconButton.svelte";
-  import { Word } from "../../model/Word";
+  import type { Word } from "../../model/Word";
   import { onMount } from "svelte";
 
   type Dictionary = {
