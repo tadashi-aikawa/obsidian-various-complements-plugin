@@ -174,6 +174,7 @@ export default class VariousComponents extends Plugin {
       this.app,
       provider.editablePaths,
       selectedWord,
+      this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion,
       async (dictionaryPath, word) => {
         if (provider.wordByValue[word.value]) {
           // noinspection ObjectAllocationIgnored
