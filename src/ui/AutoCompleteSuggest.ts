@@ -769,9 +769,11 @@ export class AutoCompleteSuggest
         this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
       )
     ) {
-      return text.split(
-        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
-      )[0];
+      return (
+        text.split(
+          this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
+        )[0] + " => ..."
+      );
     }
 
     if (
