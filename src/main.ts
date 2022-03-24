@@ -2,12 +2,12 @@ import { Notice, Plugin } from "obsidian";
 import { AutoCompleteSuggest } from "./ui/AutoCompleteSuggest";
 import {
   DEFAULT_SETTINGS,
-  Settings,
+  type Settings,
   VariousComplementsSettingTab,
 } from "./setting/settings";
-import { CustomDictionaryWordRegisterModal } from "./ui/CustomDictionaryWordRegisterModal";
 import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
+import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
 
 export default class VariousComponents extends Plugin {
   appHelper: AppHelper;
@@ -170,7 +170,7 @@ export default class VariousComponents extends Plugin {
   addWordToCustomDictionary() {
     const selectedWord = this.appHelper.getSelection();
     const provider = this.suggester.customDictionaryWordProvider;
-    const modal = new CustomDictionaryWordRegisterModal(
+    const modal = new CustomDictionaryWordAddModal(
       this.app,
       provider.editablePaths,
       selectedWord,
@@ -189,11 +189,5 @@ export default class VariousComponents extends Plugin {
     );
 
     modal.open();
-
-    if (selectedWord) {
-      modal.button.buttonEl.focus();
-    } else {
-      modal.wordTextArea.inputEl.focus();
-    }
   }
 }

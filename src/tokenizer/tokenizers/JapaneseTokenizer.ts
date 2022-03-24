@@ -1,6 +1,6 @@
 import TinySegmenter from "../../external/tiny-segmenter";
 import { TRIM_CHAR_PATTERN } from "./DefaultTokenizer";
-import { Tokenizer } from "../tokenizer";
+import type { Tokenizer } from "../tokenizer";
 // @ts-ignore
 const segmenter = new TinySegmenter();
 

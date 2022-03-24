@@ -1,11 +1,7 @@
-import {
-  capitalizeFirstLetter,
-  lowerIncludes,
-  lowerStartsWith,
-} from "../util/strings";
-import { IndexedWords } from "../ui/AutoCompleteSuggest";
+import { capitalizeFirstLetter, lowerIncludes, lowerStartsWith, } from "../util/strings";
+import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
-import { Word, WordTypeMeta } from "../model/Word";
+import { type Word, WordTypeMeta } from "../model/Word";
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 

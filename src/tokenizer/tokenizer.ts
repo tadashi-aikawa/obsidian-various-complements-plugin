@@ -1,7 +1,7 @@
 import { ArabicTokenizer } from "./tokenizers/ArabicTokenizer";
 import { DefaultTokenizer } from "./tokenizers/DefaultTokenizer";
 import { JapaneseTokenizer } from "./tokenizers/JapaneseTokenizer";
-import { TokenizeStrategy } from "./TokenizeStrategy";
+import type { TokenizeStrategy } from "./TokenizeStrategy";
 import { EnglishOnlyTokenizer } from "./tokenizers/EnglishOnlyTokenizer";
 
 export interface Tokenizer {

@@ -1,4 +1,4 @@
-import { Modifier } from "obsidian";
+import type { Modifier } from "obsidian";
 
 type Name = "Enter" | "Tab" | "Ctrl/Cmd+Enter" | "Alt+Enter" | "Shift+Enter";
 interface KeyBind {

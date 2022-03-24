@@ -1,4 +1,4 @@
-import { MatchStrategy } from "../provider/MatchStrategy";
+import type { MatchStrategy } from "../provider/MatchStrategy";
 
 export class ProviderStatusBar {
   constructor(

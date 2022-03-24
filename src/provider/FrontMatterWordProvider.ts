@@ -1,7 +1,7 @@
-import { App, TFile } from "obsidian";
-import { WordsByFirstLetter } from "./suggester";
-import { AppHelper, FrontMatterValue } from "../app-helper";
-import { FrontMatterWord } from "../model/Word";
+import type { App, TFile } from "obsidian";
+import type { WordsByFirstLetter } from "./suggester";
+import type { AppHelper, FrontMatterValue } from "../app-helper";
+import type { FrontMatterWord } from "../model/Word";
 import { excludeEmoji } from "../util/strings";
 import { groupBy, uniqWith } from "../util/collection-helper";
 

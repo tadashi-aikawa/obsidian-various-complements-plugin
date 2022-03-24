@@ -1,4 +1,4 @@
-import { Word } from "../model/Word";
+import type { Word } from "../model/Word";
 import { basename } from "../util/path";
 
 export class DescriptionOnSuggestion {

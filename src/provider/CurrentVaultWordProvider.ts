@@ -1,9 +1,9 @@
-import { App } from "obsidian";
+import type { App } from "obsidian";
 import { groupBy } from "../util/collection-helper";
-import { WordsByFirstLetter } from "./suggester";
-import { Tokenizer } from "../tokenizer/tokenizer";
-import { AppHelper } from "../app-helper";
-import { Word } from "../model/Word";
+import type { WordsByFirstLetter } from "./suggester";
+import type { Tokenizer } from "../tokenizer/tokenizer";
+import type { AppHelper } from "../app-helper";
+import type { Word } from "../model/Word";
 import { dirname } from "../util/path";
 
 export class CurrentVaultWordProvider {

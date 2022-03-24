@@ -1,6 +1,6 @@
-import { IndexedWords } from "../ui/AutoCompleteSuggest";
+import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { suggestWords, suggestWordsByPartialMatch } from "./suggester";
-import { Word } from "../model/Word";
+import type { Word } from "../model/Word";
 
 type Name = "inherit" | "prefix" | "partial";
 
@@ -11,7 +11,7 @@ type Handler = (
   frontMatter: string | null
 ) => Word[];
 
-const neverUsedHandler = (...args: any[]) => [];
+const neverUsedHandler = (..._args: any[]) => [];
 
 export class SpecificMatchStrategy {
   private static readonly _values: SpecificMatchStrategy[] = [];

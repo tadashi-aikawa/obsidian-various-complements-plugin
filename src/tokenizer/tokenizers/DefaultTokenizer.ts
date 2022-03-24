@@ -1,4 +1,4 @@
-import { Tokenizer } from "../tokenizer";
+import type { Tokenizer } from "../tokenizer";
 import { splitRaw } from "../../util/strings";
 
 function pickTokens(content: string, trimPattern: RegExp): string[] {

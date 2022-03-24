@@ -1,10 +1,10 @@
-import { App } from "obsidian";
+import type { App } from "obsidian";
 import { groupBy, uniq } from "../util/collection-helper";
-import { WordsByFirstLetter } from "./suggester";
-import { Tokenizer } from "../tokenizer/tokenizer";
-import { AppHelper } from "../app-helper";
+import type { WordsByFirstLetter } from "./suggester";
+import type { Tokenizer } from "../tokenizer/tokenizer";
+import type { AppHelper } from "../app-helper";
 import { allAlphabets } from "../util/strings";
-import { Word } from "../model/Word";
+import type { Word } from "../model/Word";
 
 export class CurrentFileWordProvider {
   wordsByFirstLetter: WordsByFirstLetter = {};

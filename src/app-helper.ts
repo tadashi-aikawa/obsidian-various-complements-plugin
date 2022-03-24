@@ -1,7 +1,7 @@
 import {
   App,
   Editor,
-  EditorPosition,
+  type EditorPosition,
   MarkdownView,
   parseFrontMatterAliases,
   parseFrontMatterStringArray,

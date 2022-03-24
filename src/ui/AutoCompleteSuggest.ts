@@ -1,23 +1,23 @@
 import {
   App,
   debounce,
-  Debouncer,
+  type Debouncer,
   Editor,
-  EditorPosition,
+  type EditorPosition,
   EditorSuggest,
-  EditorSuggestContext,
-  EditorSuggestTriggerInfo,
-  EventRef,
-  KeymapEventHandler,
+  type EditorSuggestContext,
+  type EditorSuggestTriggerInfo,
+  type EventRef,
+  type KeymapEventHandler,
   Notice,
   Scope,
   TFile,
 } from "obsidian";
-import { createTokenizer, Tokenizer } from "../tokenizer/tokenizer";
+import { createTokenizer, type Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
-import { Settings } from "../setting/settings";
+import type { Settings } from "../setting/settings";
 import { AppHelper } from "../app-helper";
-import { WordsByFirstLetter } from "../provider/suggester";
+import type { WordsByFirstLetter } from "../provider/suggester";
 import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
@@ -27,8 +27,8 @@ import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
-import { ProviderStatusBar } from "./ProviderStatusBar";
-import { Word } from "../model/Word";
+import type { ProviderStatusBar } from "./ProviderStatusBar";
+import type { Word } from "../model/Word";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
@@ -452,6 +452,7 @@ export class AutoCompleteSuggest
               item.createdPath
             );
             if (!markdownFile) {
+              // noinspection ObjectAllocationIgnored
               new Notice(`Can't open ${item.createdPath}`);
               return false;
             }

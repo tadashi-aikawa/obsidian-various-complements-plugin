@@ -4,10 +4,10 @@ import {
   pushWord,
   suggestWords,
   suggestWordsByPartialMatch,
-  WordsByFirstLetter,
+  type WordsByFirstLetter,
 } from "./suggester";
 import { describe, expect } from "@jest/globals";
-import { IndexedWords } from "../ui/AutoCompleteSuggest";
+import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 
 describe("pushWord", () => {
   const createWordsByFirstLetter = (): WordsByFirstLetter => ({

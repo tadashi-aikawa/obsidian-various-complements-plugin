@@ -1,5 +1,5 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
-import VariousComponents from "../main";
+import type VariousComponents from "../main";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";

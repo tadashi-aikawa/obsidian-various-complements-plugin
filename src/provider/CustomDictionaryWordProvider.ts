@@ -1,8 +1,8 @@
 import { App, FileSystemAdapter, Notice, request } from "obsidian";
-import { pushWord, WordsByFirstLetter } from "./suggester";
-import { ColumnDelimiter } from "../option/ColumnDelimiter";
+import { pushWord, type WordsByFirstLetter } from "./suggester";
+import type { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
-import { Word } from "../model/Word";
+import type { Word } from "../model/Word";
 import { excludeEmoji } from "../util/strings";
 
 function escape(value: string): string {

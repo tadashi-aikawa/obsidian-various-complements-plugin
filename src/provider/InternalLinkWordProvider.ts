@@ -1,8 +1,8 @@
-import { App } from "obsidian";
-import { pushWord, WordsByFirstLetter } from "./suggester";
-import { AppHelper } from "../app-helper";
+import type { App } from "obsidian";
+import { pushWord, type WordsByFirstLetter } from "./suggester";
+import type { AppHelper } from "../app-helper";
 import { excludeEmoji } from "../util/strings";
-import { InternalLinkWord, Word, WordType } from "../model/Word";
+import type { InternalLinkWord, Word } from "../model/Word";
 
 export class InternalLinkWordProvider {
   private words: Word[] = [];
