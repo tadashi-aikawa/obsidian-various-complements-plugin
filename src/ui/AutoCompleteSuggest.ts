@@ -776,7 +776,7 @@ export class AutoCompleteSuggest
       return (
         text.split(
           this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
-        )[0] + " => ..."
+        )[0] + this.settings.displayedTextSuffix
       );
     }
 

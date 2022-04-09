@@ -54,6 +54,7 @@ export interface Settings {
   delimiterToHideSuggestion: string;
   delimiterToDivideSuggestionsForDisplayFromInsertion: string;
   caretLocationSymbolAfterComplement: string;
+  displayedTextSuffix: string;
 
   // internal link complement
   enableInternalLinkComplement: boolean;
@@ -113,6 +114,7 @@ export const DEFAULT_SETTINGS: Settings = {
   delimiterToHideSuggestion: "",
   delimiterToDivideSuggestionsForDisplayFromInsertion: "",
   caretLocationSymbolAfterComplement: "",
+  displayedTextSuffix: " => ...",
 
   // internal link complement
   enableInternalLinkComplement: true,
@@ -604,6 +606,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.caretLocationSymbolAfterComplement = value;
             await this.plugin.saveSettings();
           });
+        });
+
+      new Setting(containerEl)
+        .setName("Displayed text suffix")
+        .setDesc(
+          "It shows as a suffix of displayed text if there is a difference between displayed and inserted"
+        )
+        .addText((cb) => {
+          cb.setValue(this.plugin.settings.displayedTextSuffix).onChange(
+            async (value) => {
+              this.plugin.settings.displayedTextSuffix = value;
+              await this.plugin.saveSettings();
+            }
+          );
         });
     }
   }
