@@ -683,7 +683,11 @@ export class AutoCompleteSuggest
 
     const currentTokenSeparatedWhiteSpace =
       currentLineUntilCursor.split(" ").last() ?? "";
-    if (/^[:\/^]/.test(currentTokenSeparatedWhiteSpace)) {
+    if (
+      new RegExp(`^[${this.settings.firstCharactersDisableSuggestions}]`).test(
+        currentTokenSeparatedWhiteSpace
+      )
+    ) {
       this.runManually = false;
       this.showDebugLog(
         () =>

@@ -23,6 +23,7 @@ export interface Settings {
   disableSuggestionsDuringImeOn: boolean;
   // FIXME: Rename at next major version up
   insertAfterCompletion: boolean;
+  firstCharactersDisableSuggestions: string;
 
   // appearance
   showMatchStrategy: boolean;
@@ -81,6 +82,7 @@ export const DEFAULT_SETTINGS: Settings = {
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
   insertAfterCompletion: true,
+  firstCharactersDisableSuggestions: ":/^",
 
   // appearance
   showMatchStrategy: true,
@@ -282,6 +284,17 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }
         );
+      });
+
+    new Setting(containerEl)
+      .setName("First characters to disable suggestions")
+      .addText((cb) => {
+        cb.setValue(
+          this.plugin.settings.firstCharactersDisableSuggestions
+        ).onChange(async (value) => {
+          this.plugin.settings.firstCharactersDisableSuggestions = value;
+          await this.plugin.saveSettings();
+        });
       });
   }
 
