@@ -1,6 +1,12 @@
 import type { Modifier } from "obsidian";
 
-type Name = "Enter" | "Tab" | "Ctrl/Cmd+Enter" | "Alt+Enter" | "Shift+Enter";
+type Name =
+  | "Enter"
+  | "Tab"
+  | "Ctrl/Cmd+Enter"
+  | "Alt+Enter"
+  | "Shift+Enter"
+  | "Space";
 interface KeyBind {
   modifiers: Modifier[];
   key: string | null;
@@ -28,6 +34,10 @@ export class SelectSuggestionKey {
   static readonly SHIFT_ENTER = new SelectSuggestionKey("Shift+Enter", {
     modifiers: ["Shift"],
     key: "Enter",
+  });
+  static readonly SPACE = new SelectSuggestionKey("Space", {
+    modifiers: [],
+    key: " ",
   });
 
   private constructor(readonly name: Name, readonly keyBind: KeyBind) {
