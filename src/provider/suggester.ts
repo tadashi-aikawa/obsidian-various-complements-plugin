@@ -1,7 +1,12 @@
-import { capitalizeFirstLetter, lowerIncludes, lowerStartsWith, } from "../util/strings";
+import {
+  capitalizeFirstLetter,
+  lowerIncludes,
+  lowerStartsWith,
+} from "../util/strings";
 import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
 import { type Word, WordTypeMeta } from "../model/Word";
+import type { SelectionHistoryStorage } from "../storage/SelectionHistoryStorage";
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
@@ -31,7 +36,11 @@ export function judge(
   queryStartWithUpper: boolean
 ): Judgement {
   if (query === "") {
-    return { word, value: word.value, alias: false };
+    return {
+      word: { ...word, completionDistance: word.value.length - query.length },
+      value: word.value,
+      alias: false,
+    };
   }
 
   if (lowerStartsWith(word.value, query)) {
@@ -41,28 +50,44 @@ export function judge(
       word.type !== "frontMatter"
     ) {
       const c = capitalizeFirstLetter(word.value);
-      return { word: { ...word, value: c }, value: c, alias: false };
+      return {
+        word: {
+          ...word,
+          value: c,
+          completionDistance: c.length - query.length,
+        },
+        value: c,
+        alias: false,
+      };
     } else {
-      return { word: word, value: word.value, alias: false };
+      return {
+        word: { ...word, completionDistance: word.value.length - query.length },
+        value: word.value,
+        alias: false,
+      };
     }
   }
   const matchedAlias = word.aliases?.find((a) => lowerStartsWith(a, query));
   if (matchedAlias) {
     return {
-      word: { ...word },
+      word: { ...word, completionDistance: matchedAlias.length - query.length },
       value: matchedAlias,
       alias: true,
     };
   }
 
-  return { word: word, alias: false };
+  return {
+    word,
+    alias: false,
+  };
 }
 
 export function suggestWords(
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  frontMatter: string | null
+  frontMatter: string | null,
+  selectionHistoryStorage?: SelectionHistoryStorage
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
@@ -107,6 +132,13 @@ export function suggestWords(
       const notSameWordType = a.word.type !== b.word.type;
       if (frontMatter && notSameWordType) {
         return b.word.type === "frontMatter" ? 1 : -1;
+      }
+
+      if (selectionHistoryStorage) {
+        const ret = selectionHistoryStorage.compare(a.word.value, b.word.value);
+        if (ret !== 0) {
+          return ret;
+        }
       }
 
       if (a.value!.length !== b.value!.length) {
@@ -192,7 +224,8 @@ export function suggestWordsByPartialMatch(
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  frontMatter: string | null
+  frontMatter: string | null,
+  selectionHistoryStorage?: SelectionHistoryStorage
 ): Word[] {
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 

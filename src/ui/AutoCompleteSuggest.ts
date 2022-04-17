@@ -33,6 +33,7 @@ import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
+import { SelectionHistoryStorage } from "../storage/SelectionHistoryStorage";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -72,6 +73,7 @@ export class AutoCompleteSuggest
   customDictionaryWordProvider: CustomDictionaryWordProvider;
   internalLinkWordProvider: InternalLinkWordProvider;
   frontMatterWordProvider: FrontMatterWordProvider;
+  selectionHistoryStorage: SelectionHistoryStorage | undefined;
 
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
@@ -138,6 +140,8 @@ export class AutoCompleteSuggest
       ins.app,
       ins.appHelper
     );
+
+    ins.selectionHistoryStorage = new SelectionHistoryStorage();
 
     await ins.updateSettings(settings);
 
@@ -319,7 +323,8 @@ export class AutoCompleteSuggest
               this.indexedWords,
               q.word,
               this.settings.maxNumberOfSuggestions,
-              parsedQuery.currentFrontMatter
+              parsedQuery.currentFrontMatter,
+              this.selectionHistoryStorage
             ).map((word) => ({ ...word, offset: q.offset }));
           })
           .flat();
@@ -912,6 +917,9 @@ export class AutoCompleteSuggest
         )
       );
     }
+
+    this.selectionHistoryStorage?.increment(word);
+    console.log(this.selectionHistoryStorage?.data);
 
     this.close();
     this.debounceClose();

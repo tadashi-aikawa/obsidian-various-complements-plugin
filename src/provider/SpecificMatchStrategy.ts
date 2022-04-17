@@ -1,6 +1,7 @@
 import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { suggestWords, suggestWordsByPartialMatch } from "./suggester";
 import type { Word } from "../model/Word";
+import type { SelectionHistoryStorage } from "../storage/SelectionHistoryStorage";
 
 type Name = "inherit" | "prefix" | "partial";
 
@@ -8,7 +9,8 @@ type Handler = (
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  frontMatter: string | null
+  frontMatter: string | null,
+  selectionHistoryStorage?: SelectionHistoryStorage
 ) => Word[];
 
 const neverUsedHandler = (..._args: any[]) => [];

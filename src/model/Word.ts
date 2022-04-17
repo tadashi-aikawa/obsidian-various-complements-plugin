@@ -13,6 +13,7 @@ export interface DefaultWord {
   createdPath: string;
   // Add after judge
   offset?: number;
+  completionDistance?: number;
 }
 export interface CurrentFileWord extends DefaultWord {
   type: "currentFile";
