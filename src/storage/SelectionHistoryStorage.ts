@@ -1,4 +1,7 @@
 import type { Word } from "../model/Word";
+import type { PartialRequired } from "../types";
+
+export type HitWord = PartialRequired<Word, "hit" | "completionDistance">;
 
 export type SelectionHistoryByValue = {
   [value: string]: {
@@ -7,6 +10,10 @@ export type SelectionHistoryByValue = {
   };
 };
 
+function word2Key(word: HitWord): string {
+  return `${word.hit}/${word.type}`;
+}
+
 export class SelectionHistoryStorage {
   data: SelectionHistoryByValue;
 
@@ -14,34 +21,34 @@ export class SelectionHistoryStorage {
     this.data = data;
   }
 
-  increment(word: Word): void {
-    if (!word.hit) {
-      return;
-    }
+  increment(word: HitWord): void {
+    const key = word2Key(word);
 
-    const distance = word.completionDistance ?? 0;
-    if (this.data[word.hit]) {
-      this.data[word.hit] = {
+    const distance = word.completionDistance;
+    if (this.data[key]) {
+      this.data[key] = {
         accumulatedCompletionDistance:
-          this.data[word.hit].accumulatedCompletionDistance + distance,
+          this.data[key].accumulatedCompletionDistance + distance + 1,
         lastUpdated: Date.now(),
       };
     } else {
-      this.data[word.hit] = {
-        accumulatedCompletionDistance: distance,
+      this.data[key] = {
+        accumulatedCompletionDistance: distance + 1,
         lastUpdated: Date.now(),
       };
     }
   }
 
-  compare(v1: string, v2: string): -1 | 0 | 1 {
-    const distance1 = this.data[v1]?.accumulatedCompletionDistance ?? 0;
-    const distance2 = this.data[v2]?.accumulatedCompletionDistance ?? 0;
+  compare(w1: HitWord, w2: HitWord): -1 | 0 | 1 {
+    const distance1 =
+      this.data[word2Key(w1)]?.accumulatedCompletionDistance ?? 0;
+    const distance2 =
+      this.data[word2Key(w2)]?.accumulatedCompletionDistance ?? 0;
 
-    if (v1.length - distance1 === v2.length - distance2) {
+    if (w1.hit.length - distance1 === w2.hit.length - distance2) {
       return 0;
     }
 
-    return v1.length - distance1 > v2.length - distance2 ? 1 : -1;
+    return w1.hit.length - distance1 > w2.hit.length - distance2 ? 1 : -1;
   }
 }

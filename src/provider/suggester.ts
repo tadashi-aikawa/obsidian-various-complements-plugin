@@ -6,7 +6,10 @@ import {
 import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { uniqWith } from "../util/collection-helper";
 import { type Word, WordTypeMeta } from "../model/Word";
-import type { SelectionHistoryStorage } from "../storage/SelectionHistoryStorage";
+import type {
+  HitWord,
+  SelectionHistoryStorage,
+} from "../storage/SelectionHistoryStorage";
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
@@ -143,13 +146,19 @@ export function suggestWords(
     .map((x) => judge(x, query, queryStartWithUpper))
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
-      const notSameWordType = a.word.type !== b.word.type;
+      const aWord = a.word as HitWord;
+      const bWord = b.word as HitWord;
+
+      const notSameWordType = aWord.type !== bWord.type;
       if (frontMatter && notSameWordType) {
-        return b.word.type === "frontMatter" ? 1 : -1;
+        return bWord.type === "frontMatter" ? 1 : -1;
       }
 
       if (selectionHistoryStorage) {
-        const ret = selectionHistoryStorage.compare(a.word.hit!, b.word.hit!);
+        const ret = selectionHistoryStorage.compare(
+          aWord as HitWord,
+          bWord as HitWord
+        );
         if (ret !== 0) {
           return ret;
         }
@@ -159,8 +168,8 @@ export function suggestWords(
         return a.value!.length > b.value!.length ? 1 : -1;
       }
       if (notSameWordType) {
-        return WordTypeMeta.of(b.word.type).priority >
-          WordTypeMeta.of(a.word.type).priority
+        return WordTypeMeta.of(bWord.type).priority >
+          WordTypeMeta.of(aWord.type).priority
           ? 1
           : -1;
       }

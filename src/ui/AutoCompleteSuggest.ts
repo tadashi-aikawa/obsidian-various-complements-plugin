@@ -33,7 +33,10 @@ import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
-import { SelectionHistoryStorage } from "../storage/SelectionHistoryStorage";
+import {
+  type HitWord,
+  SelectionHistoryStorage,
+} from "../storage/SelectionHistoryStorage";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -918,7 +921,7 @@ export class AutoCompleteSuggest
       );
     }
 
-    this.selectionHistoryStorage?.increment(word);
+    this.selectionHistoryStorage?.increment(word as HitWord);
     console.log(this.selectionHistoryStorage?.data);
 
     this.close();
