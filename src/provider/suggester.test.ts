@@ -52,18 +52,18 @@ describe("pushWord", () => {
 
 describe.each`
   word                                                                   | query   | queryStartWithUpper | expected
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary", completionDistance: 3 }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary", completionDistance: 3 }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", aliases: ["ab"], type: "customDictionary", completionDistance: 3 }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "internalLink", completionDistance: 3 }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", type: "customDictionary", completionDistance: 3 }, alias: false }}
+  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["ab"], type: "customDictionary", completionDistance: 3 }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink", completionDistance: 3 }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary", completionDistance: 3 }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "internalLink", completionDistance: 3 }, alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ value: "abc", word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary", completionDistance: 1 }, alias: true }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink", completionDistance: 3 }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary", completionDistance: 1 }, alias: true }}
   ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary", completionDistance: 5 }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary", completionDistance: 5 }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary", completionDistance: 5 }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary", completionDistance: 5 }, alias: false }}
 `("judge", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judge(${JSON.stringify(
     word
@@ -166,24 +166,28 @@ describe("suggestWords", () => {
       {
         value: "AI",
         type: "internalLink",
+        hit: "AI",
         createdPath: "",
         completionDistance: 1,
       },
       {
         value: "ai",
         type: "currentFile",
+        hit: "ai",
         createdPath: "",
         completionDistance: 1,
       },
       {
         value: "AWS",
         type: "internalLink",
+        hit: "AWS",
         createdPath: "",
         completionDistance: 2,
       },
       {
         value: "uwaa",
         aliases: ["aaa"],
+        hit: "aaa",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 2,
@@ -191,12 +195,14 @@ describe("suggestWords", () => {
       {
         value: "aiUEO",
         type: "internalLink",
+        hit: "aiUEO",
         createdPath: "",
         completionDistance: 4,
       },
       {
         value: "あいうえお",
         aliases: ["aiueo"],
+        hit: "aiueo",
         type: "internalLink",
         createdPath: "",
         completionDistance: 4,
@@ -204,6 +210,7 @@ describe("suggestWords", () => {
       {
         value: "aiUEO",
         type: "customDictionary",
+        hit: "aiUEO",
         createdPath: "",
         completionDistance: 4,
       },
@@ -215,18 +222,21 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "ai", 10, null)).toStrictEqual([
       {
         value: "AI",
+        hit: "AI",
         type: "internalLink",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "ai",
+        hit: "ai",
         type: "currentFile",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
         completionDistance: 3,
@@ -234,12 +244,14 @@ describe("suggestWords", () => {
       {
         value: "あいうえお",
         aliases: ["aiueo"],
+        hit: "aiueo",
         type: "internalLink",
         createdPath: "",
         completionDistance: 3,
       },
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 3,
@@ -252,6 +264,7 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "aiu", 10, null)).toStrictEqual([
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
         completionDistance: 2,
@@ -259,12 +272,14 @@ describe("suggestWords", () => {
       {
         value: "あいうえお",
         aliases: ["aiueo"],
+        hit: "aiueo",
         type: "internalLink",
         createdPath: "",
         completionDistance: 2,
       },
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 2,
@@ -277,24 +292,28 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "A", 10, null)).toStrictEqual([
       {
         value: "AI",
+        hit: "AI",
         type: "internalLink",
         createdPath: "",
         completionDistance: 1,
       },
       {
         value: "Ai",
+        hit: "Ai",
         type: "currentFile",
         createdPath: "",
         completionDistance: 1,
       },
       {
         value: "AWS",
+        hit: "AWS",
         type: "internalLink",
         createdPath: "",
         completionDistance: 2,
       },
       {
         value: "AWS",
+        hit: "AWS",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 2,
@@ -303,11 +322,13 @@ describe("suggestWords", () => {
         value: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
+        hit: "aaa",
         createdPath: "",
         completionDistance: 2,
       },
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
         completionDistance: 4,
@@ -315,12 +336,14 @@ describe("suggestWords", () => {
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
         completionDistance: 4,
       },
       {
         value: "AiUEO",
+        hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 4,
@@ -333,24 +356,28 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "Ai", 10, null)).toStrictEqual([
       {
         value: "AI",
+        hit: "AI",
         type: "internalLink",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "Ai",
+        hit: "Ai",
         type: "currentFile",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
         completionDistance: 3,
       },
       {
         value: "あいうえお",
+        hit: "aiueo",
         type: "internalLink",
         aliases: ["aiueo"],
         createdPath: "",
@@ -358,6 +385,7 @@ describe("suggestWords", () => {
       },
       {
         value: "AiUEO",
+        hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 3,
@@ -370,24 +398,28 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "AI", 10, null)).toStrictEqual([
       {
         value: "AI",
+        hit: "AI",
         type: "internalLink",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "Ai",
+        hit: "Ai",
         type: "currentFile",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
         completionDistance: 3,
       },
       {
         value: "あいうえお",
+        hit: "aiueo",
         type: "internalLink",
         aliases: ["aiueo"],
         createdPath: "",
@@ -395,6 +427,7 @@ describe("suggestWords", () => {
       },
       {
         value: "AiUEO",
+        hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 3,
@@ -407,12 +440,14 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "AIU", 10, null)).toStrictEqual([
       {
         value: "aiUEO",
+        hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
         completionDistance: 2,
       },
       {
         value: "あいうえお",
+        hit: "aiueo",
         type: "internalLink",
         aliases: ["aiueo"],
         createdPath: "",
@@ -420,6 +455,7 @@ describe("suggestWords", () => {
       },
       {
         value: "AiUEO",
+        hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 2,
@@ -432,6 +468,7 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "u", 10, null)).toStrictEqual([
       {
         value: "uwaa",
+        hit: "uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
         createdPath: "",
@@ -445,6 +482,7 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "U", 10, null)).toStrictEqual([
       {
         value: "UFO",
+        hit: "UFO",
         type: "customDictionary",
         aliases: ["Unidentified flying object"],
         createdPath: "",
@@ -452,6 +490,7 @@ describe("suggestWords", () => {
       },
       {
         value: "Uwaa",
+        hit: "Uwaa",
         type: "customDictionary",
         aliases: ["aaa"],
         createdPath: "",
@@ -465,18 +504,21 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords, "a", 3, null)).toStrictEqual([
       {
         value: "AI",
+        hit: "AI",
         type: "internalLink",
         createdPath: "",
         completionDistance: 1,
       },
       {
         value: "ai",
+        hit: "ai",
         type: "currentFile",
         createdPath: "",
         completionDistance: 1,
       },
       {
         value: "AWS",
+        hit: "AWS",
         type: "internalLink",
         createdPath: "",
         completionDistance: 2,
@@ -542,6 +584,7 @@ describe("suggestWords", () => {
       {
         key: "tags",
         value: "a",
+        hit: "a",
         type: "frontMatter",
         createdPath: "",
         completionDistance: 0,
@@ -553,12 +596,14 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords2, "a", 10, null)).toStrictEqual([
       {
         value: "a",
+        hit: "a",
         type: "internalLink",
         createdPath: "",
         completionDistance: 0,
       },
       {
         value: "a",
+        hit: "a",
         type: "customDictionary",
         createdPath: "",
         completionDistance: 0,
@@ -596,6 +641,7 @@ describe("suggestWords", () => {
     expect(suggestWords(indexedWords3, "a", 10, null)).toStrictEqual([
       {
         value: "a",
+        hit: "a",
         type: "currentFile",
         createdPath: "",
         completionDistance: 0,

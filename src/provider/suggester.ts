@@ -12,6 +12,7 @@ export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
 interface Judgement {
   word: Word;
+  // TODO: remove value. use word.hit instead
   value?: string;
   alias: boolean;
 }
@@ -37,7 +38,11 @@ export function judge(
 ): Judgement {
   if (query === "") {
     return {
-      word: { ...word, completionDistance: word.value.length - query.length },
+      word: {
+        ...word,
+        completionDistance: word.value.length - query.length,
+        hit: word.value,
+      },
       value: word.value,
       alias: false,
     };
@@ -55,13 +60,18 @@ export function judge(
           ...word,
           value: c,
           completionDistance: c.length - query.length,
+          hit: c,
         },
         value: c,
         alias: false,
       };
     } else {
       return {
-        word: { ...word, completionDistance: word.value.length - query.length },
+        word: {
+          ...word,
+          completionDistance: word.value.length - query.length,
+          hit: word.value,
+        },
         value: word.value,
         alias: false,
       };
@@ -70,7 +80,11 @@ export function judge(
   const matchedAlias = word.aliases?.find((a) => lowerStartsWith(a, query));
   if (matchedAlias) {
     return {
-      word: { ...word, completionDistance: matchedAlias.length - query.length },
+      word: {
+        ...word,
+        completionDistance: matchedAlias.length - query.length,
+        hit: matchedAlias,
+      },
       value: matchedAlias,
       alias: true,
     };
@@ -135,7 +149,7 @@ export function suggestWords(
       }
 
       if (selectionHistoryStorage) {
-        const ret = selectionHistoryStorage.compare(a.word.value, b.word.value);
+        const ret = selectionHistoryStorage.compare(a.word.hit!, b.word.hit!);
         if (ret !== 0) {
           return ret;
         }

@@ -15,16 +15,19 @@ export class SelectionHistoryStorage {
   }
 
   increment(word: Word): void {
-    const distance = word.completionDistance ?? 0;
+    if (!word.hit) {
+      return;
+    }
 
-    if (this.data[word.value]) {
-      this.data[word.value] = {
+    const distance = word.completionDistance ?? 0;
+    if (this.data[word.hit]) {
+      this.data[word.hit] = {
         accumulatedCompletionDistance:
-          this.data[word.value].accumulatedCompletionDistance + distance,
+          this.data[word.hit].accumulatedCompletionDistance + distance,
         lastUpdated: Date.now(),
       };
     } else {
-      this.data[word.value] = {
+      this.data[word.hit] = {
         accumulatedCompletionDistance: distance,
         lastUpdated: Date.now(),
       };
@@ -32,14 +35,6 @@ export class SelectionHistoryStorage {
   }
 
   compare(v1: string, v2: string): -1 | 0 | 1 {
-    // const lastUpdated1 = this.data[v1]?.lastUpdated ?? 0;
-    // const lastUpdated2 = this.data[v2]?.lastUpdated ?? 0;
-    //
-    // if (lastUpdated1 === lastUpdated2) {
-    //   return 0;
-    // }
-    // return lastUpdated1 > lastUpdated2 ? -1 : 1;
-
     const distance1 = this.data[v1]?.accumulatedCompletionDistance ?? 0;
     const distance2 = this.data[v2]?.accumulatedCompletionDistance ?? 0;
 
