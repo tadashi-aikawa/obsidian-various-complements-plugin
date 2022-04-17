@@ -922,7 +922,10 @@ export class AutoCompleteSuggest
     }
 
     this.selectionHistoryStorage?.increment(word as HitWord);
-    console.log(this.selectionHistoryStorage?.data);
+    if (this.settings.showLogAboutPerformanceInConsole) {
+      console.log("--- history ---");
+      console.log(this.selectionHistoryStorage?.data);
+    }
 
     this.close();
     this.debounceClose();
