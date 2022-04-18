@@ -12,7 +12,7 @@ export type SelectionHistoryByValue = {
 };
 
 function word2Key(word: HitWord): string {
-  return `${word.hit}/${word.type}`;
+  return `${word.hit}___${word.value}___${word.type}`;
 }
 
 const SEC = 1000;
