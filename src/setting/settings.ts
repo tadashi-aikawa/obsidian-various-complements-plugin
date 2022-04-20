@@ -9,6 +9,7 @@ import { mirrorMap } from "../util/collection-helper";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
+import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
 
 export interface Settings {
   // general
@@ -68,6 +69,9 @@ export interface Settings {
 
   // debug
   showLogAboutPerformanceInConsole: boolean;
+
+  // others
+  selectionHistoryTree: SelectionHistoryTree;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -128,6 +132,9 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // debug
   showLogAboutPerformanceInConsole: false,
+
+  // others
+  selectionHistoryTree: {},
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
@@ -761,7 +768,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       {
         version: this.plugin.manifest.version,
         mobile: (this.app as any).isMobile,
-        settings: this.plugin.settings,
+        settings: { ...this.plugin.settings, selectionHistoryTree: null },
       },
       null,
       4

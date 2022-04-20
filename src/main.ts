@@ -41,6 +41,14 @@ export default class VariousComponents extends Plugin {
       })
     );
 
+    this.app.workspace.on("quit", async () => {
+      if (this.suggester.selectionHistoryStorage) {
+        this.settings.selectionHistoryTree =
+          this.suggester.selectionHistoryStorage.data;
+        await this.saveData(this.settings);
+      }
+    });
+
     await this.loadSettings();
 
     this.settingTab = new VariousComplementsSettingTab(this.app, this);

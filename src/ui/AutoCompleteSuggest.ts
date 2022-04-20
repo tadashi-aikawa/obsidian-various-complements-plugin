@@ -144,7 +144,9 @@ export class AutoCompleteSuggest
       ins.appHelper
     );
 
-    ins.selectionHistoryStorage = new SelectionHistoryStorage();
+    ins.selectionHistoryStorage = new SelectionHistoryStorage(
+      settings.selectionHistoryTree
+    );
 
     await ins.updateSettings(settings);
 
