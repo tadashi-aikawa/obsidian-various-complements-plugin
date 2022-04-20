@@ -7,13 +7,13 @@ export type SelectionHistory = {
   lastUpdated: number;
 };
 
-export type SelectionHistoryByValue = {
-  [value: string]: SelectionHistory;
+export type SelectionHistoryTree = {
+  [hit: string]: {
+    [value: string]: {
+      [type: string]: SelectionHistory;
+    };
+  };
 };
-
-function word2Key(word: HitWord): string {
-  return `${word.hit}___${word.value}___${word.type}`;
-}
 
 const SEC = 1000;
 const MIN = SEC * 60;
@@ -42,22 +42,31 @@ function calcScore(history: SelectionHistory | undefined): number {
 }
 
 export class SelectionHistoryStorage {
-  data: SelectionHistoryByValue;
+  data: SelectionHistoryTree;
 
-  constructor(data: SelectionHistoryByValue = {}) {
+  constructor(data: SelectionHistoryTree = {}) {
     this.data = data;
   }
 
-  increment(word: HitWord): void {
-    const key = word2Key(word);
+  getSelectionHistory(word: HitWord): SelectionHistory | undefined {
+    return this.data[word.hit]?.[word.value]?.[word.type];
+  }
 
-    if (this.data[key]) {
-      this.data[key] = {
-        count: this.data[key].count + 1,
+  increment(word: HitWord): void {
+    if (!this.data[word.hit]) {
+      this.data[word.hit] = {};
+    }
+    if (!this.data[word.hit][word.value]) {
+      this.data[word.hit][word.value] = {};
+    }
+
+    if (this.data[word.hit][word.value][word.type]) {
+      this.data[word.hit][word.value][word.type] = {
+        count: this.data[word.hit][word.value][word.type].count + 1,
         lastUpdated: Date.now(),
       };
     } else {
-      this.data[key] = {
+      this.data[word.hit][word.value][word.type] = {
         count: 1,
         lastUpdated: Date.now(),
       };
@@ -65,8 +74,8 @@ export class SelectionHistoryStorage {
   }
 
   compare(w1: HitWord, w2: HitWord): -1 | 0 | 1 {
-    const score1 = calcScore(this.data[word2Key(w1)]);
-    const score2 = calcScore(this.data[word2Key(w2)]);
+    const score1 = calcScore(this.getSelectionHistory(w1));
+    const score2 = calcScore(this.getSelectionHistory(w2));
 
     if (score1 === score2) {
       return 0;
