@@ -120,7 +120,8 @@ export class AutoCompleteSuggest
   static async new(
     app: App,
     settings: Settings,
-    statusBar: ProviderStatusBar
+    statusBar: ProviderStatusBar,
+    onPersistSelectionHistory: () => void
   ): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app, statusBar);
 
@@ -152,6 +153,11 @@ export class AutoCompleteSuggest
 
     ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
+      if (ins.selectionHistoryStorage?.shouldPersist) {
+        ins.settings.selectionHistoryTree = ins.selectionHistoryStorage.data;
+        ins.selectionHistoryStorage.syncPersistVersion();
+        onPersistSelectionHistory();
+      }
     });
     ins.activeLeafChangeRef = app.workspace.on(
       "active-leaf-change",

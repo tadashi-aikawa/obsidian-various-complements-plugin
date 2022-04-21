@@ -1,4 +1,4 @@
-import { Notice, Plugin } from "obsidian";
+import { debounce, Notice, Plugin } from "obsidian";
 import { AutoCompleteSuggest } from "./ui/AutoCompleteSuggest";
 import {
   DEFAULT_SETTINGS,
@@ -41,14 +41,6 @@ export default class VariousComponents extends Plugin {
       })
     );
 
-    this.app.workspace.on("quit", async () => {
-      if (this.suggester.selectionHistoryStorage) {
-        this.settings.selectionHistoryTree =
-          this.suggester.selectionHistoryStorage.data;
-        await this.saveData(this.settings);
-      }
-    });
-
     await this.loadSettings();
 
     this.settingTab = new VariousComplementsSettingTab(this.app, this);
@@ -63,10 +55,15 @@ export default class VariousComponents extends Plugin {
       await this.settingTab.toggleMatchStrategy();
     });
 
+    const debouncedSaveData = debounce(async () => {
+      await this.saveData(this.settings);
+    }, 5000);
+
     this.suggester = await AutoCompleteSuggest.new(
       this.app,
       this.settings,
-      this.statusBar
+      this.statusBar,
+      debouncedSaveData
     );
     this.registerEditorSuggest(this.suggester);
 

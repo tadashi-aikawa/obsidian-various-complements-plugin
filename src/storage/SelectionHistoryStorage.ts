@@ -43,9 +43,15 @@ function calcScore(history: SelectionHistory | undefined): number {
 
 export class SelectionHistoryStorage {
   data: SelectionHistoryTree;
+  version: number;
+  persistedVersion: number;
 
   constructor(data: SelectionHistoryTree = {}) {
     this.data = data;
+
+    const now = Date.now();
+    this.version = now;
+    this.persistedVersion = now;
   }
 
   getSelectionHistory(word: HitWord): SelectionHistory | undefined {
@@ -71,6 +77,8 @@ export class SelectionHistoryStorage {
         lastUpdated: Date.now(),
       };
     }
+
+    this.version = Date.now();
   }
 
   compare(w1: HitWord, w2: HitWord): -1 | 0 | 1 {
@@ -82,5 +90,13 @@ export class SelectionHistoryStorage {
     }
 
     return score1 > score2 ? -1 : 1;
+  }
+
+  get shouldPersist(): boolean {
+    return this.version > this.persistedVersion;
+  }
+
+  syncPersistVersion(): void {
+    this.persistedVersion = this.version;
   }
 }

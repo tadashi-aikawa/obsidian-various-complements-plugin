@@ -3,6 +3,7 @@ import {
   Editor,
   type EditorPosition,
   MarkdownView,
+  normalizePath,
   parseFrontMatterAliases,
   parseFrontMatterStringArray,
   parseFrontMatterTags,
@@ -176,5 +177,9 @@ export class AppHelper {
 
     // cm5
     return !!cm5or6?.display?.input?.composing;
+  }
+
+  async writeLog(log: string) {
+    await this.app.vault.adapter.append(normalizePath("log.md"), log);
   }
 }
