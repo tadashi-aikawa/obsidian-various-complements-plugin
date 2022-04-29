@@ -148,6 +148,7 @@ export class AutoCompleteSuggest
     ins.selectionHistoryStorage = new SelectionHistoryStorage(
       settings.selectionHistoryTree
     );
+    ins.selectionHistoryStorage.purge();
 
     await ins.updateSettings(settings);
 

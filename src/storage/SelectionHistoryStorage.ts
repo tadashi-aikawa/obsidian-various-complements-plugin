@@ -28,6 +28,7 @@ function calcScore(history: SelectionHistory | undefined): number {
 
   const behind = Date.now() - history.lastUpdated;
 
+  // noinspection IfStatementWithTooManyBranchesJS
   if (behind < MIN) {
     return 8 * history.count;
   } else if (behind < HOUR) {
@@ -52,6 +53,27 @@ export class SelectionHistoryStorage {
     const now = Date.now();
     this.version = now;
     this.persistedVersion = now;
+  }
+
+  // noinspection FunctionWithMultipleLoopsJS
+  purge() {
+    for (const hit of Object.keys(this.data)) {
+      for (const value of Object.keys(this.data[hit])) {
+        for (const kind of Object.keys(this.data[hit][value])) {
+          if (Date.now() - this.data[hit][value][kind].lastUpdated > 4 * WEEK) {
+            delete this.data[hit][value][kind];
+          }
+        }
+
+        if (Object.isEmpty(this.data[hit][value])) {
+          delete this.data[hit][value];
+        }
+      }
+
+      if (Object.isEmpty(this.data[hit])) {
+        delete this.data[hit];
+      }
+    }
   }
 
   getSelectionHistory(word: HitWord): SelectionHistory | undefined {
