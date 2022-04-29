@@ -8,12 +8,25 @@ import {
   parseFrontMatterStringArray,
   parseFrontMatterTags,
   TFile,
+  Vault,
 } from "obsidian";
+
+interface UnsafeAppInterface {
+  vault: Vault & {
+    config: {
+      spellcheckDictionary?: string[];
+    };
+  };
+}
 
 export type FrontMatterValue = string[];
 
 export class AppHelper {
-  constructor(private app: App) {}
+  private unsafeApp: App & UnsafeAppInterface;
+
+  constructor(app: App) {
+    this.unsafeApp = app as any;
+  }
 
   equalsAsEditorPostion(one: EditorPosition, other: EditorPosition): boolean {
     return one.line === other.line && one.ch === other.ch;
@@ -22,13 +35,14 @@ export class AppHelper {
   getAliases(file: TFile): string[] {
     return (
       parseFrontMatterAliases(
-        this.app.metadataCache.getFileCache(file)?.frontmatter
+        this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter
       ) ?? []
     );
   }
 
   getFrontMatter(file: TFile): { [key: string]: FrontMatterValue } | undefined {
-    const frontMatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+    const frontMatter =
+      this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter;
     if (!frontMatter) {
       return undefined;
     }
@@ -53,15 +67,15 @@ export class AppHelper {
   }
 
   getMarkdownViewInActiveLeaf(): MarkdownView | null {
-    if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
+    if (!this.unsafeApp.workspace.getActiveViewOfType(MarkdownView)) {
       return null;
     }
 
-    return this.app.workspace.activeLeaf!.view as MarkdownView;
+    return this.unsafeApp.workspace.activeLeaf!.view as MarkdownView;
   }
 
   getActiveFile(): TFile | null {
-    return this.app.workspace.getActiveFile();
+    return this.unsafeApp.workspace.getActiveFile();
   }
 
   getCurrentDirname(): string | null {
@@ -89,7 +103,7 @@ export class AppHelper {
   }
 
   searchPhantomLinks(): { path: string; link: string }[] {
-    return Object.entries(this.app.metadataCache.unresolvedLinks).flatMap(
+    return Object.entries(this.unsafeApp.metadataCache.unresolvedLinks).flatMap(
       ([path, obj]) => Object.keys(obj).map((link) => ({ path, link }))
     );
   }
@@ -99,7 +113,7 @@ export class AppHelper {
       return null;
     }
 
-    const abstractFile = this.app.vault.getAbstractFileByPath(path);
+    const abstractFile = this.unsafeApp.vault.getAbstractFileByPath(path);
     if (!abstractFile) {
       return null;
     }
@@ -108,13 +122,14 @@ export class AppHelper {
   }
 
   openMarkdownFile(file: TFile, newLeaf: boolean, offset: number = 0) {
-    const leaf = this.app.workspace.getLeaf(newLeaf);
+    const leaf = this.unsafeApp.workspace.getLeaf(newLeaf);
 
     leaf
-      .openFile(file, this.app.workspace.activeLeaf?.getViewState())
+      .openFile(file, this.unsafeApp.workspace.activeLeaf?.getViewState())
       .then(() => {
-        this.app.workspace.setActiveLeaf(leaf, true, true);
-        const viewOfType = this.app.workspace.getActiveViewOfType(MarkdownView);
+        this.unsafeApp.workspace.setActiveLeaf(leaf, true, true);
+        const viewOfType =
+          this.unsafeApp.workspace.getActiveViewOfType(MarkdownView);
         if (viewOfType) {
           const editor = viewOfType.editor;
           const pos = editor.offsetToPos(offset);
@@ -159,15 +174,20 @@ export class AppHelper {
     return currentKeyLocation[0].split(":")[0];
   }
 
+  loadSpellCheckWords(): string[] {
+    return this.unsafeApp.vault.config.spellcheckDictionary ?? [];
+  }
+
   /**
    * Unsafe method
    */
   isIMEOn(): boolean {
-    if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
+    if (!this.unsafeApp.workspace.getActiveViewOfType(MarkdownView)) {
       return false;
     }
 
-    const markdownView = this.app.workspace.activeLeaf!.view as MarkdownView;
+    const markdownView = this.unsafeApp.workspace.activeLeaf!
+      .view as MarkdownView;
     const cm5or6: any = (markdownView.editor as any).cm;
 
     // cm6
@@ -180,6 +200,6 @@ export class AppHelper {
   }
 
   async writeLog(log: string) {
-    await this.app.vault.adapter.append(normalizePath("log.md"), log);
+    await this.unsafeApp.vault.adapter.append(normalizePath("log.md"), log);
   }
 }

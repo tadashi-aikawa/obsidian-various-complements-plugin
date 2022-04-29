@@ -134,7 +134,8 @@ export class AutoCompleteSuggest
       ins.appHelper
     );
     ins.customDictionaryWordProvider = new CustomDictionaryWordProvider(
-      ins.app
+      ins.app,
+      ins.appHelper
     );
     ins.internalLinkWordProvider = new InternalLinkWordProvider(
       ins.app,
@@ -552,7 +553,8 @@ export class AutoCompleteSuggest
     }
 
     await this.customDictionaryWordProvider.refreshCustomWords(
-      this.settings.customDictionaryWordRegexPattern
+      this.settings.customDictionaryWordRegexPattern,
+      this.settings.loadSpellcheckWords
     );
 
     this.statusBar.setCustomDictionaryIndexed(

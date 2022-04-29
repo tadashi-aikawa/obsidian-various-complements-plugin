@@ -4,6 +4,7 @@ import type { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
 import type { Word } from "../model/Word";
 import { excludeEmoji } from "../util/strings";
+import type { AppHelper } from "../app-helper";
 
 function escape(value: string): string {
   // This tricky logics for Safari
@@ -63,13 +64,13 @@ export class CustomDictionaryWordProvider {
   wordByValue: { [value: string]: Word } = {};
   wordsByFirstLetter: WordsByFirstLetter = {};
 
-  private app: App;
+  private appHelper: AppHelper;
   private fileSystemAdapter: FileSystemAdapter;
   private paths: string[];
   private delimiter: ColumnDelimiter;
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(app: App, appHelper: AppHelper) {
+    this.appHelper = appHelper;
     this.fileSystemAdapter = app.vault.adapter as FileSystemAdapter;
   }
 
@@ -90,7 +91,10 @@ export class CustomDictionaryWordProvider {
       .filter((x) => !regexp || x.value.match(new RegExp(regexp)));
   }
 
-  async refreshCustomWords(regexp: string): Promise<void> {
+  async refreshCustomWords(
+    regexp: string,
+    loadSpellcheckWords: boolean
+  ): Promise<void> {
     this.clearWords();
 
     for (const path of this.paths) {
@@ -104,6 +108,15 @@ export class CustomDictionaryWordProvider {
           0
         );
       }
+    }
+
+    if (loadSpellcheckWords) {
+      this.appHelper
+        .loadSpellCheckWords()
+        .filter((x) => !regexp || x.match(new RegExp(regexp)))
+        .forEach((x) =>
+          this.words.push(lineToWord(x, this.delimiter, "config"))
+        );
     }
 
     this.words.forEach((x) => this.addWord(x));
