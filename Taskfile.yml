@@ -44,8 +44,8 @@ tasks:
     deps:
       - ci
     cmds:
-      - |
-        sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest.json
+      - sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest.json
+      - sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest-beta.json
       - git add manifest.json
       - git commit -m "Update manifest"
       - npm version {{.VERSION}}
@@ -63,8 +63,7 @@ tasks:
     deps:
       - ci
     cmds:
-      - |
-        sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest-beta.json
+      - sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest-beta.json
       - git add manifest-beta.json
       - git commit -m "[beta] Update manifest"
       - npm version {{.VERSION}}
