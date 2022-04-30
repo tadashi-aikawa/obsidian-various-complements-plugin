@@ -91,10 +91,7 @@ export class CustomDictionaryWordProvider {
       .filter((x) => !regexp || x.value.match(new RegExp(regexp)));
   }
 
-  async refreshCustomWords(
-    regexp: string,
-    loadSpellcheckWords: boolean
-  ): Promise<void> {
+  async refreshCustomWords(regexp: string): Promise<void> {
     this.clearWords();
 
     for (const path of this.paths) {
@@ -108,15 +105,6 @@ export class CustomDictionaryWordProvider {
           0
         );
       }
-    }
-
-    if (loadSpellcheckWords) {
-      this.appHelper
-        .loadSpellCheckWords()
-        .filter((x) => !regexp || x.match(new RegExp(regexp)))
-        .forEach((x) =>
-          this.words.push(lineToWord(x, this.delimiter, "config"))
-        );
     }
 
     this.words.forEach((x) => this.addWord(x));

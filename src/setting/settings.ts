@@ -56,7 +56,6 @@ export interface Settings {
   delimiterToDivideSuggestionsForDisplayFromInsertion: string;
   caretLocationSymbolAfterComplement: string;
   displayedTextSuffix: string;
-  loadSpellcheckWords: boolean;
 
   // internal link complement
   enableInternalLinkComplement: boolean;
@@ -120,7 +119,6 @@ export const DEFAULT_SETTINGS: Settings = {
   delimiterToDivideSuggestionsForDisplayFromInsertion: "",
   caretLocationSymbolAfterComplement: "",
   displayedTextSuffix: " => ...",
-  loadSpellcheckWords: false,
 
   // internal link complement
   enableInternalLinkComplement: true,
@@ -627,20 +625,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             async (value) => {
               this.plugin.settings.displayedTextSuffix = value;
               await this.plugin.saveSettings();
-            }
-          );
-        });
-
-      new Setting(containerEl)
-        .setName("Load spellcheck words")
-        .setDesc(
-          "[⚠Warning: This option is experimental and only works on Mac] Load spellcheck words from `spellcheckDictionary` in .obsidian/app.json"
-        )
-        .addToggle((tc) => {
-          tc.setValue(this.plugin.settings.loadSpellcheckWords).onChange(
-            async (value) => {
-              this.plugin.settings.loadSpellcheckWords = value;
-              await this.plugin.saveSettings({ customDictionary: true });
             }
           );
         });

@@ -174,10 +174,6 @@ export class AppHelper {
     return currentKeyLocation[0].split(":")[0];
   }
 
-  loadSpellCheckWords(): string[] {
-    return this.unsafeApp.vault.config.spellcheckDictionary ?? [];
-  }
-
   /**
    * Unsafe method
    */

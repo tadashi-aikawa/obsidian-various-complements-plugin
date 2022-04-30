@@ -553,8 +553,7 @@ export class AutoCompleteSuggest
     }
 
     await this.customDictionaryWordProvider.refreshCustomWords(
-      this.settings.customDictionaryWordRegexPattern,
-      this.settings.loadSpellcheckWords
+      this.settings.customDictionaryWordRegexPattern
     );
 
     this.statusBar.setCustomDictionaryIndexed(
