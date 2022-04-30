@@ -121,7 +121,6 @@ export default class VariousComponents extends Plugin {
     this.addCommand({
       id: "predictable-complements",
       name: "Predictable complement",
-      hotkeys: [{ modifiers: ["Shift"], key: " " }],
       callback: async () => {
         this.suggester.predictableComplete();
       },
