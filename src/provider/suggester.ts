@@ -43,7 +43,6 @@ export function judge(
     return {
       word: {
         ...word,
-        completionDistance: word.value.length - query.length,
         hit: word.value,
       },
       value: word.value,
@@ -62,7 +61,6 @@ export function judge(
         word: {
           ...word,
           value: c,
-          completionDistance: c.length - query.length,
           hit: c,
         },
         value: c,
@@ -72,7 +70,6 @@ export function judge(
       return {
         word: {
           ...word,
-          completionDistance: word.value.length - query.length,
           hit: word.value,
         },
         value: word.value,
@@ -85,7 +82,6 @@ export function judge(
     return {
       word: {
         ...word,
-        completionDistance: matchedAlias.length - query.length,
         hit: matchedAlias,
       },
       value: matchedAlias,
@@ -198,7 +194,11 @@ export function judgeByPartialMatch(
   queryStartWithUpper: boolean
 ): Judgement {
   if (query === "") {
-    return { word, value: word.value, alias: false };
+    return {
+      word: { ...word, hit: word.value },
+      value: word.value,
+      alias: false,
+    };
   }
 
   if (lowerStartsWith(word.value, query)) {
@@ -208,9 +208,13 @@ export function judgeByPartialMatch(
       word.type !== "frontMatter"
     ) {
       const c = capitalizeFirstLetter(word.value);
-      return { word: { ...word, value: c }, value: c, alias: false };
+      return { word: { ...word, value: c, hit: c }, value: c, alias: false };
     } else {
-      return { word: word, value: word.value, alias: false };
+      return {
+        word: { ...word, hit: word.value },
+        value: word.value,
+        alias: false,
+      };
     }
   }
 
@@ -219,14 +223,18 @@ export function judgeByPartialMatch(
   );
   if (matchedAliasStarts) {
     return {
-      word: { ...word },
+      word: { ...word, hit: matchedAliasStarts },
       value: matchedAliasStarts,
       alias: true,
     };
   }
 
   if (lowerIncludes(word.value, query)) {
-    return { word: word, value: word.value, alias: false };
+    return {
+      word: { ...word, hit: word.value },
+      value: word.value,
+      alias: false,
+    };
   }
 
   const matchedAliasIncluded = word.aliases?.find((a) =>
@@ -234,7 +242,7 @@ export function judgeByPartialMatch(
   );
   if (matchedAliasIncluded) {
     return {
-      word: { ...word },
+      word: { ...word, hit: matchedAliasIncluded },
       value: matchedAliasIncluded,
       alias: true,
     };
@@ -278,9 +286,22 @@ export function suggestWordsByPartialMatch(
     .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper))
     .filter((x) => x.value !== undefined)
     .sort((a, b) => {
-      const notSameWordType = a.word.type !== b.word.type;
+      const aWord = a.word as HitWord;
+      const bWord = b.word as HitWord;
+
+      const notSameWordType = aWord.type !== bWord.type;
       if (frontMatter && notSameWordType) {
-        return b.word.type === "frontMatter" ? 1 : -1;
+        return bWord.type === "frontMatter" ? 1 : -1;
+      }
+
+      if (selectionHistoryStorage) {
+        const ret = selectionHistoryStorage.compare(
+          aWord as HitWord,
+          bWord as HitWord
+        );
+        if (ret !== 0) {
+          return ret;
+        }
       }
 
       const as = lowerStartsWith(a.value!, query);
@@ -293,8 +314,8 @@ export function suggestWordsByPartialMatch(
         return a.value!.length > b.value!.length ? 1 : -1;
       }
       if (notSameWordType) {
-        return WordTypeMeta.of(b.word.type).priority >
-          WordTypeMeta.of(a.word.type).priority
+        return WordTypeMeta.of(bWord.type).priority >
+          WordTypeMeta.of(aWord.type).priority
           ? 1
           : -1;
       }

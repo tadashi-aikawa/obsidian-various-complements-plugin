@@ -52,18 +52,18 @@ describe("pushWord", () => {
 
 describe.each`
   word                                                                   | query   | queryStartWithUpper | expected
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary", completionDistance: 3 }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["ab"], type: "customDictionary", completionDistance: 3 }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink", completionDistance: 3 }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary", completionDistance: 3 }, alias: false }}
+  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["ab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink", completionDistance: 3 }, alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary", completionDistance: 1 }, alias: true }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
   ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary", completionDistance: 5 }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary", completionDistance: 5 }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
 `("judge", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judge(${JSON.stringify(
     word
@@ -74,18 +74,18 @@ describe.each`
 
 describe.each`
   word                                                                   | query   | queryStartWithUpper | expected
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", aliases: ["ab"], type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "internalLink" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "internalLink" }, alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["ab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
 `("judgeByPartialMatch", ({ word, query, queryStartWithUpper, expected }) => {
   test(`judgeByPartialMatch(${JSON.stringify(
     word
@@ -168,21 +168,18 @@ describe("suggestWords", () => {
         type: "internalLink",
         hit: "AI",
         createdPath: "",
-        completionDistance: 1,
       },
       {
         value: "ai",
         type: "currentFile",
         hit: "ai",
         createdPath: "",
-        completionDistance: 1,
       },
       {
         value: "AWS",
         type: "internalLink",
         hit: "AWS",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "uwaa",
@@ -190,14 +187,12 @@ describe("suggestWords", () => {
         hit: "aaa",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "aiUEO",
         type: "internalLink",
         hit: "aiUEO",
         createdPath: "",
-        completionDistance: 4,
       },
       {
         value: "あいうえお",
@@ -205,14 +200,12 @@ describe("suggestWords", () => {
         hit: "aiueo",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 4,
       },
       {
         value: "aiUEO",
         type: "customDictionary",
         hit: "aiUEO",
         createdPath: "",
-        completionDistance: 4,
       },
     ]);
   });
@@ -225,21 +218,18 @@ describe("suggestWords", () => {
         hit: "AI",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "ai",
         hit: "ai",
         type: "currentFile",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "aiUEO",
         hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 3,
       },
       {
         value: "あいうえお",
@@ -247,14 +237,12 @@ describe("suggestWords", () => {
         hit: "aiueo",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 3,
       },
       {
         value: "aiUEO",
         hit: "aiUEO",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 3,
       },
     ]);
   });
@@ -267,7 +255,6 @@ describe("suggestWords", () => {
         hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "あいうえお",
@@ -275,14 +262,12 @@ describe("suggestWords", () => {
         hit: "aiueo",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "aiUEO",
         hit: "aiUEO",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 2,
       },
     ]);
   });
@@ -295,28 +280,24 @@ describe("suggestWords", () => {
         hit: "AI",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 1,
       },
       {
         value: "Ai",
         hit: "Ai",
         type: "currentFile",
         createdPath: "",
-        completionDistance: 1,
       },
       {
         value: "AWS",
         hit: "AWS",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "AWS",
         hit: "AWS",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "uwaa",
@@ -324,14 +305,12 @@ describe("suggestWords", () => {
         aliases: ["aaa"],
         hit: "aaa",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "aiUEO",
         hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 4,
       },
       {
         value: "あいうえお",
@@ -339,14 +318,12 @@ describe("suggestWords", () => {
         hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
-        completionDistance: 4,
       },
       {
         value: "AiUEO",
         hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 4,
       },
     ]);
   });
@@ -359,21 +336,18 @@ describe("suggestWords", () => {
         hit: "AI",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "Ai",
         hit: "Ai",
         type: "currentFile",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "aiUEO",
         hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 3,
       },
       {
         value: "あいうえお",
@@ -381,14 +355,12 @@ describe("suggestWords", () => {
         type: "internalLink",
         aliases: ["aiueo"],
         createdPath: "",
-        completionDistance: 3,
       },
       {
         value: "AiUEO",
         hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 3,
       },
     ]);
   });
@@ -401,21 +373,18 @@ describe("suggestWords", () => {
         hit: "AI",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "Ai",
         hit: "Ai",
         type: "currentFile",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "aiUEO",
         hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 3,
       },
       {
         value: "あいうえお",
@@ -423,14 +392,12 @@ describe("suggestWords", () => {
         type: "internalLink",
         aliases: ["aiueo"],
         createdPath: "",
-        completionDistance: 3,
       },
       {
         value: "AiUEO",
         hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 3,
       },
     ]);
   });
@@ -443,7 +410,6 @@ describe("suggestWords", () => {
         hit: "aiUEO",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "あいうえお",
@@ -451,14 +417,12 @@ describe("suggestWords", () => {
         type: "internalLink",
         aliases: ["aiueo"],
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "AiUEO",
         hit: "AiUEO",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 2,
       },
     ]);
   });
@@ -472,7 +436,6 @@ describe("suggestWords", () => {
         type: "customDictionary",
         aliases: ["aaa"],
         createdPath: "",
-        completionDistance: 3,
       },
     ]);
   });
@@ -486,7 +449,6 @@ describe("suggestWords", () => {
         type: "customDictionary",
         aliases: ["Unidentified flying object"],
         createdPath: "",
-        completionDistance: 2,
       },
       {
         value: "Uwaa",
@@ -494,7 +456,6 @@ describe("suggestWords", () => {
         type: "customDictionary",
         aliases: ["aaa"],
         createdPath: "",
-        completionDistance: 3,
       },
     ]);
   });
@@ -507,21 +468,18 @@ describe("suggestWords", () => {
         hit: "AI",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 1,
       },
       {
         value: "ai",
         hit: "ai",
         type: "currentFile",
         createdPath: "",
-        completionDistance: 1,
       },
       {
         value: "AWS",
         hit: "AWS",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 2,
       },
       // --- hidden ---
       // { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
@@ -587,7 +545,6 @@ describe("suggestWords", () => {
         hit: "a",
         type: "frontMatter",
         createdPath: "",
-        completionDistance: 0,
       },
     ]);
   });
@@ -599,14 +556,12 @@ describe("suggestWords", () => {
         hit: "a",
         type: "internalLink",
         createdPath: "",
-        completionDistance: 0,
       },
       {
         value: "a",
         hit: "a",
         type: "customDictionary",
         createdPath: "",
-        completionDistance: 0,
       },
     ]);
   });
@@ -644,7 +599,6 @@ describe("suggestWords", () => {
         hit: "a",
         type: "currentFile",
         createdPath: "",
-        completionDistance: 0,
       },
     ]);
   });
@@ -718,24 +672,31 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "a", 10, null)
     ).toStrictEqual([
-      { value: "AI", type: "internalLink", createdPath: "" },
-      { value: "ai", type: "currentFile", createdPath: "" },
-      { value: "AWS", type: "internalLink", createdPath: "" },
-      { value: "AWS", type: "customDictionary", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
+      { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
+      { value: "AWS", type: "customDictionary", hit: "AWS", createdPath: "" },
       {
         value: "uwaa",
         type: "customDictionary",
+        hit: "aaa",
         aliases: ["aaa"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        createdPath: "",
+      },
       // ??? currentFile
     ]);
   });
@@ -745,16 +706,22 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "ai", 10, null)
     ).toStrictEqual([
-      { value: "AI", type: "internalLink", createdPath: "" },
-      { value: "ai", type: "currentFile", createdPath: "" },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -763,14 +730,20 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "aiu", 10, null)
     ).toStrictEqual([
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -779,24 +752,31 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "A", 10, null)
     ).toStrictEqual([
-      { value: "AI", type: "internalLink", createdPath: "" },
-      { value: "Ai", type: "currentFile", createdPath: "" },
-      { value: "AWS", type: "internalLink", createdPath: "" },
-      { value: "AWS", type: "customDictionary", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
+      { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
+      { value: "AWS", type: "customDictionary", hit: "AWS", createdPath: "" },
       {
         value: "uwaa",
         type: "customDictionary",
+        hit: "aaa",
         aliases: ["aaa"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "AiUEO",
+        type: "customDictionary",
+        hit: "AiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -805,16 +785,22 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "Ai", 10, null)
     ).toStrictEqual([
-      { value: "AI", type: "internalLink", createdPath: "" },
-      { value: "Ai", type: "currentFile", createdPath: "" },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "AiUEO",
+        type: "customDictionary",
+        hit: "AiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -823,16 +809,22 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "AI", 10, null)
     ).toStrictEqual([
-      { value: "AI", type: "internalLink", createdPath: "" },
-      { value: "Ai", type: "currentFile", createdPath: "" },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "AiUEO",
+        type: "customDictionary",
+        hit: "AiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -841,14 +833,20 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "AIU", 10, null)
     ).toStrictEqual([
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "AiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "AiUEO",
+        type: "customDictionary",
+        hit: "AiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -860,23 +858,31 @@ describe("suggestWordsByPartialMatch", () => {
       {
         value: "UFO",
         type: "customDictionary",
+        hit: "UFO",
         aliases: ["Unidentified flying object"],
         createdPath: "",
       },
       {
         value: "uwaa",
         type: "customDictionary",
+        hit: "uwaa",
         aliases: ["aaa"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -888,23 +894,31 @@ describe("suggestWordsByPartialMatch", () => {
       {
         value: "UFO",
         type: "customDictionary",
+        hit: "UFO",
         aliases: ["Unidentified flying object"],
         createdPath: "",
       },
       {
         value: "Uwaa",
         type: "customDictionary",
+        hit: "Uwaa",
         aliases: ["aaa"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "internalLink", createdPath: "" },
+      { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
         type: "internalLink",
+        hit: "aiueo",
         aliases: ["aiueo"],
         createdPath: "",
       },
-      { value: "aiUEO", type: "customDictionary", createdPath: "" },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -913,9 +927,9 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "a", 3, null)
     ).toStrictEqual([
-      { value: "AI", type: "internalLink", createdPath: "" },
-      { value: "ai", type: "currentFile", createdPath: "" },
-      { value: "AWS", type: "internalLink", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
+      { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
     ]);
   });
 
@@ -970,7 +984,13 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, "tags")
     ).toStrictEqual([
-      { key: "tags", value: "a", type: "frontMatter", createdPath: "" },
+      {
+        key: "tags",
+        value: "a",
+        type: "frontMatter",
+        hit: "a",
+        createdPath: "",
+      },
     ]);
   });
 
@@ -978,8 +998,8 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, null)
     ).toStrictEqual([
-      { value: "a", type: "internalLink", createdPath: "" },
-      { value: "a", type: "customDictionary", createdPath: "" },
+      { value: "a", type: "internalLink", hit: "a", createdPath: "" },
+      { value: "a", type: "customDictionary", hit: "a", createdPath: "" },
     ]);
   });
 
@@ -1016,6 +1036,8 @@ describe("suggestWordsByPartialMatch", () => {
   test("word type priority order (currentFile & currentVault)", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords3, "a", 10, null)
-    ).toStrictEqual([{ value: "a", type: "currentFile", createdPath: "" }]);
+    ).toStrictEqual([
+      { value: "a", type: "currentFile", hit: "a", createdPath: "" },
+    ]);
   });
 });

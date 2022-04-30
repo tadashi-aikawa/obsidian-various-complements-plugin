@@ -1,7 +1,7 @@
 import type { Word } from "../model/Word";
 import type { PartialRequired } from "../types";
 
-export type HitWord = PartialRequired<Word, "hit" | "completionDistance">;
+export type HitWord = PartialRequired<Word, "hit">;
 export type SelectionHistory = {
   count: number;
   lastUpdated: number;
