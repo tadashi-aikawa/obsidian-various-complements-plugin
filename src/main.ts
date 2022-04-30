@@ -9,7 +9,24 @@ import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
 
-export default class VariousComponents extends Plugin {
+interface PublicAPI {
+  /**
+   * Ensure that there is a custom dictionary path or not.
+   * This function guarantees idempotency.
+   *
+   * @return Custom dictionary path is updated or not
+   *
+   * Example:
+   *   - App.plugins.plugins["various-complements"].ensureCustomDictionaryPath("./your-dictionary.md", "present")
+   *   - App.plugins.plugins["various-complements"].ensureCustomDictionaryPath("https://your-dictionary/files.csv", "absent")
+   */
+  ensureCustomDictionaryPath(
+    path: string,
+    state: "present" | "absent"
+  ): Promise<boolean>;
+}
+
+export default class VariousComponents extends Plugin implements PublicAPI {
   appHelper: AppHelper;
   settings: Settings;
   settingTab: VariousComplementsSettingTab;
@@ -194,5 +211,12 @@ export default class VariousComponents extends Plugin {
     );
 
     modal.open();
+  }
+
+  ensureCustomDictionaryPath(
+    path: string,
+    state: "present" | "absent"
+  ): Promise<boolean> {
+    return this.settingTab.ensureCustomDictionaryPath(path, state);
   }
 }

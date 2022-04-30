@@ -763,6 +763,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     await this.plugin.saveSettings();
   }
 
+  async ensureCustomDictionaryPath(
+    path: string,
+    state: "present" | "absent"
+  ): Promise<boolean> {
+    const paths = this.plugin.settings.customDictionaryPaths.split("\n");
+    const exists = paths.some((x) => x === path);
+    if ((exists && state === "present") || (!exists && state === "absent")) {
+      return false;
+    }
+
+    const newPaths =
+      state === "present" ? [...paths, path] : paths.filter((x) => x !== path);
+    this.plugin.settings.customDictionaryPaths = newPaths.join("\n");
+    await this.plugin.saveSettings({ customDictionary: true });
+
+    return true;
+  }
+
   getPluginSettingsAsJsonString(): string {
     return JSON.stringify(
       {
