@@ -8,30 +8,16 @@ import {
 import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
+import { createApi, type PublicAPI } from "./api";
 
-interface PublicAPI {
-  /**
-   * Ensure that there is a custom dictionary path or not.
-   * This function guarantees idempotency.
-   *
-   * @return Custom dictionary path is updated or not
-   *
-   * Example:
-   *   - App.plugins.plugins["various-complements"].ensureCustomDictionaryPath("./your-dictionary.md", "present")
-   *   - App.plugins.plugins["various-complements"].ensureCustomDictionaryPath("https://your-dictionary/files.csv", "absent")
-   */
-  ensureCustomDictionaryPath(
-    path: string,
-    state: "present" | "absent"
-  ): Promise<boolean>;
-}
-
-export default class VariousComponents extends Plugin implements PublicAPI {
+export default class VariousComponents extends Plugin {
   appHelper: AppHelper;
   settings: Settings;
   settingTab: VariousComplementsSettingTab;
   suggester: AutoCompleteSuggest;
   statusBar?: ProviderStatusBar;
+
+  api: PublicAPI;
 
   onunload() {
     super.onunload();
@@ -71,6 +57,8 @@ export default class VariousComponents extends Plugin implements PublicAPI {
     this.statusBar.setOnClickStrategyListener(async () => {
       await this.settingTab.toggleMatchStrategy();
     });
+
+    this.api = createApi(this.settingTab);
 
     const debouncedSaveData = debounce(async () => {
       await this.saveData(this.settings);
@@ -211,12 +199,5 @@ export default class VariousComponents extends Plugin implements PublicAPI {
     );
 
     modal.open();
-  }
-
-  ensureCustomDictionaryPath(
-    path: string,
-    state: "present" | "absent"
-  ): Promise<boolean> {
-    return this.settingTab.ensureCustomDictionaryPath(path, state);
   }
 }
