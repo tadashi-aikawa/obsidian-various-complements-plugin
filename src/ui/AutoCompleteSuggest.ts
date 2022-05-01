@@ -98,6 +98,7 @@ export class AutoCompleteSuggest
   keymapEventHandler: KeymapEventHandler[] = [];
   modifyEventRef: EventRef;
   activeLeafChangeRef: EventRef;
+  metadataCacheChangeRef: EventRef;
 
   private constructor(app: App, statusBar: ProviderStatusBar) {
     super(app);
@@ -166,9 +167,17 @@ export class AutoCompleteSuggest
       async (_) => {
         await ins.refreshCurrentFileTokens();
         ins.refreshInternalLinkTokens();
-        ins.refreshFrontMatterTokens();
+        ins.updateFrontMatterToken();
       }
     );
+
+    ins.metadataCacheChangeRef = app.metadataCache.on("changed", (f) => {
+      ins.updateFrontMatterTokenIndex(f);
+      if (!ins.appHelper.isActiveFile(f)) {
+        ins.updateFrontMatterToken();
+      }
+    });
+
     // Avoid referring to incorrect cache
     const cacheResolvedRef = app.metadataCache.on("resolved", async () => {
       ins.refreshInternalLinkTokens();
@@ -232,6 +241,7 @@ export class AutoCompleteSuggest
   unregister() {
     this.app.vault.offref(this.modifyEventRef);
     this.app.workspace.offref(this.activeLeafChangeRef);
+    this.app.metadataCache.offref(this.metadataCacheChangeRef);
   }
 
   // settings getters
@@ -619,6 +629,50 @@ export class AutoCompleteSuggest
     );
     this.showDebugLog(() =>
       buildLogMessage("Index front matter tokens", performance.now() - start)
+    );
+  }
+
+  updateFrontMatterTokenIndex(file: TFile): void {
+    const start = performance.now();
+    if (!this.settings.enableFrontMatterComplement) {
+      this.showDebugLog(() =>
+        buildLogMessage(
+          "👢Skip: Update front matter token index",
+          performance.now() - start
+        )
+      );
+      return;
+    }
+
+    this.frontMatterWordProvider.updateWordIndex(file);
+
+    this.showDebugLog(() =>
+      buildLogMessage(
+        "Update front matter token index",
+        performance.now() - start
+      )
+    );
+  }
+
+  updateFrontMatterToken(): void {
+    const start = performance.now();
+    if (!this.settings.enableFrontMatterComplement) {
+      this.showDebugLog(() =>
+        buildLogMessage(
+          "👢Skip: Update front matter token",
+          performance.now() - start
+        )
+      );
+      return;
+    }
+
+    this.frontMatterWordProvider.updateWords();
+    this.statusBar.setFrontMatterIndexed(
+      this.frontMatterWordProvider.wordCount
+    );
+
+    this.showDebugLog(() =>
+      buildLogMessage("Update front matter token", performance.now() - start)
     );
   }
 

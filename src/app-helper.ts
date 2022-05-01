@@ -78,6 +78,19 @@ export class AppHelper {
     return this.unsafeApp.workspace.getActiveFile();
   }
 
+  isActiveFile(file: TFile): boolean {
+    return this.getActiveFile()?.path === file.path;
+  }
+
+  getPreviousFile(): TFile | null {
+    const fName = this.unsafeApp.workspace.getLastOpenFiles()?.[1];
+    if (!fName) {
+      return null;
+    }
+
+    return this.getMarkdownFileByPath(fName);
+  }
+
   getCurrentDirname(): string | null {
     return this.getActiveFile()?.parent.path ?? null;
   }
