@@ -1,6 +1,6 @@
 import { App, Modal, Notice } from "obsidian";
 import { AppHelper } from "../app-helper";
-import type { Word } from "../model/Word";
+import type { CustomDictionaryWord } from "../model/Word";
 import CustomDictionaryWordAdd from "./component/CustomDictionaryWordAdd.svelte";
 
 export class CustomDictionaryWordAddModal extends Modal {
@@ -11,7 +11,7 @@ export class CustomDictionaryWordAddModal extends Modal {
     dictionaryPaths: string[],
     initialValue: string = "",
     dividerForDisplay: string = "",
-    onSubmit: (dictionaryPath: string, word: Word) => void
+    onSubmit: (dictionaryPath: string, word: CustomDictionaryWord) => void
   ) {
     super(app);
     const appHelper = new AppHelper(app);

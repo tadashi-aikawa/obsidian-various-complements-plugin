@@ -23,6 +23,11 @@ export interface CurrentVaultWord extends DefaultWord {
 }
 export interface CustomDictionaryWord extends DefaultWord {
   type: "customDictionary";
+  caretSymbol?: string;
+  /** Use for inserting instead of value **/
+  insertedText?: string;
+  /** If true, ignore `Insert space after completion` option **/
+  ignoreSpaceAfterCompletion?: boolean;
 }
 export interface InternalLinkWord extends DefaultWord {
   type: "internalLink";

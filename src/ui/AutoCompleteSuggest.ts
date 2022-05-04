@@ -309,7 +309,8 @@ export class AutoCompleteSuggest
     );
     this.customDictionaryWordProvider.setSettings(
       settings.customDictionaryPaths.split("\n").filter((x) => x),
-      ColumnDelimiter.fromName(settings.columnDelimiter)
+      ColumnDelimiter.fromName(settings.columnDelimiter),
+      settings.delimiterToDivideSuggestionsForDisplayFromInsertion || null
     );
 
     this.debounceGetSuggestions = debounce(
@@ -562,9 +563,15 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.customDictionaryWordProvider.refreshCustomWords(
-      this.settings.customDictionaryWordRegexPattern
-    );
+    await this.customDictionaryWordProvider.refreshCustomWords({
+      regexp: this.settings.customDictionaryWordRegexPattern,
+      delimiterForHide: this.settings.delimiterToHideSuggestion || undefined,
+      delimiterForDisplay:
+        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion ||
+        undefined,
+      caretSymbol:
+        this.settings.caretLocationSymbolAfterComplement || undefined,
+    });
 
     this.statusBar.setCustomDictionaryIndexed(
       this.customDictionaryWordProvider.wordCount
@@ -836,37 +843,20 @@ export class AutoCompleteSuggest
     });
   }
 
-  createRenderSuggestion(word: Word): string {
-    const text = word.value;
-
-    if (
-      this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion &&
-      text.includes(
-        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
-      )
-    ) {
-      return (
-        text.split(
-          this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
-        )[0] + this.settings.displayedTextSuffix
-      );
-    }
-
-    if (
-      this.settings.delimiterToHideSuggestion &&
-      text.includes(this.settings.delimiterToHideSuggestion)
-    ) {
-      return `${text.split(this.settings.delimiterToHideSuggestion)[0]} ...`;
-    }
-
-    return text;
-  }
-
   renderSuggestion(word: Word, el: HTMLElement): void {
     const base = createDiv();
 
+    let text = word.value;
+    if (
+      word.type === "customDictionary" &&
+      word.insertedText &&
+      this.settings.displayedTextSuffix
+    ) {
+      text += this.settings.displayedTextSuffix;
+    }
+
     base.createDiv({
-      text: this.createRenderSuggestion(word),
+      text,
       cls:
         word.type === "internalLink" && word.aliasMeta
           ? "various-complements__suggestion-item__content__alias"
@@ -925,33 +915,26 @@ export class AutoCompleteSuggest
     ) {
       insertedText = `${insertedText}, `;
     } else {
-      if (this.settings.insertAfterCompletion) {
+      if (
+        this.settings.insertAfterCompletion &&
+        !(word.type === "customDictionary" && word.ignoreSpaceAfterCompletion)
+      ) {
         insertedText = `${insertedText} `;
       }
     }
 
-    if (
-      this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion &&
-      insertedText.includes(
-        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
-      )
-    ) {
-      insertedText = insertedText.split(
-        this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion
-      )[1];
-    }
+    let positionToMove = -1;
 
-    if (this.settings.delimiterToHideSuggestion) {
-      insertedText = insertedText.replace(
-        this.settings.delimiterToHideSuggestion,
-        ""
-      );
-    }
+    if (word.type === "customDictionary") {
+      if (word.insertedText) {
+        insertedText = word.insertedText;
+      }
 
-    const caret = this.settings.caretLocationSymbolAfterComplement;
-    const positionToMove = caret ? insertedText.indexOf(caret) : -1;
-    if (positionToMove !== -1) {
-      insertedText = insertedText.replace(caret, "");
+      const caret = word.caretSymbol;
+      if (caret) {
+        positionToMove = insertedText.indexOf(caret);
+        insertedText = insertedText.replace(caret, "");
+      }
     }
 
     const editor = this.context.editor;

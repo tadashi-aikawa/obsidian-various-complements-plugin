@@ -3,7 +3,7 @@
   import ObsidianButton from "./ObsidianButton.svelte";
   import { File } from "svelte-lucide-icons";
   import ObsidianIconButton from "./ObsidianIconButton.svelte";
-  import type { Word } from "../../model/Word";
+  import type { CustomDictionaryWord } from "../../model/Word";
   import { onMount } from "svelte";
 
   type Dictionary = {
@@ -20,7 +20,10 @@
   export let aliases: string[] = [];
   export let dividerForDisplay = "";
 
-  export let onSubmit: (dictionaryPath: string, word: Word) => void;
+  export let onSubmit: (
+    dictionaryPath: string,
+    word: CustomDictionaryWord
+  ) => void;
   export let onClickFileIcon: (dictionaryPath: string) => void;
 
   let aliasesStr = aliases.join("\n");
@@ -38,13 +41,12 @@
 
   const handleSubmit = () => {
     onSubmit(selectedDictionary.path, {
-      value: displayedWord
-        ? `${displayedWord}${dividerForDisplay}${word}`
-        : word,
+      value: displayedWord || word,
       description,
-      createdPath: selectedDictionary.path,
       aliases: aliasesStr.split("\n"),
       type: "customDictionary",
+      createdPath: selectedDictionary.path,
+      insertedText: displayedWord ? word : undefined,
     });
   };
 
