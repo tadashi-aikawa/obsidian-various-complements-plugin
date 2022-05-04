@@ -5,6 +5,7 @@ import {
   keyBy,
   mirrorMap,
   uniq,
+  uniqBy,
   uniqWith,
 } from "./collection-helper";
 
@@ -35,6 +36,16 @@ describe.each`
 `("uniq", ({ values, expected }) => {
   test(`uniq(${values}) = ${expected}`, () => {
     expect(uniq(values)).toStrictEqual(expected);
+  });
+});
+
+describe.each`
+  arr                     | fn                         | expected
+  ${["aa", "iii", "uu"]}  | ${(x: string) => x.length} | ${["aa", "iii"]}
+  ${[11, 21, 31, 40, 51]} | ${(x: number) => x % 10}   | ${[11, 40]}
+`("uniqBy", ({ arr, fn, expected }) => {
+  test(`uniqBy(${arr}, ${fn}) = ${expected}`, () => {
+    expect(uniqBy(arr, fn)).toStrictEqual(expected);
   });
 });
 

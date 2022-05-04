@@ -22,6 +22,17 @@ export function uniq<T>(values: T[]): T[] {
   return [...new Set(values)];
 }
 
+export function uniqBy<T>(values: T[], fn: (x: T) => string | number): T[] {
+  const m = new Map<string | number, T>();
+  values.forEach((x) => {
+    const k = fn(x);
+    if (!m.has(k)) {
+      m.set(k, x);
+    }
+  });
+  return Array.from(m.values());
+}
+
 export function uniqWith<T>(arr: T[], fn: (one: T, other: T) => boolean) {
   return arr.filter(
     (element, index) => arr.findIndex((step) => fn(element, step)) === index
