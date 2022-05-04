@@ -10,7 +10,6 @@ import {
   TFile,
   Vault,
 } from "obsidian";
-import { uniqBy } from "./util/collection-helper";
 
 interface UnsafeAppInterface {
   vault: Vault & {
@@ -51,7 +50,6 @@ export class AppHelper {
     // remove #
     const tags =
       parseFrontMatterTags(frontMatter)?.map((x) => x.slice(1)) ?? [];
-    const uniqTags = uniqBy(tags, (x) => x.toLowerCase());
     const aliases = parseFrontMatterAliases(frontMatter) ?? [];
     const { position, ...rest } = frontMatter;
     return {
@@ -61,8 +59,8 @@ export class AppHelper {
           parseFrontMatterStringArray(frontMatter, k),
         ])
       ),
-      tags: uniqTags,
-      tag: uniqTags,
+      tags,
+      tag: tags,
       aliases,
       alias: aliases,
     };

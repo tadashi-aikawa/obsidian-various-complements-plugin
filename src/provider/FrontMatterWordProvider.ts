@@ -3,7 +3,7 @@ import type { WordsByFirstLetter } from "./suggester";
 import type { AppHelper, FrontMatterValue } from "../app-helper";
 import type { FrontMatterWord } from "../model/Word";
 import { excludeEmoji } from "../util/strings";
-import { groupBy } from "../util/collection-helper";
+import { groupBy, uniqBy } from "../util/collection-helper";
 
 function synonymAliases(name: string): string[] {
   const lessEmojiValue = excludeEmoji(name);
@@ -38,13 +38,10 @@ function pickWords(file: TFile, fm: { [key: string]: FrontMatterValue }) {
 function extractAndUniqWords(
   wordsByCreatedPath: FrontMatterWordProvider["wordsByCreatedPath"]
 ): FrontMatterWord[] {
-  const m: { [hash: string]: FrontMatterWord } = {};
-  Object.values(wordsByCreatedPath).forEach((ws) => {
-    ws.forEach((w) => {
-      m[w.key + w.value] = w;
-    });
-  });
-  return Object.values(m);
+  return uniqBy(
+    Object.values(wordsByCreatedPath).flat(),
+    (w) => w.key + w.value.toLowerCase()
+  );
 }
 
 function indexingWords(
