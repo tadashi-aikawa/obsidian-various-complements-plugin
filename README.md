@@ -12,6 +12,23 @@ This plugin for [Obsidian] enables you complete words like the auto-completion o
 
 https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/
 
+## 👥 For users
+
+### Feature requests / Bugs
+
+Please create a new [issue].
+
+### Questions / Others
+
+Please create a new [discussion].
+
+### Pull requests
+
+Before creating a pull request, please make an [issue] or a [discussion]😉
+
+[issue]: https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues
+[discussion]: https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/discussions
+
 ## 🖥️ For developers
 
 - Requirements
