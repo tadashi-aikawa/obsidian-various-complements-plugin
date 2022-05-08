@@ -48,7 +48,7 @@ tasks:
         sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest.json
       - |
         sed -i -r 's/\"version\": \".+\"/\"version\": \"{{.VERSION}}\"/g' manifest-beta.json
-      - git add manifest.json
+      - git add manifest.json manifest-beta.json
       - git commit -m "Update manifest"
       - npm version {{.VERSION}}
       - task: ci
