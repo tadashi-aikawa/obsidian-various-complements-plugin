@@ -8,7 +8,6 @@ import {
 import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
-import { createApi, type PublicAPI } from "./api";
 
 export default class VariousComponents extends Plugin {
   appHelper: AppHelper;
@@ -16,8 +15,6 @@ export default class VariousComponents extends Plugin {
   settingTab: VariousComplementsSettingTab;
   suggester: AutoCompleteSuggest;
   statusBar?: ProviderStatusBar;
-
-  api: PublicAPI;
 
   onunload() {
     super.onunload();
@@ -57,8 +54,6 @@ export default class VariousComponents extends Plugin {
     this.statusBar.setOnClickStrategyListener(async () => {
       await this.settingTab.toggleMatchStrategy();
     });
-
-    this.api = createApi(this.settingTab);
 
     const debouncedSaveData = debounce(async () => {
       await this.saveData(this.settings);
