@@ -37,6 +37,7 @@
     "node": "16.13.0"
   },
   "dependencies": {
+    "chinese-tokenizer": "^2.4.0",
     "svelte-lucide-icons": "^0.4.0"
   }
 }

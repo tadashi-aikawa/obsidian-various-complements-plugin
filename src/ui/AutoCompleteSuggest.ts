@@ -295,7 +295,11 @@ export class AutoCompleteSuggest
 
     this.statusBar.setMatchStrategy(this.matchStrategy);
 
-    this.tokenizer = createTokenizer(this.tokenizerStrategy);
+    try {
+      this.tokenizer = await createTokenizer(this.tokenizerStrategy, this.app);
+    } catch (e: any) {
+      new Notice(e.message, 0);
+    }
     this.currentFileWordProvider.setSettings(this.tokenizer);
     this.currentVaultWordProvider.setSettings(
       this.tokenizer,

@@ -171,12 +171,28 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.strategy)
         .onChange(async (value) => {
           this.plugin.settings.strategy = value;
+          this.display();
           await this.plugin.saveSettings({
             currentFile: true,
             currentVault: true,
           });
         })
     );
+    if (this.plugin.settings.strategy === TokenizeStrategy.CHINESE.name) {
+      const el = containerEl.createEl("div", {
+        cls: "various-complements__settings__warning",
+      });
+      el.createSpan({
+        text: "⚠ You need to download `cedict_ts.u8` from",
+      });
+      el.createEl("a", {
+        href: "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
+        text: " the site ",
+      });
+      el.createSpan({
+        text: "and store it in vault root.",
+      });
+    }
 
     new Setting(containerEl).setName("Match strategy").addDropdown((tc) =>
       tc
