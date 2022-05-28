@@ -1,5 +1,4 @@
-import { createTokenizer } from "../tokenizer";
-import { TokenizeStrategy } from "../TokenizeStrategy";
+import { JapaneseTokenizer } from "./JapaneseTokenizer";
 
 describe.each`
   content               | raw      | expected
@@ -8,9 +7,9 @@ describe.each`
   ${"$\\alpha"}         | ${false} | ${["\\alpha"]}
 `("tokenize", ({ content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
-    expect(
-      createTokenizer(TokenizeStrategy.JAPANESE).tokenize(content, raw)
-    ).toStrictEqual(expected);
+    expect(new JapaneseTokenizer().tokenize(content, raw)).toStrictEqual(
+      expected
+    );
   });
 });
 
@@ -26,8 +25,8 @@ describe.each`
   ${"::one::two"}        | ${[{ word: "::one::two", offset: 0 }, { word: "one::two", offset: 2 }, { word: "two", offset: 7 }]}
 `("recursiveTokenize", ({ content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
-    expect(
-      createTokenizer(TokenizeStrategy.JAPANESE).recursiveTokenize(content)
-    ).toStrictEqual(expected);
+    expect(new JapaneseTokenizer().recursiveTokenize(content)).toStrictEqual(
+      expected
+    );
   });
 });

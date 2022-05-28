@@ -1,5 +1,4 @@
-import { createTokenizer } from "../tokenizer";
-import { TokenizeStrategy } from "../TokenizeStrategy";
+import { DefaultTokenizer } from "./DefaultTokenizer";
 
 // The expectation for "::one::two" is not ideal probably.
 describe.each`
@@ -11,8 +10,8 @@ describe.each`
   ${"::one::two"} | ${[{ word: "::one::two", offset: 0 }, { word: ":one::two", offset: 1 }, { word: "one::two", offset: 2 }, { word: ":two", offset: 6 }, { word: "two", offset: 7 }]}
 `("recursiveTokenize", ({ content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
-    expect(
-      createTokenizer(TokenizeStrategy.DEFAULT).recursiveTokenize(content)
-    ).toStrictEqual(expected);
+    expect(new DefaultTokenizer().recursiveTokenize(content)).toStrictEqual(
+      expected
+    );
   });
 });

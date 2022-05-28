@@ -1,5 +1,4 @@
-import { createTokenizer } from "../tokenizer";
-import { TokenizeStrategy } from "../TokenizeStrategy";
+import { EnglishOnlyTokenizer } from "./EnglishOnlyTokenizer";
 
 describe.each`
   content                 | raw      | expected
@@ -12,9 +11,9 @@ describe.each`
   ${"$\\alpha"}           | ${false} | ${["\\alpha"]}
 `("tokenize", ({ content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
-    expect(
-      createTokenizer(TokenizeStrategy.ENGLISH_ONLY).tokenize(content, raw)
-    ).toStrictEqual(expected);
+    expect(new EnglishOnlyTokenizer().tokenize(content, raw)).toStrictEqual(
+      expected
+    );
   });
 });
 
@@ -33,8 +32,8 @@ describe.each`
   ${"::one::two"}   | ${[{ word: "::one::two", offset: 0 }, { word: "one::two", offset: 2 }, { word: "two", offset: 7 }]}
 `("recursiveTokenize", ({ content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
-    expect(
-      createTokenizer(TokenizeStrategy.ENGLISH_ONLY).recursiveTokenize(content)
-    ).toStrictEqual(expected);
+    expect(new EnglishOnlyTokenizer().recursiveTokenize(content)).toStrictEqual(
+      expected
+    );
   });
 });
