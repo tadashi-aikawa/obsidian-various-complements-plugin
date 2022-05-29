@@ -11,7 +11,6 @@ declare module "chinese-tokenizer" {
     matches: unknown[];
   }
 
-  export const loadFile: (path: string) => any;
   export const load: (
     content: string
   ) => (content: string) => TokenizedResult[];
