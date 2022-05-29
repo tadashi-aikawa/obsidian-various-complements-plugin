@@ -1,12 +1,12 @@
 import { TRIM_CHAR_PATTERN } from "./DefaultTokenizer";
 import type { Tokenizer } from "../tokenizer";
-import chineseTokenizer, { load } from "chinese-tokenizer";
+import chineseTokenizer from "chinese-tokenizer";
 
 /**
  * Chinese needs original logic.
  */
 export class ChineseTokenizer implements Tokenizer {
-  _tokenize: ReturnType<typeof load>;
+  _tokenize: ReturnType<typeof chineseTokenizer.load>;
 
   static create(dict: string): ChineseTokenizer {
     const ins = new ChineseTokenizer();
