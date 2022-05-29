@@ -39,10 +39,12 @@ export interface Settings {
 
   // current file complement
   enableCurrentFileComplement: boolean;
+  currentFileMinNumberOfCharacters: number;
   onlyComplementEnglishOnCurrentFileComplement: boolean;
 
   // current vault complement
   enableCurrentVaultComplement: boolean;
+  currentVaultMinNumberOfCharacters: number;
   includeCurrentVaultPathPrefixPatterns: string;
   excludeCurrentVaultPathPrefixPatterns: string;
   includeCurrentVaultOnlyFilesUnderCurrentDirectory: boolean;
@@ -102,10 +104,12 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // current file complement
   enableCurrentFileComplement: true,
+  currentFileMinNumberOfCharacters: 0,
   onlyComplementEnglishOnCurrentFileComplement: false,
 
   // current vault complement
   enableCurrentVaultComplement: false,
+  currentVaultMinNumberOfCharacters: 0,
   includeCurrentVaultPathPrefixPatterns: "",
   excludeCurrentVaultPathPrefixPatterns: "",
   includeCurrentVaultOnlyFilesUnderCurrentDirectory: false,
@@ -443,6 +447,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     if (this.plugin.settings.enableCurrentFileComplement) {
       new Setting(containerEl)
+        .setName("Min number of characters for indexing")
+        .setDesc("It uses a default value of Strategy if set 0.")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 15, 1)
+            .setValue(this.plugin.settings.currentFileMinNumberOfCharacters)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentFileMinNumberOfCharacters = value;
+              await this.plugin.saveSettings({ currentFile: true });
+            })
+        );
+
+      new Setting(containerEl)
         .setName("Only complement English on current file complement")
         .addToggle((tc) => {
           tc.setValue(
@@ -475,6 +493,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       });
 
     if (this.plugin.settings.enableCurrentVaultComplement) {
+      new Setting(containerEl)
+        .setName("Min number of characters for indexing")
+        .setDesc("It uses a default value of Strategy if set 0.")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 15, 1)
+            .setValue(this.plugin.settings.currentVaultMinNumberOfCharacters)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentVaultMinNumberOfCharacters = value;
+              await this.plugin.saveSettings();
+            })
+        );
+
       new Setting(containerEl)
         .setName("Include prefix path patterns")
         .setDesc("Prefix match path patterns to include files.")

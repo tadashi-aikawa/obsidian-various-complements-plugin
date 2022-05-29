@@ -266,6 +266,20 @@ export class AutoCompleteSuggest
     );
   }
 
+  get currentFileMinNumberOfCharacters(): number {
+    return (
+      this.settings.currentFileMinNumberOfCharacters ||
+      this.tokenizerStrategy.indexingThreshold
+    );
+  }
+
+  get currentVaultMinNumberOfCharacters(): number {
+    return (
+      this.settings.currentVaultMinNumberOfCharacters ||
+      this.tokenizerStrategy.indexingThreshold
+    );
+  }
+
   get descriptionOnSuggestion(): DescriptionOnSuggestion {
     return DescriptionOnSuggestion.fromName(
       this.settings.descriptionOnSuggestion
@@ -514,7 +528,8 @@ export class AutoCompleteSuggest
     }
 
     await this.currentFileWordProvider.refreshWords(
-      this.settings.onlyComplementEnglishOnCurrentFileComplement
+      this.settings.onlyComplementEnglishOnCurrentFileComplement,
+      this.currentFileMinNumberOfCharacters
     );
 
     this.statusBar.setCurrentFileIndexed(
@@ -541,7 +556,9 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.currentVaultWordProvider.refreshWords();
+    await this.currentVaultWordProvider.refreshWords(
+      this.currentVaultMinNumberOfCharacters
+    );
 
     this.statusBar.setCurrentVaultIndexed(
       this.currentVaultWordProvider.wordCount

@@ -17,7 +17,7 @@ export class CurrentVaultWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  async refreshWords(): Promise<void> {
+  async refreshWords(minNumberOfCharacters: number): Promise<void> {
     this.clearWords();
 
     const currentDirname = this.appHelper.getCurrentDirname();
@@ -35,11 +35,11 @@ export class CurrentVaultWordProvider {
     for (const path of markdownFilePaths) {
       const content = await this.app.vault.adapter.read(path);
 
-      const tokens = this.tokenizer.tokenize(content);
-      const extendedTokens = tokens.map((x) =>
-        startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x
-      );
-      for (const token of extendedTokens) {
+      const tokens = this.tokenizer
+        .tokenize(content)
+        .filter((x) => x.length >= minNumberOfCharacters)
+        .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
+      for (const token of tokens) {
         wordByValue[token] = {
           value: token,
           type: "currentVault",

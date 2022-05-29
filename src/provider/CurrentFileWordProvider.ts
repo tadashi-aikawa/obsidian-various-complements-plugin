@@ -13,7 +13,10 @@ export class CurrentFileWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  async refreshWords(onlyEnglish: boolean): Promise<void> {
+  async refreshWords(
+    onlyEnglish: boolean,
+    minNumberOfCharacters: number
+  ): Promise<void> {
     this.clearWords();
 
     const editor = this.appHelper.getCurrentEditor();
@@ -33,13 +36,16 @@ export class CurrentFileWordProvider {
       .last();
 
     const content = await this.app.vault.cachedRead(file);
-    const tokens = onlyEnglish
-      ? this.tokenizer.tokenize(content).filter(allAlphabets)
-      : this.tokenizer.tokenize(content);
-    const extendedTokens = tokens.map((x) =>
-      startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x
-    );
-    this.words = uniq(extendedTokens)
+    const tokens = this.tokenizer
+      .tokenize(content)
+      .filter((x) => {
+        if (x.length < minNumberOfCharacters) {
+          return false;
+        }
+        return onlyEnglish ? allAlphabets(x) : true;
+      })
+      .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
+    this.words = uniq(tokens)
       .filter((x) => x !== currentToken)
       .map((x) => ({
         value: x,
