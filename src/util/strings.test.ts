@@ -7,6 +7,7 @@ import {
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
   splitRaw,
+  startsSmallLetterOnlyFirst,
 } from "./strings";
 
 describe.each`
@@ -103,6 +104,19 @@ describe.each`
 `("capitalizeFirstLetter", ({ text, expected }) => {
   test(`capitalizeFirstLetter(${text}) = ${expected}`, () => {
     expect(capitalizeFirstLetter(text)).toBe(expected);
+  });
+});
+
+describe.each`
+  text      | expected
+  ${"abc"}  | ${false}
+  ${"Abc"}  | ${true}
+  ${"ABC"}  | ${false}
+  ${" Abc"} | ${false}
+  ${"🍰🍴"} | ${false}
+`("startsSmallLetterOnlyFirst", ({ text, expected }) => {
+  test(`startsSmallLetterOnlyFirst(${text}) = ${expected}`, () => {
+    expect(startsSmallLetterOnlyFirst(text)).toBe(expected);
   });
 });
 

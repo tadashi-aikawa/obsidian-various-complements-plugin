@@ -102,6 +102,7 @@ describe("suggestWords", () => {
       a: [
         { value: "ai", type: "currentFile", createdPath: "" },
         { value: "aiUEO", type: "currentFile", createdPath: "" },
+        { value: "Arc", type: "currentFile", createdPath: "" },
       ],
     },
     currentVault: {},
@@ -181,11 +182,18 @@ describe("suggestWords", () => {
         hit: "AWS",
         createdPath: "",
       },
+      { value: "AWS", type: "customDictionary", hit: "AWS", createdPath: "" },
       {
         value: "uwaa",
         aliases: ["aaa"],
         hit: "aaa",
         type: "customDictionary",
+        createdPath: "",
+      },
+      {
+        value: "Arc",
+        type: "currentFile",
+        hit: "Arc",
         createdPath: "",
       },
       {
@@ -304,6 +312,12 @@ describe("suggestWords", () => {
         type: "customDictionary",
         aliases: ["aaa"],
         hit: "aaa",
+        createdPath: "",
+      },
+      {
+        value: "Arc",
+        type: "currentFile",
+        hit: "Arc",
         createdPath: "",
       },
       {
@@ -430,6 +444,13 @@ describe("suggestWords", () => {
   test("Query: u", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "u", 10, null)).toStrictEqual([
+      {
+        value: "UFO",
+        hit: "UFO",
+        type: "customDictionary",
+        aliases: ["Unidentified flying object"],
+        createdPath: "",
+      },
       {
         value: "uwaa",
         hit: "uwaa",
@@ -610,6 +631,7 @@ describe("suggestWordsByPartialMatch", () => {
       a: [
         { value: "ai", type: "currentFile", createdPath: "" },
         { value: "aiUEO", type: "currentFile", createdPath: "" },
+        { value: "Arc", type: "currentFile", createdPath: "" },
       ],
     },
     currentVault: {},
@@ -669,8 +691,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
+    // It is as specified that max doesn't match the expected length
     expect(
-      suggestWordsByPartialMatch(indexedWords, "a", 10, null)
+      suggestWordsByPartialMatch(indexedWords, "a", 11, null)
     ).toStrictEqual([
       { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
       { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
@@ -683,6 +706,7 @@ describe("suggestWordsByPartialMatch", () => {
         aliases: ["aaa"],
         createdPath: "",
       },
+      { value: "Arc", type: "currentFile", hit: "Arc", createdPath: "" },
       { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",
@@ -749,8 +773,9 @@ describe("suggestWordsByPartialMatch", () => {
 
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
+    // It is as specified that max doesn't match the expected length
     expect(
-      suggestWordsByPartialMatch(indexedWords, "A", 10, null)
+      suggestWordsByPartialMatch(indexedWords, "A", 11, null)
     ).toStrictEqual([
       { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
       { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
@@ -763,6 +788,7 @@ describe("suggestWordsByPartialMatch", () => {
         aliases: ["aaa"],
         createdPath: "",
       },
+      { value: "Arc", type: "currentFile", hit: "Arc", createdPath: "" },
       { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
         value: "あいうえお",

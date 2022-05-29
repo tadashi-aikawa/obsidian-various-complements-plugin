@@ -3,7 +3,7 @@ import { groupBy, uniq } from "../util/collection-helper";
 import type { WordsByFirstLetter } from "./suggester";
 import type { Tokenizer } from "../tokenizer/tokenizer";
 import type { AppHelper } from "../app-helper";
-import { allAlphabets } from "../util/strings";
+import { allAlphabets, startsSmallLetterOnlyFirst } from "../util/strings";
 import type { Word } from "../model/Word";
 
 export class CurrentFileWordProvider {
@@ -36,7 +36,10 @@ export class CurrentFileWordProvider {
     const tokens = onlyEnglish
       ? this.tokenizer.tokenize(content).filter(allAlphabets)
       : this.tokenizer.tokenize(content);
-    this.words = uniq(tokens)
+    const extendedTokens = tokens.map((x) =>
+      startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x
+    );
+    this.words = uniq(extendedTokens)
       .filter((x) => x !== currentToken)
       .map((x) => ({
         value: x,

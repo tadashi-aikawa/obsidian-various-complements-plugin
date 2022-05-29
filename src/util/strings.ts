@@ -35,6 +35,10 @@ export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export function startsSmallLetterOnlyFirst(str: string): boolean {
+  return Boolean(str.match(/^[A-Z][^A-Z]+$/));
+}
+
 export function* splitRaw(
   text: string,
   regexp: RegExp

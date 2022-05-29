@@ -5,6 +5,7 @@ import type { Tokenizer } from "../tokenizer/tokenizer";
 import type { AppHelper } from "../app-helper";
 import type { Word } from "../model/Word";
 import { dirname } from "../util/path";
+import { startsSmallLetterOnlyFirst } from "../util/strings";
 
 export class CurrentVaultWordProvider {
   wordsByFirstLetter: WordsByFirstLetter = {};
@@ -34,7 +35,11 @@ export class CurrentVaultWordProvider {
     for (const path of markdownFilePaths) {
       const content = await this.app.vault.adapter.read(path);
 
-      for (const token of this.tokenizer.tokenize(content)) {
+      const tokens = this.tokenizer.tokenize(content);
+      const extendedTokens = tokens.map((x) =>
+        startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x
+      );
+      for (const token of extendedTokens) {
         wordByValue[token] = {
           value: token,
           type: "currentVault",

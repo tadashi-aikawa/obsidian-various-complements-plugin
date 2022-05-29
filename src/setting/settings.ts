@@ -468,8 +468,8 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         tc.setValue(this.plugin.settings.enableCurrentVaultComplement).onChange(
           async (value) => {
             this.plugin.settings.enableCurrentVaultComplement = value;
-            await this.plugin.saveSettings({ currentVault: true });
             this.display();
+            await this.plugin.saveSettings({ currentVault: true });
           }
         );
       });

@@ -132,8 +132,11 @@ export function suggestWords(
     ? flattenFrontMatterWords()
     : [
         ...(indexedWords.currentFile[query.charAt(0)] ?? []),
+        ...(indexedWords.currentFile[query.charAt(0).toUpperCase()] ?? []),
         ...(indexedWords.currentVault[query.charAt(0)] ?? []),
+        ...(indexedWords.currentVault[query.charAt(0).toUpperCase()] ?? []),
         ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
+        ...(indexedWords.customDictionary[query.charAt(0).toUpperCase()] ?? []),
         ...(indexedWords.internalLink[query.charAt(0)] ?? []),
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
       ];
