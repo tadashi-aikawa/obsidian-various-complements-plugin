@@ -115,6 +115,42 @@ export class AppHelper {
     return this.getCurrentLine(editor).slice(0, editor.getCursor().ch);
   }
 
+  optimizeMarkdownLinkText(linkText: string): string | null {
+    const activeFile = this.getActiveFile();
+    if (!activeFile) {
+      return null;
+    }
+
+    const path = this.linkText2Path(linkText);
+    if (!path) {
+      return null;
+    }
+
+    const file = this.getMarkdownFileByPath(path);
+    if (!file) {
+      return null;
+    }
+
+    return this.unsafeApp.fileManager
+      .generateMarkdownLink(file, activeFile.path)
+      .replace("[[", "")
+      .replace("]]", "");
+  }
+
+  linkText2Path(linkText: string): string | null {
+    const activeFile = this.getActiveFile();
+    if (!activeFile) {
+      return null;
+    }
+
+    return (
+      this.unsafeApp.metadataCache.getFirstLinkpathDest(
+        linkText,
+        activeFile.path
+      )?.path ?? null
+    );
+  }
+
   searchPhantomLinks(): { path: string; link: string }[] {
     return Object.entries(this.unsafeApp.metadataCache.unresolvedLinks).flatMap(
       ([path, obj]) => Object.keys(obj).map((link) => ({ path, link }))

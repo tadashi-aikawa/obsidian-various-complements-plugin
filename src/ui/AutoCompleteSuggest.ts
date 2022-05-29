@@ -909,8 +909,10 @@ export class AutoCompleteSuggest
     if (word.type === "internalLink") {
       insertedText =
         this.settings.suggestInternalLinkWithAlias && word.aliasMeta
-          ? `[[${word.aliasMeta.origin}|${word.value}]]`
-          : `[[${word.value}]]`;
+          ? `[[${this.appHelper.optimizeMarkdownLinkText(
+              word.aliasMeta.origin
+            )}|${word.value}]]`
+          : `[[${this.appHelper.optimizeMarkdownLinkText(word.value)}]]`;
     }
 
     if (
