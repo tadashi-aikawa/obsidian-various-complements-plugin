@@ -123,7 +123,7 @@ export class AppHelper {
 
     const path = this.linkText2Path(linkText);
     if (!path) {
-      return null;
+      return linkText;
     }
 
     const file = this.getMarkdownFileByPath(path);
