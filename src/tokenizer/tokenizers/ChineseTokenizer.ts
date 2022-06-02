@@ -23,7 +23,7 @@ export class ChineseTokenizer implements Tokenizer {
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
-    const tokens: string[] = this.tokenize(content);
+    const tokens: string[] = this._tokenize(content).map((x) => x.text);
 
     const ret = [];
     for (let i = 0; i < tokens.length; i++) {
