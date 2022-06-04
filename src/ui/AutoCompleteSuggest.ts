@@ -308,6 +308,9 @@ export class AutoCompleteSuggest
     this.settings = settings;
 
     this.statusBar.setMatchStrategy(this.matchStrategy);
+    this.statusBar.setComplementAutomatically(
+      this.settings.complementAutomatically
+    );
 
     try {
       this.tokenizer = await createTokenizer(this.tokenizerStrategy, this.app);

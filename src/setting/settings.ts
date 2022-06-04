@@ -28,6 +28,7 @@ export interface Settings {
 
   // appearance
   showMatchStrategy: boolean;
+  showComplementAutomatically: boolean;
   showIndexingStatus: boolean;
   descriptionOnSuggestion: string;
 
@@ -93,6 +94,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // appearance
   showMatchStrategy: true,
+  showComplementAutomatically: true,
   showIndexingStatus: true,
   descriptionOnSuggestion: "Short",
 
@@ -339,6 +341,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         tc.setValue(this.plugin.settings.showMatchStrategy).onChange(
           async (value) => {
             this.plugin.settings.showMatchStrategy = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
+
+    new Setting(containerEl)
+      .setName("Show Complement automatically")
+      .setDesc(
+        "Show complement automatically at the status bar. Changing this option requires a restart to take effect."
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.showComplementAutomatically).onChange(
+          async (value) => {
+            this.plugin.settings.showComplementAutomatically = value;
             await this.plugin.saveSettings();
           }
         );

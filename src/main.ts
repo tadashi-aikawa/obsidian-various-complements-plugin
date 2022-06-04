@@ -49,10 +49,14 @@ export default class VariousComponents extends Plugin {
     this.statusBar = ProviderStatusBar.new(
       this.addStatusBarItem(),
       this.settings.showMatchStrategy,
-      this.settings.showIndexingStatus
+      this.settings.showIndexingStatus,
+      this.settings.showComplementAutomatically
     );
     this.statusBar.setOnClickStrategyListener(async () => {
       await this.settingTab.toggleMatchStrategy();
+    });
+    this.statusBar.setOnClickComplementAutomatically(async () => {
+      await this.settingTab.toggleComplementAutomatically();
     });
 
     const debouncedSaveData = debounce(async () => {

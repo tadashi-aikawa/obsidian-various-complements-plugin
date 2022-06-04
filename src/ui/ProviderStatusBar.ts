@@ -7,13 +7,15 @@ export class ProviderStatusBar {
     public customDictionary: HTMLElement | null,
     public internalLink: HTMLElement | null,
     public frontMatter: HTMLElement | null,
-    public matchStrategy: HTMLElement | null
+    public matchStrategy: HTMLElement | null,
+    public complementAutomatically: HTMLElement | null
   ) {}
 
   static new(
     statusBar: HTMLElement,
     showMatchStrategy: boolean,
-    showIndexingStatus: boolean
+    showIndexingStatus: boolean,
+    showComplementAutomatically: boolean
   ): ProviderStatusBar {
     const currentFile = showIndexingStatus
       ? statusBar.createEl("span", {
@@ -53,18 +55,30 @@ export class ProviderStatusBar {
         })
       : null;
 
+    console.log(showComplementAutomatically);
+    const complementAutomatically = showComplementAutomatically
+      ? statusBar.createEl("span", {
+          text: "---",
+          cls: "various-complements__footer various-complements__footer__complement-automatically",
+        })
+      : null;
+
     return new ProviderStatusBar(
       currentFile,
       currentVault,
       customDictionary,
       internalLink,
       frontMatter,
-      matchStrategy
+      matchStrategy,
+      complementAutomatically
     );
   }
 
   setOnClickStrategyListener(listener: () => void) {
     this.matchStrategy?.addEventListener("click", listener);
+  }
+  setOnClickComplementAutomatically(listener: () => void) {
+    this.complementAutomatically?.addEventListener("click", listener);
   }
 
   setCurrentFileDisabled() {
@@ -117,5 +131,8 @@ export class ProviderStatusBar {
 
   setMatchStrategy(strategy: MatchStrategy) {
     this.matchStrategy?.setText(strategy.name);
+  }
+  setComplementAutomatically(automatically: boolean) {
+    this.complementAutomatically?.setText(automatically ? "auto" : "manual");
   }
 }
