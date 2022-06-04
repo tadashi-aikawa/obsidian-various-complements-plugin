@@ -429,16 +429,18 @@ export class AutoCompleteSuggest
         )
       );
     }
-    this.keymapEventHandler.push(
-      this.scope.register(
-        selectSuggestionKey.keyBind.modifiers,
-        selectSuggestionKey.keyBind.key,
-        () => {
-          this.suggestions.useSelectedItem({});
-          return false;
-        }
-      )
-    );
+    if (selectSuggestionKey !== SelectSuggestionKey.None) {
+      this.keymapEventHandler.push(
+        this.scope.register(
+          selectSuggestionKey.keyBind.modifiers,
+          selectSuggestionKey.keyBind.key,
+          () => {
+            this.suggestions.useSelectedItem({});
+            return false;
+          }
+        )
+      );
+    }
 
     this.scope.keys.find((x) => x.key === "Escape")!.func = () => {
       this.close();

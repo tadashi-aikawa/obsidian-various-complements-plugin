@@ -6,7 +6,10 @@ type Name =
   | "Ctrl/Cmd+Enter"
   | "Alt+Enter"
   | "Shift+Enter"
-  | "Space";
+  | "Space"
+  | "Shift+Space"
+  | "Backquote"
+  | "None";
 interface KeyBind {
   modifiers: Modifier[];
   key: string | null;
@@ -38,6 +41,18 @@ export class SelectSuggestionKey {
   static readonly SPACE = new SelectSuggestionKey("Space", {
     modifiers: [],
     key: " ",
+  });
+  static readonly SHIFT_SPACE = new SelectSuggestionKey("Shift+Space", {
+    modifiers: ["Shift"],
+    key: " ",
+  });
+  static readonly BACKQUOTE = new SelectSuggestionKey("Backquote", {
+    modifiers: [],
+    key: "`",
+  });
+  static readonly None = new SelectSuggestionKey("None", {
+    modifiers: [],
+    key: "",
   });
 
   private constructor(readonly name: Name, readonly keyBind: KeyBind) {
