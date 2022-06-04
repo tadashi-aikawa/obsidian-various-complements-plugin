@@ -9,6 +9,7 @@ import {
   type EditorSuggestTriggerInfo,
   type EventRef,
   type KeymapEventHandler,
+  type Modifier,
   Notice,
   Scope,
   TFile,
@@ -397,36 +398,39 @@ export class AutoCompleteSuggest
   }
 
   private registerKeymaps() {
+    const registerKeyAsIgnored = (
+      modifiers: Modifier[],
+      key: string | null
+    ) => {
+      this.keymapEventHandler.push(
+        this.scope.register(modifiers, key, () => {
+          this.close();
+          return true;
+        })
+      );
+    };
+
     // Clear
     this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
     this.keymapEventHandler = [];
-
     this.scope.unregister(this.scope.keys.find((x) => x.key === "Enter")!);
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "ArrowUp")!);
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "ArrowDown")!);
+
+    // selectSuggestionKeys
     const selectSuggestionKey = SelectSuggestionKey.fromName(
       this.settings.selectSuggestionKeys
     );
     if (selectSuggestionKey !== SelectSuggestionKey.ENTER) {
-      this.keymapEventHandler.push(
-        this.scope.register(
-          SelectSuggestionKey.ENTER.keyBind.modifiers,
-          SelectSuggestionKey.ENTER.keyBind.key,
-          () => {
-            this.close();
-            return true;
-          }
-        )
+      registerKeyAsIgnored(
+        SelectSuggestionKey.ENTER.keyBind.modifiers,
+        SelectSuggestionKey.ENTER.keyBind.key
       );
     }
     if (selectSuggestionKey !== SelectSuggestionKey.TAB) {
-      this.keymapEventHandler.push(
-        this.scope.register(
-          SelectSuggestionKey.TAB.keyBind.modifiers,
-          SelectSuggestionKey.TAB.keyBind.key,
-          () => {
-            this.close();
-            return true;
-          }
-        )
+      registerKeyAsIgnored(
+        SelectSuggestionKey.TAB.keyBind.modifiers,
+        SelectSuggestionKey.TAB.keyBind.key
       );
     }
     if (selectSuggestionKey !== SelectSuggestionKey.None) {
@@ -442,14 +446,31 @@ export class AutoCompleteSuggest
       );
     }
 
+    // propagateESC
     this.scope.keys.find((x) => x.key === "Escape")!.func = () => {
       this.close();
       return this.settings.propagateEsc;
     };
 
+    // cycleThroughSuggestionsKeys
+    const selectNext = () => {
+      this.suggestions.setSelectedItem(this.suggestions.selectedItem + 1, true);
+      return false;
+    };
+    const selectPrevious = () => {
+      this.suggestions.setSelectedItem(this.suggestions.selectedItem - 1, true);
+      return false;
+    };
+
     const cycleThroughSuggestionsKeys = CycleThroughSuggestionsKeys.fromName(
       this.settings.additionalCycleThroughSuggestionsKeys
     );
+    if (!this.settings.disableUpDownKeysForCycleThroughSuggestionsKeys) {
+      this.keymapEventHandler.push(
+        this.scope.register([], "ArrowDown", selectNext),
+        this.scope.register([], "ArrowUp", selectPrevious)
+      );
+    }
     if (cycleThroughSuggestionsKeys !== CycleThroughSuggestionsKeys.NONE) {
       if (cycleThroughSuggestionsKeys === CycleThroughSuggestionsKeys.TAB) {
         this.scope.unregister(
@@ -460,24 +481,12 @@ export class AutoCompleteSuggest
         this.scope.register(
           cycleThroughSuggestionsKeys.nextKey.modifiers,
           cycleThroughSuggestionsKeys.nextKey.key,
-          () => {
-            this.suggestions.setSelectedItem(
-              this.suggestions.selectedItem + 1,
-              true
-            );
-            return false;
-          }
+          selectNext
         ),
         this.scope.register(
           cycleThroughSuggestionsKeys.previousKey.modifiers,
           cycleThroughSuggestionsKeys.previousKey.key,
-          () => {
-            this.suggestions.setSelectedItem(
-              this.suggestions.selectedItem - 1,
-              true
-            );
-            return false;
-          }
+          selectPrevious
         )
       );
     }

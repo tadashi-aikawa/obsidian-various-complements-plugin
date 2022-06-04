@@ -35,6 +35,7 @@ export interface Settings {
   // key customization
   selectSuggestionKeys: string;
   additionalCycleThroughSuggestionsKeys: string;
+  disableUpDownKeysForCycleThroughSuggestionsKeys: boolean;
   openSourceFileKey: string;
   propagateEsc: boolean;
 
@@ -101,6 +102,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // key customization
   selectSuggestionKeys: "Enter",
   additionalCycleThroughSuggestionsKeys: "None",
+  disableUpDownKeysForCycleThroughSuggestionsKeys: false,
   openSourceFileKey: "None",
   propagateEsc: false,
 
@@ -417,6 +419,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Disable the up/down keys for cycle through suggestions keys")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.disableUpDownKeysForCycleThroughSuggestionsKeys
+        ).onChange(async (value) => {
+          this.plugin.settings.disableUpDownKeysForCycleThroughSuggestionsKeys =
+            value;
+          await this.plugin.saveSettings();
+        });
+      });
 
     new Setting(containerEl).setName("Open source file key").addDropdown((tc) =>
       tc
