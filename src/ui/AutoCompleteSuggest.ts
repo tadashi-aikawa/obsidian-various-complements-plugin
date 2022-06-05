@@ -465,7 +465,18 @@ export class AutoCompleteSuggest
     const cycleThroughSuggestionsKeys = CycleThroughSuggestionsKeys.fromName(
       this.settings.additionalCycleThroughSuggestionsKeys
     );
-    if (!this.settings.disableUpDownKeysForCycleThroughSuggestionsKeys) {
+    if (this.settings.disableUpDownKeysForCycleThroughSuggestionsKeys) {
+      this.keymapEventHandler.push(
+        this.scope.register([], "ArrowDown", () => {
+          this.close();
+          return true;
+        }),
+        this.scope.register([], "ArrowUp", () => {
+          this.close();
+          return true;
+        })
+      );
+    } else {
       this.keymapEventHandler.push(
         this.scope.register([], "ArrowDown", selectNext),
         this.scope.register([], "ArrowUp", selectPrevious)
