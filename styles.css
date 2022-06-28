@@ -84,10 +84,10 @@
 
 
 .various-complements__suggestion-item::before {
-    position: absolute;
     width: 16px;
     margin-top: 4px;
-    margin-left: -22px;
+    margin-left: -20px;
+    margin-right: 5px;
     filter: invert(0.5) hue-rotate(180deg);
 }
 
