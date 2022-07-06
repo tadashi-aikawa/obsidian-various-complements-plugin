@@ -55,7 +55,6 @@ export class ProviderStatusBar {
         })
       : null;
 
-    console.log(showComplementAutomatically);
     const complementAutomatically = showComplementAutomatically
       ? statusBar.createEl("span", {
           text: "---",

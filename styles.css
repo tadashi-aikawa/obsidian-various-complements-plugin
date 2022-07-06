@@ -93,6 +93,8 @@
 
 .various-complements__suggestion-item {
     padding-left: 30px!important;
+    justify-content: inherit;
+    align-items: inherit;
 }
 
 .various-complements__suggestion-item__description {
