@@ -26,7 +26,7 @@ export class CustomDictionaryWordAddModal extends Modal {
         selectedDictionary: dictionaries[0],
         word: initialValue,
         dividerForDisplay,
-        onSubmit: onSubmit,
+        onSubmit,
         onClickFileIcon: (dictionaryPath: string) => {
           const markdownFile = appHelper.getMarkdownFileByPath(dictionaryPath);
           if (!markdownFile) {

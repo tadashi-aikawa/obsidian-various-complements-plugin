@@ -180,7 +180,7 @@ export class CustomDictionaryWordProvider {
     for (const path of this.paths) {
       try {
         const words = await this.loadWords(path, option);
-        words.forEach((x) => this.words.push(x));
+        words.forEach((x) => this.addWord(x));
       } catch (e) {
         // noinspection ObjectAllocationIgnored
         new Notice(
@@ -189,8 +189,6 @@ export class CustomDictionaryWordProvider {
         );
       }
     }
-
-    this.words.forEach((x) => this.addWord(x));
   }
 
   async addWordWithDictionary(
@@ -205,6 +203,8 @@ export class CustomDictionaryWordProvider {
   }
 
   private addWord(word: CustomDictionaryWord) {
+    this.words.push(word);
+
     // Add aliases as a synonym
     const wordWithSynonym = {
       ...word,

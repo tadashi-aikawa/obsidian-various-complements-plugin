@@ -13,7 +13,7 @@
 
   export let dictionaries: Dictionary[];
   export let selectedDictionary: Dictionary;
-  export let word: string = "";
+  export let inputWord: string = "";
   export let useDisplayedWord = false;
   export let displayedWord: string = "";
   export let description: string = "";
@@ -30,7 +30,7 @@
   let wordRef = null;
   let displayedWordRef = null;
 
-  $: enableSubmit = word.length > 0;
+  $: enableSubmit = inputWord.length > 0;
   $: enableDisplayedWord = Boolean(dividerForDisplay);
   $: firstWordTitle = useDisplayedWord ? "Inserted word" : "Word";
   $: {
@@ -41,12 +41,12 @@
 
   const handleSubmit = () => {
     onSubmit(selectedDictionary.path, {
-      value: displayedWord || word,
+      value: displayedWord || inputWord,
       description,
       aliases: aliasesStr.split("\n"),
       type: "customDictionary",
       createdPath: selectedDictionary.path,
-      insertedText: displayedWord ? word : undefined,
+      insertedText: displayedWord ? inputWord : undefined,
     });
   };
 
@@ -77,7 +77,7 @@
 
   <h3>{firstWordTitle}</h3>
   <textarea
-    bind:value={word}
+    bind:value={inputWord}
     style="width: 100%;"
     rows="3"
     bind:this={wordRef}

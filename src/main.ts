@@ -183,7 +183,13 @@ export default class VariousComponents extends Plugin {
       provider.editablePaths,
       selectedWord,
       this.settings.delimiterToDivideSuggestionsForDisplayFromInsertion,
-      async (dictionaryPath, word) => {
+      async (dictionaryPath, _word) => {
+        // TODO: If support for JSON, this implementation doesn't work correctly
+        const word = {
+          ..._word,
+          caretSymbol: this.settings.caretLocationSymbolAfterComplement,
+        };
+
         if (provider.wordByValue[word.value]) {
           // noinspection ObjectAllocationIgnored
           new Notice(`⚠ ${word.value} already exists`, 0);
