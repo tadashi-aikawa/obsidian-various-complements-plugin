@@ -84,6 +84,7 @@
 
 
 .various-complements__suggestion-item::before {
+    display: inline-block;
     width: 16px;
     margin-top: 4px;
     margin-left: -20px;
@@ -92,9 +93,13 @@
 }
 
 .various-complements__suggestion-item {
+    display: flex;
+    align-items: start;
     padding-left: 30px!important;
-    justify-content: inherit;
-    align-items: inherit;
+}
+
+.various-complements__suggestion-item > div {
+    display: inline-block;
 }
 
 .various-complements__suggestion-item__description {
