@@ -32,7 +32,7 @@ export class DefaultTokenizer implements Tokenizer {
     return TRIM_CHAR_PATTERN;
   }
 
-  shouldIgnore(str: string): boolean {
+  shouldIgnoreOnCurrent(str: string): boolean {
     return false;
   }
 }

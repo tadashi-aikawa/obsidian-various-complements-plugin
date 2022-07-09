@@ -355,7 +355,6 @@ export class AutoCompleteSuggest
               (this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
                 xs.length &&
                 x.word.length >= this.minNumberTriggered &&
-                !this.tokenizer.shouldIgnore(x.word) &&
                 !x.word.endsWith(" "))
           )
           .map((q) => {
@@ -839,20 +838,16 @@ export class AutoCompleteSuggest
       : undefined;
     this.showDebugLog(() => `Current front matter is ${currentFrontMatter}`);
 
-    if (!this.runManually && !currentFrontMatter) {
-      if (currentToken.length < this.minNumberTriggered) {
-        this.showDebugLog(
-          () =>
-            "Don't show suggestions because currentToken is less than minNumberTriggered option"
-        );
-        return null;
-      }
-      if (this.tokenizer.shouldIgnore(currentToken)) {
-        this.showDebugLog(
-          () => "Don't show suggestions because currentToken should ignored"
-        );
-        return null;
-      }
+    if (
+      !this.runManually &&
+      !currentFrontMatter &&
+      currentToken.length < this.minNumberTriggered
+    ) {
+      this.showDebugLog(
+        () =>
+          "Don't show suggestions because currentToken is less than minNumberTriggered option"
+      );
+      return null;
     }
 
     this.showDebugLog(() =>

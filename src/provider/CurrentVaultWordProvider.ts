@@ -37,7 +37,11 @@ export class CurrentVaultWordProvider {
 
       const tokens = this.tokenizer
         .tokenize(content)
-        .filter((x) => x.length >= minNumberOfCharacters)
+        .filter(
+          (x) =>
+            x.length >= minNumberOfCharacters &&
+            !this.tokenizer.shouldIgnoreOnCurrent(x)
+        )
         .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
       for (const token of tokens) {
         wordByValue[token] = {

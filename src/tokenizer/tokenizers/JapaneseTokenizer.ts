@@ -48,7 +48,7 @@ export class JapaneseTokenizer implements Tokenizer {
     return TRIM_CHAR_PATTERN;
   }
 
-  shouldIgnore(str: string): boolean {
+  shouldIgnoreOnCurrent(str: string): boolean {
     return Boolean(str.match(/^[ぁ-んａ-ｚＡ-Ｚ。、ー　]*$/));
   }
 }

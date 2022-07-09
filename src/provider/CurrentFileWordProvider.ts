@@ -42,6 +42,9 @@ export class CurrentFileWordProvider {
         if (x.length < minNumberOfCharacters) {
           return false;
         }
+        if (this.tokenizer.shouldIgnoreOnCurrent(x)) {
+          return false;
+        }
         return onlyEnglish ? allAlphabets(x) : true;
       })
       .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
