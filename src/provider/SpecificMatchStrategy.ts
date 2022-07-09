@@ -9,8 +9,10 @@ type Handler = (
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  frontMatter: string | null,
-  selectionHistoryStorage?: SelectionHistoryStorage
+  option: {
+    frontMatter?: string;
+    selectionHistoryStorage?: SelectionHistoryStorage;
+  }
 ) => Word[];
 
 const neverUsedHandler = (..._args: any[]) => [];

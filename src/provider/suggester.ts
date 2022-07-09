@@ -99,9 +99,12 @@ export function suggestWords(
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  frontMatter: string | null,
-  selectionHistoryStorage?: SelectionHistoryStorage
+  option: {
+    frontMatter?: string;
+    selectionHistoryStorage?: SelectionHistoryStorage;
+  } = {}
 ): Word[] {
+  const { frontMatter, selectionHistoryStorage } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
   const flattenFrontMatterWords = () => {
@@ -258,9 +261,12 @@ export function suggestWordsByPartialMatch(
   indexedWords: IndexedWords,
   query: string,
   max: number,
-  frontMatter: string | null,
-  selectionHistoryStorage?: SelectionHistoryStorage
+  option: {
+    frontMatter?: string;
+    selectionHistoryStorage?: SelectionHistoryStorage;
+  } = {}
 ): Word[] {
+  const { frontMatter, selectionHistoryStorage } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
 
   const flatObjectValues = (object: { [firstLetter: string]: Word[] }) =>

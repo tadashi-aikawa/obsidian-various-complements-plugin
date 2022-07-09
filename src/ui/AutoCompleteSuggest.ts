@@ -341,7 +341,7 @@ export class AutoCompleteSuggest
 
         this.showDebugLog(() => `[context.query]: ${context.query}`);
         const parsedQuery = JSON.parse(context.query) as {
-          currentFrontMatter: string | null;
+          currentFrontMatter?: string;
           queries: {
             word: string;
             offset: number;
@@ -369,8 +369,10 @@ export class AutoCompleteSuggest
               this.indexedWords,
               q.word,
               this.settings.maxNumberOfSuggestions,
-              parsedQuery.currentFrontMatter,
-              this.selectionHistoryStorage
+              {
+                frontMatter: parsedQuery.currentFrontMatter,
+                selectionHistoryStorage: this.selectionHistoryStorage,
+              }
             ).map((word) => ({ ...word, offset: q.offset }));
           })
           .flat();
@@ -834,7 +836,7 @@ export class AutoCompleteSuggest
 
     const currentFrontMatter = this.settings.enableFrontMatterComplement
       ? this.appHelper.getCurrentFrontMatter()
-      : null;
+      : undefined;
     this.showDebugLog(() => `Current front matter is ${currentFrontMatter}`);
 
     if (!this.runManually && !currentFrontMatter) {
