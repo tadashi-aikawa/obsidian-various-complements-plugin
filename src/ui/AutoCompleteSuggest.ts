@@ -737,12 +737,18 @@ export class AutoCompleteSuggest
   ): EditorSuggestTriggerInfo | null {
     const start = performance.now();
 
+    const onReturnNull = (message: string) => {
+      this.showDebugLog(() => message);
+      this.runManually = false;
+      this.close();
+    };
+
     if (
       !this.settings.complementAutomatically &&
       !this.isOpen &&
       !this.runManually
     ) {
-      this.showDebugLog(() => "Don't show suggestions");
+      onReturnNull("Don't show suggestions");
       return null;
     }
 
@@ -751,16 +757,14 @@ export class AutoCompleteSuggest
       this.appHelper.isIMEOn() &&
       !this.runManually
     ) {
-      this.showDebugLog(() => "Don't show suggestions for IME");
+      onReturnNull("Don't show suggestions for IME");
       return null;
     }
 
     const cl = this.appHelper.getCurrentLine(editor);
     if (this.previousCurrentLine === cl && !this.runManually) {
       this.previousCurrentLine = cl;
-      this.showDebugLog(
-        () => "Don't show suggestions because there are no changes"
-      );
+      onReturnNull("Don't show suggestions because there are no changes");
       return null;
     }
     this.previousCurrentLine = cl;
@@ -768,9 +772,8 @@ export class AutoCompleteSuggest
     const currentLineUntilCursor =
       this.appHelper.getCurrentLineUntilCursor(editor);
     if (currentLineUntilCursor.startsWith("---")) {
-      this.showDebugLog(
-        () =>
-          "Don't show suggestions because it supposes front matter or horizontal line"
+      onReturnNull(
+        "Don't show suggestions because it supposes front matter or horizontal line"
       );
       return null;
     }
@@ -778,8 +781,8 @@ export class AutoCompleteSuggest
       currentLineUntilCursor.startsWith("~~~") ||
       currentLineUntilCursor.startsWith("```")
     ) {
-      this.showDebugLog(
-        () => "Don't show suggestions because it supposes front code block"
+      onReturnNull(
+        "Don't show suggestions because it supposes front code block"
       );
       return null;
     }
@@ -800,10 +803,7 @@ export class AutoCompleteSuggest
     const currentToken = currentTokens[0]?.word;
     this.showDebugLog(() => `[onTrigger] currentToken is ${currentToken}`);
     if (!currentToken) {
-      this.runManually = false;
-      this.showDebugLog(
-        () => `Don't show suggestions because currentToken is empty`
-      );
+      onReturnNull(`Don't show suggestions because currentToken is empty`);
       return null;
     }
 
@@ -814,10 +814,8 @@ export class AutoCompleteSuggest
         currentTokenSeparatedWhiteSpace
       )
     ) {
-      this.runManually = false;
-      this.showDebugLog(
-        () =>
-          `Don't show suggestions for avoiding to conflict with the other commands.`
+      onReturnNull(
+        `Don't show suggestions for avoiding to conflict with the other commands.`
       );
       return null;
     }
@@ -826,9 +824,8 @@ export class AutoCompleteSuggest
       currentToken.length === 1 &&
       Boolean(currentToken.match(this.tokenizer.getTrimPattern()))
     ) {
-      this.runManually = false;
-      this.showDebugLog(
-        () => `Don't show suggestions because currentToken is TRIM_PATTERN`
+      onReturnNull(
+        `Don't show suggestions because currentToken is TRIM_PATTERN`
       );
       return null;
     }
@@ -843,9 +840,8 @@ export class AutoCompleteSuggest
       !currentFrontMatter &&
       currentToken.length < this.minNumberTriggered
     ) {
-      this.showDebugLog(
-        () =>
-          "Don't show suggestions because currentToken is less than minNumberTriggered option"
+      onReturnNull(
+        "Don't show suggestions because currentToken is less than minNumberTriggered option"
       );
       return null;
     }
