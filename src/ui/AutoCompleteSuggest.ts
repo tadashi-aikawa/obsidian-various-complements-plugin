@@ -737,8 +737,11 @@ export class AutoCompleteSuggest
   ): EditorSuggestTriggerInfo | null {
     const start = performance.now();
 
+    const showDebugLog = (message: string) => {
+      this.showDebugLog(() => `[onTrigger] ${message}`);
+    };
     const onReturnNull = (message: string) => {
-      this.showDebugLog(() => message);
+      showDebugLog(message);
       this.runManually = false;
       this.close();
     };
@@ -788,7 +791,7 @@ export class AutoCompleteSuggest
     }
 
     const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
-    this.showDebugLog(() => `[onTrigger] tokens is ${tokens}`);
+    showDebugLog(`tokens is ${tokens}`);
 
     const tokenized = this.tokenizer.recursiveTokenize(currentLineUntilCursor);
     const currentTokens = tokenized.slice(
@@ -796,12 +799,10 @@ export class AutoCompleteSuggest
         ? tokenized.length - this.settings.maxNumberOfWordsAsPhrase
         : 0
     );
-    this.showDebugLog(
-      () => `[onTrigger] currentTokens is ${JSON.stringify(currentTokens)}`
-    );
+    showDebugLog(`currentTokens is ${JSON.stringify(currentTokens)}`);
 
     const currentToken = currentTokens[0]?.word;
-    this.showDebugLog(() => `[onTrigger] currentToken is ${currentToken}`);
+    showDebugLog(`currentToken is ${currentToken}`);
     if (!currentToken) {
       onReturnNull(`Don't show suggestions because currentToken is empty`);
       return null;
@@ -833,7 +834,7 @@ export class AutoCompleteSuggest
     const currentFrontMatter = this.settings.enableFrontMatterComplement
       ? this.appHelper.getCurrentFrontMatter()
       : undefined;
-    this.showDebugLog(() => `Current front matter is ${currentFrontMatter}`);
+    showDebugLog(`Current front matter is ${currentFrontMatter}`);
 
     if (
       !this.runManually &&
@@ -846,9 +847,7 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    this.showDebugLog(() =>
-      buildLogMessage("onTrigger", performance.now() - start)
-    );
+    showDebugLog(buildLogMessage("onTrigger", performance.now() - start));
     this.runManually = false;
 
     // Hack implementation for Front matter complement
