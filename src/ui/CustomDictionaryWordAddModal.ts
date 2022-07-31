@@ -24,7 +24,7 @@ export class CustomDictionaryWordAddModal extends Modal {
       props: {
         dictionaries,
         selectedDictionary: dictionaries[0],
-        word: initialValue,
+        inputWord: initialValue,
         dividerForDisplay,
         onSubmit,
         onClickFileIcon: (dictionaryPath: string) => {
