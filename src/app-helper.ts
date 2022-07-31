@@ -15,6 +15,7 @@ interface UnsafeAppInterface {
   vault: Vault & {
     config: {
       spellcheckDictionary?: string[];
+      useMarkdownLinks?: false;
     };
   };
 }
@@ -131,10 +132,14 @@ export class AppHelper {
       return null;
     }
 
-    return this.unsafeApp.fileManager
-      .generateMarkdownLink(file, activeFile.path)
-      .replace("[[", "")
-      .replace("]]", "");
+    const markdownLink = this.unsafeApp.fileManager.generateMarkdownLink(
+      file,
+      activeFile.path
+    );
+
+    return markdownLink.startsWith("[[")
+      ? markdownLink.replace("[[", "").replace("]]", "")
+      : markdownLink.replace("[", "").replace(/\]\(.+\)/g, "");
   }
 
   linkText2Path(linkText: string): string | null {
@@ -246,5 +251,9 @@ export class AppHelper {
 
   async writeLog(log: string) {
     await this.unsafeApp.vault.adapter.append(normalizePath("log.md"), log);
+  }
+
+  get useWikiLinks(): boolean {
+    return !this.unsafeApp.vault.config.useMarkdownLinks;
   }
 }

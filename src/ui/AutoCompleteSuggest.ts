@@ -941,12 +941,19 @@ export class AutoCompleteSuggest
 
     let insertedText = word.value;
     if (word.type === "internalLink") {
-      insertedText =
-        this.settings.suggestInternalLinkWithAlias && word.aliasMeta
-          ? `[[${this.appHelper.optimizeMarkdownLinkText(
-              word.aliasMeta.origin
-            )}|${word.value}]]`
-          : `[[${this.appHelper.optimizeMarkdownLinkText(word.value)}]]`;
+      if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
+        const linkText = this.appHelper.optimizeMarkdownLinkText(
+          word.aliasMeta.origin
+        );
+        insertedText = this.appHelper.useWikiLinks
+          ? `[[${linkText}|${word.value}]]`
+          : `[${word.value}](${linkText}.md)`;
+      } else {
+        const linkText = this.appHelper.optimizeMarkdownLinkText(word.value);
+        insertedText = this.appHelper.useWikiLinks
+          ? `[[${linkText}]]`
+          : `[${linkText}](${linkText}.md)`;
+      }
     }
 
     if (
