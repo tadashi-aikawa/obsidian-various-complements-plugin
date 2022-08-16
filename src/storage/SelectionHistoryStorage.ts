@@ -21,9 +21,16 @@ const HOUR = MIN * 60;
 const DAY = HOUR * 24;
 const WEEK = DAY * 7;
 
-function calcScore(history: SelectionHistory | undefined): number {
+function calcScore(
+  history: SelectionHistory | undefined,
+  latestUpdated: number
+): number {
   if (!history) {
     return 0;
+  }
+
+  if (history.lastUpdated === latestUpdated) {
+    return Number.MAX_SAFE_INTEGER;
   }
 
   const behind = Date.now() - history.lastUpdated;
@@ -103,9 +110,9 @@ export class SelectionHistoryStorage {
     this.version = Date.now();
   }
 
-  compare(w1: HitWord, w2: HitWord): -1 | 0 | 1 {
-    const score1 = calcScore(this.getSelectionHistory(w1));
-    const score2 = calcScore(this.getSelectionHistory(w2));
+  compare(w1: HitWord, w2: HitWord, latestUpdated: number): -1 | 0 | 1 {
+    const score1 = calcScore(this.getSelectionHistory(w1), latestUpdated);
+    const score2 = calcScore(this.getSelectionHistory(w2), latestUpdated);
 
     if (score1 === score2) {
       return 0;

@@ -75,3 +75,8 @@ export function mirrorMap<T>(
 ): { [key: string]: string } {
   return collection.reduce((p, c) => ({ ...p, [toValue(c)]: toValue(c) }), {});
 }
+
+export function max(collection: number[], emptyValue: number): number {
+  const select = (a: number, b: number) => (a >= b ? a : b);
+  return collection.reduce(select, emptyValue);
+}

@@ -4,7 +4,7 @@ import {
   lowerStartsWith,
 } from "../util/strings";
 import type { IndexedWords } from "../ui/AutoCompleteSuggest";
-import { uniqWith } from "../util/collection-helper";
+import { max, uniqWith } from "../util/collection-helper";
 import { type Word, WordTypeMeta } from "../model/Word";
 import type {
   HitWord,
@@ -14,6 +14,7 @@ import type {
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
 interface Judgement {
+  // TODO: want to replace to HitWord
   word: Word;
   // TODO: remove value. use word.hit instead
   value?: string;
@@ -98,7 +99,7 @@ export function judge(
 export function suggestWords(
   indexedWords: IndexedWords,
   query: string,
-  max: number,
+  maxNum: number,
   option: {
     frontMatter?: string;
     selectionHistoryStorage?: SelectionHistoryStorage;
@@ -144,9 +145,20 @@ export function suggestWords(
         ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
       ];
 
-  const candidate = Array.from(words)
+  const filteredJudgement = Array.from(words)
     .map((x) => judge(x, query, queryStartWithUpper))
-    .filter((x) => x.value !== undefined)
+    .filter((x) => x.value !== undefined);
+
+  const latestUpdated = max(
+    filteredJudgement.map(
+      (x) =>
+        selectionHistoryStorage?.getSelectionHistory(x.word as HitWord)
+          ?.lastUpdated ?? 0
+    ),
+    0
+  );
+
+  const candidate = filteredJudgement
     .sort((a, b) => {
       const aWord = a.word as HitWord;
       const bWord = b.word as HitWord;
@@ -158,8 +170,9 @@ export function suggestWords(
 
       if (selectionHistoryStorage) {
         const ret = selectionHistoryStorage.compare(
-          aWord as HitWord,
-          bWord as HitWord
+          aWord,
+          bWord,
+          latestUpdated
         );
         if (ret !== 0) {
           return ret;
@@ -181,7 +194,7 @@ export function suggestWords(
       return 0;
     })
     .map((x) => x.word)
-    .slice(0, max);
+    .slice(0, maxNum);
 
   // XXX: There is no guarantee that equals with max, but it is important for performance
   return uniqWith(
@@ -260,7 +273,7 @@ export function judgeByPartialMatch(
 export function suggestWordsByPartialMatch(
   indexedWords: IndexedWords,
   query: string,
-  max: number,
+  maxNum: number,
   option: {
     frontMatter?: string;
     selectionHistoryStorage?: SelectionHistoryStorage;
@@ -290,10 +303,20 @@ export function suggestWordsByPartialMatch(
         ...flatObjectValues(indexedWords.customDictionary),
         ...flatObjectValues(indexedWords.internalLink),
       ];
-
-  const candidate = Array.from(words)
+  const filteredJudgement = Array.from(words)
     .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper))
-    .filter((x) => x.value !== undefined)
+    .filter((x) => x.value !== undefined);
+
+  const latestUpdated = max(
+    filteredJudgement.map(
+      (x) =>
+        selectionHistoryStorage?.getSelectionHistory(x.word as HitWord)
+          ?.lastUpdated ?? 0
+    ),
+    0
+  );
+
+  const candidate = filteredJudgement
     .sort((a, b) => {
       const aWord = a.word as HitWord;
       const bWord = b.word as HitWord;
@@ -305,8 +328,9 @@ export function suggestWordsByPartialMatch(
 
       if (selectionHistoryStorage) {
         const ret = selectionHistoryStorage.compare(
-          aWord as HitWord,
-          bWord as HitWord
+          aWord,
+          bWord,
+          latestUpdated
         );
         if (ret !== 0) {
           return ret;
@@ -334,7 +358,7 @@ export function suggestWordsByPartialMatch(
       return 0;
     })
     .map((x) => x.word)
-    .slice(0, max);
+    .slice(0, maxNum);
 
   // XXX: There is no guarantee that equals with max, but it is important for performance
   return uniqWith(
