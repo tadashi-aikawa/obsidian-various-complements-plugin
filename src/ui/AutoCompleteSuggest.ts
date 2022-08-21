@@ -149,7 +149,9 @@ export class AutoCompleteSuggest
     );
 
     ins.selectionHistoryStorage = new SelectionHistoryStorage(
-      settings.selectionHistoryTree
+      settings.selectionHistoryTree,
+      settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory,
+      settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep
     );
     ins.selectionHistoryStorage.purge();
 

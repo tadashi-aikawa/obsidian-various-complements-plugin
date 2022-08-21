@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "chinese-tokenizer": "github:tadashi-aikawa/chinese-tokenizer",
-    "svelte-lucide-icons": "^0.6.0"
+    "svelte-lucide-icons": "^0.6.0",
+    "ts-deepmerge": "^3.0.0"
   }
 }

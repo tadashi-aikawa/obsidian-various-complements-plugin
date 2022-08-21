@@ -53,22 +53,42 @@ export class SelectionHistoryStorage {
   data: SelectionHistoryTree;
   version: number;
   persistedVersion: number;
+  // 0 means not defined
+  maxDaysToKeepHistory: number;
+  // 0 means not defined
+  maxNumberOfHistoryToKeep: number;
 
-  constructor(data: SelectionHistoryTree = {}) {
+  constructor(
+    data: SelectionHistoryTree = {},
+    maxDaysToKeepHistory: number,
+    maxNumberOfHistoryToKeep: number
+  ) {
     this.data = data;
 
     const now = Date.now();
     this.version = now;
     this.persistedVersion = now;
+
+    this.maxDaysToKeepHistory = maxDaysToKeepHistory;
+    this.maxNumberOfHistoryToKeep = maxNumberOfHistoryToKeep;
   }
 
   // noinspection FunctionWithMultipleLoopsJS
   purge() {
+    const now = Date.now();
+    const times: number[] = [];
+
     for (const hit of Object.keys(this.data)) {
       for (const value of Object.keys(this.data[hit])) {
         for (const kind of Object.keys(this.data[hit][value])) {
-          if (Date.now() - this.data[hit][value][kind].lastUpdated > 4 * WEEK) {
+          if (
+            this.maxDaysToKeepHistory &&
+            now - this.data[hit][value][kind].lastUpdated >
+              this.maxDaysToKeepHistory * DAY
+          ) {
             delete this.data[hit][value][kind];
+          } else {
+            times.push(this.data[hit][value][kind].lastUpdated);
           }
         }
 
@@ -79,6 +99,32 @@ export class SelectionHistoryStorage {
 
       if (Object.isEmpty(this.data[hit])) {
         delete this.data[hit];
+      }
+    }
+
+    if (this.maxNumberOfHistoryToKeep) {
+      const threshold =
+        times
+          .sort((a, b) => (a > b ? -1 : 1))
+          .slice(0, this.maxNumberOfHistoryToKeep)
+          .at(-1) ?? 0;
+
+      for (const hit of Object.keys(this.data)) {
+        for (const value of Object.keys(this.data[hit])) {
+          for (const kind of Object.keys(this.data[hit][value])) {
+            if (this.data[hit][value][kind].lastUpdated < threshold) {
+              delete this.data[hit][value][kind];
+            }
+          }
+
+          if (Object.isEmpty(this.data[hit][value])) {
+            delete this.data[hit][value];
+          }
+        }
+
+        if (Object.isEmpty(this.data[hit])) {
+          delete this.data[hit];
+        }
       }
     }
   }

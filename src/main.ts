@@ -8,6 +8,7 @@ import {
 import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
+import merge from 'ts-deepmerge';
 
 export default class VariousComponents extends Plugin {
   appHelper: AppHelper;
@@ -144,7 +145,8 @@ export default class VariousComponents extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    this.settings = { ...DEFAULT_SETTINGS, ...(await this.loadData()) };
+    const currentSettings = await this.loadData()
+    this.settings = merge(DEFAULT_SETTINGS, currentSettings)
   }
 
   async saveSettings(
