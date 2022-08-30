@@ -109,6 +109,7 @@
     font-size: 0.75em;
     /*noinspection CssUnresolvedCustomProperty*/
     color: var(--text-muted);
+    padding-top: 0.75em;
 }
 
 .various-complements__suggestion-item__current-file::before {
