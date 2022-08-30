@@ -81,9 +81,9 @@ export class AutoCompleteSuggest
 
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
-    [EditorSuggestContext, (tokens: Word[]) => void]
+    [EditorSuggestContext, (tokens: Word[]) => void], void
   >;
-  debounceClose: Debouncer<[]>;
+  debounceClose: Debouncer<[], void>;
 
   runManually: boolean;
   declare isOpen: boolean;

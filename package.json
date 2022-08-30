@@ -23,7 +23,7 @@
     "@types/node": "^18.0.0",
     "babel-jest": "^27.5.1",
     "jest": "^27.5.1",
-    "obsidian": "^0.15.4",
+    "obsidian": "^0.16.0",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
     "rollup": "^2.75.6",
