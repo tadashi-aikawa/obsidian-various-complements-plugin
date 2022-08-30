@@ -1,6 +1,6 @@
 {
   "name": "various-complements",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "description": "This plugin for Obsidian enables you to complete words like the auto-completion of IDE",
   "main": "main.js",
   "scripts": {
