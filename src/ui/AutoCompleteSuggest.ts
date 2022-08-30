@@ -57,7 +57,7 @@ interface UnsafeEditorSuggestInterface {
   suggestions: {
     selectedItem: number;
     useSelectedItem(ev: Partial<KeyboardEvent>): void;
-    setSelectedItem(selected: number, scroll: boolean): void;
+    setSelectedItem(selected: number, event: KeyboardEvent): void;
     values: Word[];
   };
   isOpen: boolean;
@@ -81,7 +81,8 @@ export class AutoCompleteSuggest
 
   tokenizer: Tokenizer;
   debounceGetSuggestions: Debouncer<
-    [EditorSuggestContext, (tokens: Word[]) => void], void
+    [EditorSuggestContext, (tokens: Word[]) => void],
+    void
   >;
   debounceClose: Debouncer<[], void>;
 
@@ -456,12 +457,12 @@ export class AutoCompleteSuggest
     };
 
     // cycleThroughSuggestionsKeys
-    const selectNext = () => {
-      this.suggestions.setSelectedItem(this.suggestions.selectedItem + 1, true);
+    const selectNext = (evt: KeyboardEvent) => {
+      this.suggestions.setSelectedItem(this.suggestions.selectedItem + 1, evt);
       return false;
     };
-    const selectPrevious = () => {
-      this.suggestions.setSelectedItem(this.suggestions.selectedItem - 1, true);
+    const selectPrevious = (evt: KeyboardEvent) => {
+      this.suggestions.setSelectedItem(this.suggestions.selectedItem - 1, evt);
       return false;
     };
 
