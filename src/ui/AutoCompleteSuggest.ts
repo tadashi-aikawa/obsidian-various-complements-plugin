@@ -38,6 +38,7 @@ import {
   type HitWord,
   SelectionHistoryStorage,
 } from "../storage/SelectionHistoryStorage";
+import { suggestionUniqPredicate } from "../provider/suggester";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -380,10 +381,10 @@ export class AutoCompleteSuggest
           .flat();
 
         cb(
-          uniqWith(
-            words,
-            (a, b) => a.value === b.value && a.type === b.type
-          ).slice(0, this.settings.maxNumberOfSuggestions)
+          uniqWith(words, suggestionUniqPredicate).slice(
+            0,
+            this.settings.maxNumberOfSuggestions
+          )
         );
 
         this.showDebugLog(() =>
@@ -952,7 +953,9 @@ export class AutoCompleteSuggest
           ? `[[${linkText}|${word.value}]]`
           : `[${word.value}](${linkText}.md)`;
       } else {
-        const linkText = this.appHelper.optimizeMarkdownLinkText(word.value);
+        const linkText = this.appHelper.optimizeMarkdownLinkText(
+          word.createdPath
+        );
         insertedText = this.appHelper.useWikiLinks
           ? `[[${linkText}]]`
           : `[${linkText}](${linkText}.md)`;

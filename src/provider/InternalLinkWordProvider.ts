@@ -45,7 +45,7 @@ export class InternalLinkWordProvider {
               aliases: synonymAliases(a),
               description: x.path,
               aliasMeta: {
-                origin: x.basename,
+                origin: x.path,
               },
             })),
           ] as InternalLinkWord[];

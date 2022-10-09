@@ -21,6 +21,23 @@ interface Judgement {
   alias: boolean;
 }
 
+export function suggestionUniqPredicate(a: Word, b: Word) {
+  if (a.value !== b.value) {
+    return false;
+  }
+
+  const groupA = WordTypeMeta.of(a.type).group;
+  if (groupA !== WordTypeMeta.of(b.type).group) {
+    return false;
+  }
+
+  if (groupA === "internalLink" && a.createdPath !== b.createdPath) {
+    return false;
+  }
+
+  return true;
+}
+
 export function pushWord(
   wordsByFirstLetter: WordsByFirstLetter,
   key: string,
@@ -197,12 +214,7 @@ export function suggestWords(
     .slice(0, maxNum);
 
   // XXX: There is no guarantee that equals with max, but it is important for performance
-  return uniqWith(
-    candidate,
-    (a, b) =>
-      a.value === b.value &&
-      WordTypeMeta.of(a.type).group === WordTypeMeta.of(b.type).group
-  );
+  return uniqWith(candidate, suggestionUniqPredicate);
 }
 
 // TODO: refactoring
@@ -361,10 +373,5 @@ export function suggestWordsByPartialMatch(
     .slice(0, maxNum);
 
   // XXX: There is no guarantee that equals with max, but it is important for performance
-  return uniqWith(
-    candidate,
-    (a, b) =>
-      a.value === b.value &&
-      WordTypeMeta.of(a.type).group === WordTypeMeta.of(b.type).group
-  );
+  return uniqWith(candidate, suggestionUniqPredicate);
 }

@@ -33,6 +33,7 @@ export interface InternalLinkWord extends DefaultWord {
   type: "internalLink";
   phantom?: boolean;
   aliasMeta?: {
+    // path
     origin: string;
   };
 }
@@ -81,7 +82,7 @@ export class WordTypeMeta {
   private constructor(
     readonly type: WordType,
     readonly priority: number,
-    readonly group: string
+    readonly group: "frontMatter" | "internalLink" | "suggestion"
   ) {
     WordTypeMeta._values.push(this);
     WordTypeMeta._dict[type] = this;
