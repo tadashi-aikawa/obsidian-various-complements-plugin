@@ -147,7 +147,8 @@ describe("suggestWords", () => {
       ],
       A: [
         { value: "AWS", type: "internalLink", createdPath: "" },
-        { value: "AI", type: "internalLink", createdPath: "" },
+        { value: "AI", type: "internalLink", createdPath: "a/AI.md" },
+        { value: "AI", type: "internalLink", createdPath: "b/AI.md" },
       ],
       あ: [
         {
@@ -168,7 +169,13 @@ describe("suggestWords", () => {
         value: "AI",
         type: "internalLink",
         hit: "AI",
-        createdPath: "",
+        createdPath: "a/AI.md",
+      },
+      {
+        value: "AI",
+        type: "internalLink",
+        hit: "AI",
+        createdPath: "b/AI.md",
       },
       {
         value: "ai",
@@ -225,7 +232,13 @@ describe("suggestWords", () => {
         value: "AI",
         hit: "AI",
         type: "internalLink",
-        createdPath: "",
+        createdPath: "a/AI.md",
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        type: "internalLink",
+        createdPath: "b/AI.md",
       },
       {
         value: "ai",
@@ -287,7 +300,13 @@ describe("suggestWords", () => {
         value: "AI",
         hit: "AI",
         type: "internalLink",
-        createdPath: "",
+        createdPath: "a/AI.md",
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        type: "internalLink",
+        createdPath: "b/AI.md",
       },
       {
         value: "Ai",
@@ -349,7 +368,13 @@ describe("suggestWords", () => {
         value: "AI",
         hit: "AI",
         type: "internalLink",
-        createdPath: "",
+        createdPath: "a/AI.md",
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        type: "internalLink",
+        createdPath: "b/AI.md",
       },
       {
         value: "Ai",
@@ -386,7 +411,13 @@ describe("suggestWords", () => {
         value: "AI",
         hit: "AI",
         type: "internalLink",
-        createdPath: "",
+        createdPath: "a/AI.md",
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        type: "internalLink",
+        createdPath: "b/AI.md",
       },
       {
         value: "Ai",
@@ -488,7 +519,13 @@ describe("suggestWords", () => {
         value: "AI",
         hit: "AI",
         type: "internalLink",
-        createdPath: "",
+        createdPath: "a/AI.md",
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        type: "internalLink",
+        createdPath: "b/AI.md",
       },
       {
         value: "ai",
@@ -496,12 +533,12 @@ describe("suggestWords", () => {
         type: "currentFile",
         createdPath: "",
       },
-      {
-        value: "AWS",
-        hit: "AWS",
-        type: "internalLink",
-        createdPath: "",
-      },
+      // {
+      //   value: "AWS",
+      //   hit: "AWS",
+      //   type: "internalLink",
+      //   createdPath: "",
+      // },
       // --- hidden ---
       // { value: "uwaa", type: "customDictionary", aliases: ["aaa"] },
       // { value: "aiUEO", type: "internalLink" },
@@ -681,7 +718,8 @@ describe("suggestWordsByPartialMatch", () => {
       ],
       A: [
         { value: "AWS", type: "internalLink", createdPath: "" },
-        { value: "AI", type: "internalLink", createdPath: "" },
+        { value: "AI", type: "internalLink", createdPath: "a/AI.md" },
+        { value: "AI", type: "internalLink", createdPath: "b/AI.md" },
       ],
       あ: [
         {
@@ -698,8 +736,9 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
     // It is as specified that max doesn't match the expected length
-    expect(suggestWordsByPartialMatch(indexedWords, "a", 11)).toStrictEqual([
-      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+    expect(suggestWordsByPartialMatch(indexedWords, "a", 12)).toStrictEqual([
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "a/AI.md" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "b/AI.md" },
       { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
       { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
       { value: "AWS", type: "customDictionary", hit: "AWS", createdPath: "" },
@@ -732,7 +771,8 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "ai", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "a/AI.md" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "b/AI.md" },
       { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
       { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
@@ -774,8 +814,9 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: A", () => {
     const indexedWords = createIndexedWords();
     // It is as specified that max doesn't match the expected length
-    expect(suggestWordsByPartialMatch(indexedWords, "A", 11)).toStrictEqual([
-      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+    expect(suggestWordsByPartialMatch(indexedWords, "A", 12)).toStrictEqual([
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "a/AI.md" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "b/AI.md" },
       { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
       { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
       { value: "AWS", type: "customDictionary", hit: "AWS", createdPath: "" },
@@ -807,7 +848,8 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: Ai", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "Ai", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "a/AI.md" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "b/AI.md" },
       { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
       { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
@@ -829,7 +871,8 @@ describe("suggestWordsByPartialMatch", () => {
   test("Query: AI", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "AI", 10)).toStrictEqual([
-      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "a/AI.md" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "b/AI.md" },
       { value: "Ai", type: "currentFile", hit: "Ai", createdPath: "" },
       { value: "aiUEO", type: "internalLink", hit: "aiUEO", createdPath: "" },
       {
@@ -939,9 +982,10 @@ describe("suggestWordsByPartialMatch", () => {
   test("max: 3", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWordsByPartialMatch(indexedWords, "a", 3)).toStrictEqual([
-      { value: "AI", type: "internalLink", hit: "AI", createdPath: "" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "a/AI.md" },
+      { value: "AI", type: "internalLink", hit: "AI", createdPath: "b/AI.md" },
       { value: "ai", type: "currentFile", hit: "ai", createdPath: "" },
-      { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
+      // { value: "AWS", type: "internalLink", hit: "AWS", createdPath: "" },
     ]);
   });
 
