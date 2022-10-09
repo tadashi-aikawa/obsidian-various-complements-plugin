@@ -954,7 +954,7 @@ export class AutoCompleteSuggest
           : `[${word.value}](${linkText}.md)`;
       } else {
         const linkText = this.appHelper.optimizeMarkdownLinkText(
-          word.createdPath
+          word.phantom ? word.value : word.createdPath
         );
         insertedText = this.appHelper.useWikiLinks
           ? `[[${linkText}]]`

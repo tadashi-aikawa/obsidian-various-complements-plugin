@@ -26,12 +26,15 @@ export function suggestionUniqPredicate(a: Word, b: Word) {
     return false;
   }
 
-  const groupA = WordTypeMeta.of(a.type).group;
-  if (groupA !== WordTypeMeta.of(b.type).group) {
+  if (WordTypeMeta.of(a.type).group !== WordTypeMeta.of(b.type).group) {
     return false;
   }
 
-  if (groupA === "internalLink" && a.createdPath !== b.createdPath) {
+  if (
+    a.type === "internalLink" &&
+    !a.phantom &&
+    a.createdPath !== b.createdPath
+  ) {
     return false;
   }
 
