@@ -39,6 +39,7 @@ import {
   SelectionHistoryStorage,
 } from "../storage/SelectionHistoryStorage";
 import { suggestionUniqPredicate } from "../provider/suggester";
+import { encodeSpace } from "../util/strings";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -948,17 +949,17 @@ export class AutoCompleteSuggest
       if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
         const linkText = this.appHelper.optimizeMarkdownLinkText(
           word.aliasMeta.origin
-        );
+        )!;
         insertedText = this.appHelper.useWikiLinks
           ? `[[${linkText}|${word.value}]]`
-          : `[${word.value}](${linkText}.md)`;
+          : `[${word.value}](${encodeSpace(linkText)}.md)`;
       } else {
         const linkText = this.appHelper.optimizeMarkdownLinkText(
           word.phantom ? word.value : word.createdPath
-        );
+        )!;
         insertedText = this.appHelper.useWikiLinks
           ? `[[${linkText}]]`
-          : `[${linkText}](${linkText}.md)`;
+          : `[${linkText}](${encodeSpace(linkText)}.md)`;
       }
     }
 

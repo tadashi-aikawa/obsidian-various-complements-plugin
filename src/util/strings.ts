@@ -15,6 +15,10 @@ export function excludeSpace(text: string): string {
   return text.replace(/ /g, "");
 }
 
+export function encodeSpace(text: string): string {
+  return text.replace(/ /g, "%20");
+}
+
 export function lowerIncludes(one: string, other: string): boolean {
   return one.toLowerCase().includes(other.toLowerCase());
 }

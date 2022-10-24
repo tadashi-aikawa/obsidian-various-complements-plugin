@@ -1,6 +1,7 @@
 import {
   allAlphabets,
   capitalizeFirstLetter,
+  encodeSpace,
   excludeEmoji,
   excludeSpace,
   lowerIncludes,
@@ -37,6 +38,18 @@ describe.each`
 `("excludeSpace", ({ text, expected }) => {
   test(`excludeSpace(${text}) = ${expected}`, () => {
     expect(excludeSpace(text)).toBe(expected);
+  });
+});
+
+describe.each`
+  text          | expected
+  ${"aa"}       | ${"aa"}
+  ${"aa bb"}    | ${"aa%20bb"}
+  ${"aa bb cc"} | ${"aa%20bb%20cc"}
+  ${"aa@"}      | ${"aa@"}
+`("encodeSpace", ({ text, expected }) => {
+  test(`encodeSpace(${text}) = ${expected}`, () => {
+    expect(encodeSpace(text)).toBe(expected);
   });
 });
 
