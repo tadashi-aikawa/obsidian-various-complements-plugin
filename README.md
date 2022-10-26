@@ -44,7 +44,11 @@ task dev
 ### Release
 
 ```
+# Stable
 task release VERSION=1.2.3
+
+# Beta
+task release VERSION=1.2.3-beta1
 ```
 
 [Obsidian]: https://obsidian.md/
