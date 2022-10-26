@@ -1,6 +1,7 @@
+import { describe, expect, test } from "@jest/globals";
 import { JapaneseTokenizer } from "./JapaneseTokenizer";
 
-describe.each`
+describe.each<{ content: string; raw: boolean; expected: string[] }>`
   content               | raw      | expected
   ${"aa bb cc"}         | ${false} | ${["aa", "bb", "cc"]}
   ${"イーディス旧市街"} | ${false} | ${["イーディス", "旧", "市街"]}
@@ -14,7 +15,10 @@ describe.each`
 });
 
 // The expectation for `$\\alpha` is because of tiny-segmenter's specifications
-describe.each`
+describe.each<{
+  content: string;
+  expected: { word: string; offset: number }[];
+}>`
   content                | expected
   ${"aa bb cc"}          | ${[{ word: "aa bb cc", offset: 0 }, { word: "bb cc", offset: 3 }, { word: "cc", offset: 6 }]}
   ${"aa:bb:cc"}          | ${[{ word: "aa:bb:cc", offset: 0 }, { word: "bb:cc", offset: 3 }, { word: "cc", offset: 6 }]}

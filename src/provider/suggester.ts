@@ -13,7 +13,7 @@ import type {
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
-interface Judgement {
+export interface Judgement {
   // TODO: want to replace to HitWord
   word: Word;
   // TODO: remove value. use word.hit instead

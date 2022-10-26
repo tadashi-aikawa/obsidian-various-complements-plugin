@@ -1,6 +1,7 @@
+import { describe, expect, test } from "@jest/globals";
 import { EnglishOnlyTokenizer } from "./EnglishOnlyTokenizer";
 
-describe.each`
+describe.each<{ content: string; raw: boolean; expected: string[] }>`
   content                 | raw      | expected
   ${"aa bb cc"}           | ${false} | ${["aa", "bb", "cc"]}
   ${"Edith旧市街"}        | ${false} | ${["Edith"]}
@@ -17,7 +18,10 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{
+  content: string;
+  expected: { word: string; offset: number }[];
+}>`
   content           | expected
   ${"aa bb cc"}     | ${[{ word: "aa bb cc", offset: 0 }, { word: "bb cc", offset: 3 }, { word: "cc", offset: 6 }]}
   ${"aa:bb:cc"}     | ${[{ word: "aa:bb:cc", offset: 0 }, { word: "bb:cc", offset: 3 }, { word: "cc", offset: 6 }]}

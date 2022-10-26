@@ -6,8 +6,10 @@ import {
   suggestWordsByPartialMatch,
   type WordsByFirstLetter,
 } from "./suggester";
-import { describe, expect } from "@jest/globals";
+import { describe, expect, test } from "@jest/globals";
 import type { IndexedWords } from "../ui/AutoCompleteSuggest";
+import type { Word } from "src/model/Word";
+import type { Judgement } from "./suggester";
 
 describe("pushWord", () => {
   const createWordsByFirstLetter = (): WordsByFirstLetter => ({
@@ -50,7 +52,12 @@ describe("pushWord", () => {
   });
 });
 
-describe.each`
+describe.each<{
+  word: Word;
+  query: string;
+  queryStartWithUpper: boolean;
+  expected: Judgement;
+}>`
   word                                                                   | query   | queryStartWithUpper | expected
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
@@ -72,7 +79,12 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{
+  word: Word;
+  query: string;
+  queryStartWithUpper: boolean;
+  expected: Judgement;
+}>`
   word                                                                   | query   | queryStartWithUpper | expected
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
   ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}

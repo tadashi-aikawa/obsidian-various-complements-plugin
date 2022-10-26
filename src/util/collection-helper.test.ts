@@ -1,28 +1,21 @@
+import { describe, expect, test } from "@jest/globals";
 import {
   arrayEquals,
   arrayEqualsUntil,
   groupBy,
-  keyBy,
   mirrorMap,
   uniq,
   uniqBy,
   uniqWith,
 } from "./collection-helper";
 
-describe.each`
-  values                 | toKey                      | expected
-  ${["aa", "iii", "u"]}  | ${(x: string) => x.length} | ${{ 1: "u", 2: "aa", 3: "iii" }}
-  ${["aa", "iii", "uu"]} | ${(x: string) => x.length} | ${{ 2: "uu", 3: "iii" }}
-`("keyBy", ({ values, toKey, expected }) => {
-  test(`keyBy(${values}, ${toKey}) = ${expected}`, () => {
-    expect(keyBy(values, toKey)).toStrictEqual(expected);
-  });
-});
-
-describe.each`
-  values                 | toKey                      | expected
-  ${["aa", "iii", "u"]}  | ${(x: string) => x.length} | ${{ 1: ["u"], 2: ["aa"], 3: ["iii"] }}
-  ${["aa", "iii", "uu"]} | ${(x: string) => x.length} | ${{ 2: ["aa", "uu"], 3: ["iii"] }}
+describe.each<{
+  values: string[];
+  toKey: (x: string) => string;
+  expected: { [key: string]: string[] };
+}>`
+  values                  | toKey                         | expected
+  ${["aa", "aai", "iaa"]} | ${(x: string) => x.charAt(0)} | ${{ a: ["aa", "aai"], i: ["iaa"] }}
 `("groupBy", ({ values, toKey, expected }) => {
   test(`groupBy(${values}, ${toKey}) = ${expected}`, () => {
     expect(groupBy(values, toKey)).toStrictEqual(expected);
@@ -39,7 +32,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ arr: any[]; fn: (x: any) => any; expected: any[] }>`
   arr                     | fn                         | expected
   ${["aa", "iii", "uu"]}  | ${(x: string) => x.length} | ${["aa", "iii"]}
   ${[11, 21, 31, 40, 51]} | ${(x: number) => x % 10}   | ${[11, 40]}
@@ -49,7 +42,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ arr: any[]; fn: (a: any, b: any) => any; expected: any[] }>`
   arr                     | fn                                                 | expected
   ${["aa", "iii", "uu"]}  | ${(a: string, b: string) => a.length === b.length} | ${["aa", "iii"]}
   ${[11, 21, 31, 40, 51]} | ${(a: number, b: number) => a % 10 === b % 10}     | ${[11, 40]}
@@ -59,7 +52,12 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{
+  arr1: unknown[];
+  arr2: unknown[];
+  length?: number;
+  expected: boolean;
+}>`
   arr1                   | arr2                   | length       | expected
   ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} | ${undefined} | ${true}
   ${[]}                  | ${[]}                  | ${undefined} | ${true}
@@ -77,7 +75,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ arr1: unknown[]; arr2: unknown[]; expected: number }>`
   arr1                   | arr2                   | expected
   ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} | ${2}
   ${[]}                  | ${[]}                  | ${-1}
@@ -90,7 +88,11 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{
+  arr: unknown[];
+  toValue: (x: any) => string;
+  expected: { [key: string]: unknown };
+}>`
   arr                           | toValue            | expected
   ${["aa", "ii"]}               | ${(x: any) => x}   | ${{ aa: "aa", ii: "ii" }}
   ${[{ s: "aa" }, { s: "ii" }]} | ${(x: any) => x.s} | ${{ aa: "aa", ii: "ii" }}

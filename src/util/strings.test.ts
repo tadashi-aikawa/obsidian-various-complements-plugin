@@ -1,3 +1,4 @@
+import { describe, expect, test } from "@jest/globals";
 import {
   allAlphabets,
   capitalizeFirstLetter,
@@ -11,7 +12,7 @@ import {
   startsSmallLetterOnlyFirst,
 } from "./strings";
 
-describe.each`
+describe.each<{ text: string; expected: boolean }>`
   text      | expected
   ${"abc"}  | ${true}
   ${"ABC"}  | ${true}
@@ -66,7 +67,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ one: string; other: string; expected: boolean }>`
   one        | other      | expected
   ${"abcde"} | ${"cd"}    | ${true}
   ${"abcde"} | ${"bd"}    | ${false}
@@ -80,7 +81,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ one: string; other: string; expected: boolean }>`
   one         | other    | expected
   ${"ab cde"} | ${"c d"} | ${true}
   ${"AB CDE"} | ${"c d"} | ${true}
@@ -91,7 +92,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ one: string; other: string; expected: boolean }>`
   one          | other      | expected
   ${"abcde"}   | ${"ab"}    | ${true}
   ${"abcde"}   | ${"bc"}    | ${false}
@@ -120,7 +121,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ text: string; expected: boolean }>`
   text      | expected
   ${"abc"}  | ${false}
   ${"Abc"}  | ${true}
@@ -133,7 +134,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ text: string; regexp: RegExp; expected: string[] }>`
   text                      | regexp      | expected
   ${"I am tadashi-aikawa."} | ${/[ -.]/g} | ${["I", " ", "am", " ", "tadashi", "-", "aikawa", "."]}
   ${" am tadashi-aikawa."}  | ${/[ -.]/g} | ${[" ", "am", " ", "tadashi", "-", "aikawa", "."]}

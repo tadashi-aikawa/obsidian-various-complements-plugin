@@ -1,6 +1,7 @@
+import { describe, expect, test } from "@jest/globals";
 import { basename, dirname, extname, isURL } from "./path";
 
-describe.each`
+describe.each<{ path: string; ext?: string; expected: string }>`
   path               | ext          | expected
   ${"a\\b\\c.txt"}   | ${undefined} | ${"c.txt"}
   ${"a/b/c.txt"}     | ${undefined} | ${"c.txt"}
@@ -58,7 +59,7 @@ describe.each`
   });
 });
 
-describe.each`
+describe.each<{ path: string; expected: boolean }>`
   path              | expected
   ${"http://hoge"}  | ${true}
   ${"https://hoge"} | ${true}

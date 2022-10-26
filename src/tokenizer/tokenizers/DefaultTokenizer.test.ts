@@ -1,7 +1,11 @@
+import { describe, expect, test } from "@jest/globals";
 import { DefaultTokenizer } from "./DefaultTokenizer";
 
 // The expectation for "::one::two" is not ideal probably.
-describe.each`
+describe.each<{
+  content: string;
+  expected: { word: string; offset: number }[];
+}>`
   content         | expected
   ${"aa bb cc"}   | ${[{ word: "aa bb cc", offset: 0 }, { word: "bb cc", offset: 3 }, { word: "cc", offset: 6 }]}
   ${"aa:bb:cc"}   | ${[{ word: "aa:bb:cc", offset: 0 }, { word: "bb:cc", offset: 3 }, { word: "cc", offset: 6 }]}
