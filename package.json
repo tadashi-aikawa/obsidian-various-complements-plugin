@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "prepare": "husky install",
+    "pre:commit": "tsc -noEmit -skipLibCheck && npm run test"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
@@ -17,6 +19,7 @@
     "esbuild": "^0.15.12",
     "esbuild-jest": "^0.5.0",
     "esbuild-svelte": "^0.7.1",
+    "husky": "^8.0.1",
     "jest": "^29.2.2",
     "obsidian": "^0.16.0",
     "prettier": "^2.7.1",
