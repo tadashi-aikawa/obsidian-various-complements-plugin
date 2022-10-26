@@ -122,6 +122,10 @@ export class AutoCompleteSuggest
     (this as any).trigger(editor, activeFile, true);
   }
 
+  hideCompletion() {
+    this.close();
+  }
+
   static async new(
     app: App,
     settings: Settings,

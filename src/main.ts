@@ -115,6 +115,14 @@ export default class VariousComponents extends Plugin {
     });
 
     this.addCommand({
+      id: "hide-suggestions",
+      name: "Hide suggestions",
+      callback: async () => {
+        this.suggester.hideCompletion();
+      },
+    });
+
+    this.addCommand({
       id: "add-word-custom-dictionary",
       name: "Add a word to a custom dictionary",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: " " }],
