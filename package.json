@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "version": "node version-bump.mjs && git add manifest-beta.json manifest.json versions.json",
     "test": "jest --coverage",
     "prepare": "husky install",
     "pre:commit": "tsc -noEmit -skipLibCheck && npm run test"
