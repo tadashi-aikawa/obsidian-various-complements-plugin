@@ -25,6 +25,7 @@ export interface Settings {
   // FIXME: Rename at next major version up
   insertAfterCompletion: boolean;
   firstCharactersDisableSuggestions: string;
+  useCommonPrefixCompletionOfSuggestion: boolean;
 
   // appearance
   showMatchStrategy: boolean;
@@ -99,6 +100,7 @@ export const DEFAULT_SETTINGS: Settings = {
   disableSuggestionsDuringImeOn: false,
   insertAfterCompletion: true,
   firstCharactersDisableSuggestions: ":/^",
+  useCommonPrefixCompletionOfSuggestion: false,
 
   // appearance
   showMatchStrategy: true,
@@ -339,6 +341,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           this.plugin.settings.firstCharactersDisableSuggestions
         ).onChange(async (value) => {
           this.plugin.settings.firstCharactersDisableSuggestions = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName("(Experimental) Use common prefix completion of suggestion")
+      .setDesc("Hotkey is <TAB>")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.useCommonPrefixCompletionOfSuggestion
+        ).onChange(async (value) => {
+          this.plugin.settings.useCommonPrefixCompletionOfSuggestion = value;
           await this.plugin.saveSettings();
         });
       });

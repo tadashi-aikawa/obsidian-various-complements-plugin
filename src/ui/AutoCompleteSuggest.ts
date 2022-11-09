@@ -39,7 +39,7 @@ import {
   SelectionHistoryStorage,
 } from "../storage/SelectionHistoryStorage";
 import { suggestionUniqPredicate } from "../provider/suggester";
-import { encodeSpace } from "../util/strings";
+import { encodeSpace, excludeEmoji, findCommonPrefix } from "../util/strings";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -542,6 +542,59 @@ export class AutoCompleteSuggest
             return false;
           }
         )
+      );
+    }
+
+    if (this.settings.useCommonPrefixCompletionOfSuggestion) {
+      this.scope.unregister(
+        this.scope.keys.find((x) => x.modifiers === "" && x.key === "Tab")!
+      );
+      this.keymapEventHandler.push(
+        this.scope.register([], "Tab", () => {
+          if (!this.context) {
+            return;
+          }
+
+          const editor = this.context.editor;
+          const currentPhrase = editor.getRange(
+            {
+              ...this.context.start,
+              ch: this.contextStartCh,
+            },
+            this.context.end
+          );
+
+          const tokens = this.tokenizer.recursiveTokenize(currentPhrase);
+          const commonPrefixWithToken = tokens
+            .map((t) => ({
+              token: t,
+              commonPrefix: findCommonPrefix(
+                this.suggestions.values
+                  .map((x) => excludeEmoji(x.value))
+                  .filter((x) =>
+                    x.toLowerCase().startsWith(t.word.toLowerCase())
+                  )
+              ),
+            }))
+            .find((x) => x.commonPrefix != null);
+
+          if (
+            !commonPrefixWithToken ||
+            currentPhrase === commonPrefixWithToken.commonPrefix
+          ) {
+            return false;
+          }
+
+          editor.replaceRange(
+            commonPrefixWithToken.commonPrefix!,
+            {
+              ...this.context.start,
+              ch: this.contextStartCh + commonPrefixWithToken.token.offset,
+            },
+            this.context.end
+          );
+          return true;
+        })
       );
     }
   }

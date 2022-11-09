@@ -1,3 +1,5 @@
+import { uniq } from "./collection-helper";
+
 const regEmoji = new RegExp(
   /[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]|[\uFE0E-\uFE0F]/,
   "g"
@@ -59,4 +61,19 @@ export function* splitRaw(
   if (previousIndex !== text.length) {
     yield text.slice(previousIndex, text.length);
   }
+}
+
+export function findCommonPrefix(strs: string[]): string | null {
+  if (strs.length === 0) {
+    return null;
+  }
+
+  const min = Math.min(...strs.map((x) => x.length));
+  for (let i = 0; i < min; i++) {
+    if (uniq(strs.map((x) => x[i].toLowerCase())).length > 1) {
+      return strs[0].substring(0, i);
+    }
+  }
+
+  return strs[0].substring(0, min);
 }

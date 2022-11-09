@@ -5,6 +5,7 @@ import {
   encodeSpace,
   excludeEmoji,
   excludeSpace,
+  findCommonPrefix,
   lowerIncludes,
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
@@ -142,5 +143,17 @@ describe.each<{ text: string; regexp: RegExp; expected: string[] }>`
 `("splitRaw", ({ text, regexp, expected }) => {
   test(`splitRaw(${text}, ${regexp}) = ${expected}`, () => {
     expect(Array.from(splitRaw(text, regexp))).toStrictEqual(expected);
+  });
+});
+
+describe.each<{ strs: string[]; expected: string | null }>`
+  strs                                | expected
+  ${["obsidian", "obsidian publish"]} | ${"obsidian"}
+  ${["abcdefg", "abcdezz"]}           | ${"abcde"}
+  ${["abcde", "abcde"]}               | ${"abcde"}
+  ${[]}                               | ${null}
+`("findCommonPrefix", ({ strs, expected }) => {
+  test(`findCommonPrefix(${strs}) = ${expected}`, () => {
+    expect(findCommonPrefix(strs)).toStrictEqual(expected);
   });
 });
