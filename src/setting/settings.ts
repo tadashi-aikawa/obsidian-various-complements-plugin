@@ -14,6 +14,7 @@ import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
 export interface Settings {
   // general
   strategy: string;
+  cedictPath: string;
   matchStrategy: string;
   maxNumberOfSuggestions: number;
   maxNumberOfWordsAsPhrase: number;
@@ -89,6 +90,7 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   // general
   strategy: "default",
+  cedictPath: "./cedict_ts.u8",
   matchStrategy: "prefix",
 
   maxNumberOfSuggestions: 5,
@@ -205,16 +207,29 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       const el = containerEl.createEl("div", {
         cls: "various-complements__settings__warning",
       });
-      el.createSpan({
-        text: "⚠ You need to download `cedict_ts.u8` from",
-      });
-      el.createEl("a", {
-        href: "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
-        text: " the site ",
-      });
-      el.createSpan({
-        text: "and store it in vault root.",
-      });
+
+      const df = document.createDocumentFragment();
+      df.append(
+        createSpan({
+          text: "The path to `cedict_ts.u8`. You can download it from ",
+        }),
+        createEl("a", {
+          href: "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
+          text: " the site ",
+        })
+      );
+      new Setting(containerEl)
+        .setName("CC-CEDICT path")
+        .setDesc(df)
+        .setClass("various-complements__settings__nested")
+        .addText((cb) => {
+          cb.setValue(this.plugin.settings.cedictPath).onChange(
+            async (value) => {
+              this.plugin.settings.cedictPath = value;
+              await this.plugin.saveSettings();
+            }
+          );
+        });
     }
 
     new Setting(containerEl).setName("Match strategy").addDropdown((tc) =>

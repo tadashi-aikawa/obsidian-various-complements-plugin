@@ -323,7 +323,7 @@ export class AutoCompleteSuggest
     );
 
     try {
-      this.tokenizer = await createTokenizer(this.tokenizerStrategy, this.app);
+      this.tokenizer = await createTokenizer(this.tokenizerStrategy, this.app, this.settings);
     } catch (e: any) {
       new Notice(e.message, 0);
     }

@@ -5,6 +5,7 @@ import type { TokenizeStrategy } from "./TokenizeStrategy";
 import { EnglishOnlyTokenizer } from "./tokenizers/EnglishOnlyTokenizer";
 import type { App } from "obsidian";
 import { ChineseTokenizer } from "./tokenizers/ChineseTokenizer";
+import type { Settings } from "../setting/settings";
 
 export interface Tokenizer {
   tokenize(content: string, raw?: boolean): string[];
@@ -15,7 +16,8 @@ export interface Tokenizer {
 
 export async function createTokenizer(
   strategy: TokenizeStrategy,
-  app: App
+  app: App,
+  settings: Settings
 ): Promise<Tokenizer> {
   switch (strategy.name) {
     case "default":
@@ -27,13 +29,13 @@ export async function createTokenizer(
     case "japanese":
       return new JapaneseTokenizer();
     case "chinese":
-      const hasCedict = await app.vault.adapter.exists("./cedict_ts.u8");
+      const hasCedict = await app.vault.adapter.exists(settings.cedictPath);
       if (!hasCedict) {
         return Promise.reject(
-          new Error("cedict_ts.U8 doesn't exist in your vault root.")
+          new Error(`cedict_ts.U8 doesn't exist in ${settings.cedictPath}.`)
         );
       }
-      const dict = await app.vault.adapter.read("./cedict_ts.u8");
+      const dict = await app.vault.adapter.read(settings.cedictPath);
       return ChineseTokenizer.create(dict);
   }
 }
