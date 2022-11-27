@@ -323,7 +323,11 @@ export class AutoCompleteSuggest
     );
 
     try {
-      this.tokenizer = await createTokenizer(this.tokenizerStrategy, this.app, this.settings);
+      this.tokenizer = await createTokenizer(
+        this.tokenizerStrategy,
+        this.app,
+        this.settings
+      );
     } catch (e: any) {
       new Notice(e.message, 0);
     }
@@ -842,12 +846,12 @@ export class AutoCompleteSuggest
       );
       return null;
     }
-    if (
-      currentLineUntilCursor.startsWith("~~~") ||
-      currentLineUntilCursor.startsWith("```")
-    ) {
+    const suppressedPattern = this.settings.patternsToSuppressTrigger.find(
+      (p) => new RegExp(p).test(currentLineUntilCursor)
+    );
+    if (suppressedPattern) {
       onReturnNull(
-        "Don't show suggestions because it supposes front code block"
+        `Don't show suggestions because it is the ignored pattern: ${suppressedPattern}`
       );
       return null;
     }

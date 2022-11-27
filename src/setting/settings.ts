@@ -10,6 +10,7 @@ import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
+import { smartLineBreakSplit } from "../util/strings";
 
 export interface Settings {
   // general
@@ -27,6 +28,7 @@ export interface Settings {
   insertAfterCompletion: boolean;
   firstCharactersDisableSuggestions: string;
   useCommonPrefixCompletionOfSuggestion: boolean;
+  patternsToSuppressTrigger: string[];
 
   // appearance
   showMatchStrategy: boolean;
@@ -103,6 +105,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertAfterCompletion: true,
   firstCharactersDisableSuggestions: ":/^",
   useCommonPrefixCompletionOfSuggestion: false,
+  patternsToSuppressTrigger: ["^~~~.*", "^```.*"],
 
   // appearance
   showMatchStrategy: true,
@@ -371,6 +374,21 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    new Setting(containerEl)
+      .setName("Patterns to suppress trigger")
+      .setDesc(
+        "RegExp line patterns until the cursor, which suppresses the auto-completion trigger. It can set multi patterns by line breaks."
+      )
+      .addTextArea((tc) =>
+        tc
+          .setValue(this.plugin.settings.patternsToSuppressTrigger.join("\n"))
+          .onChange(async (value) => {
+            this.plugin.settings.patternsToSuppressTrigger =
+              smartLineBreakSplit(value);
+            await this.plugin.saveSettings();
+          })
+      );
   }
 
   private addAppearanceSettings(containerEl: HTMLElement) {

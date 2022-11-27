@@ -45,6 +45,10 @@ export function startsSmallLetterOnlyFirst(str: string): boolean {
   return Boolean(str.match(/^[A-Z][^A-Z]+$/));
 }
 
+export function smartLineBreakSplit(text: string): string[] {
+  return text.split("\n").filter((x) => x);
+}
+
 export function* splitRaw(
   text: string,
   regexp: RegExp
