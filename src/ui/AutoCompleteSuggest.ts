@@ -1008,19 +1008,28 @@ export class AutoCompleteSuggest
     let insertedText = word.value;
     if (word.type === "internalLink") {
       if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
-        const linkText = this.appHelper.optimizeMarkdownLinkText(
+        const { link } = this.appHelper.optimizeMarkdownLinkText(
           word.aliasMeta.origin
         )!;
         insertedText = this.appHelper.useWikiLinks
-          ? `[[${linkText}|${word.value}]]`
-          : `[${word.value}](${encodeSpace(linkText)}.md)`;
+          ? `[[${link}|${word.value}]]`
+          : `[${word.value}](${encodeSpace(link)}.md)`;
       } else {
-        const linkText = this.appHelper.optimizeMarkdownLinkText(
+        const { displayed, link } = this.appHelper.optimizeMarkdownLinkText(
           word.phantom ? word.value : word.createdPath
         )!;
-        insertedText = this.appHelper.useWikiLinks
-          ? `[[${linkText}]]`
-          : `[${linkText}](${encodeSpace(linkText)}.md)`;
+        if (
+          this.appHelper.newLinkFormat === "shortest" &&
+          displayed.includes("/")
+        ) {
+          insertedText = this.appHelper.useWikiLinks
+            ? `[[${link}|${word.value}]]`
+            : `[${word.value}](${encodeSpace(link)}.md)`;
+        } else {
+          insertedText = this.appHelper.useWikiLinks
+            ? `[[${link}]]`
+            : `[${displayed}](${encodeSpace(link)}.md)`;
+        }
       }
     }
 

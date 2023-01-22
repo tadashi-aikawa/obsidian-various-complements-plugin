@@ -16,6 +16,7 @@ interface UnsafeAppInterface {
     config: {
       spellcheckDictionary?: string[];
       useMarkdownLinks?: false;
+      newLinkFormat?: "shortest" | "relative" | "absolute";
     };
   };
 }
@@ -116,7 +117,9 @@ export class AppHelper {
     return this.getCurrentLine(editor).slice(0, editor.getCursor().ch);
   }
 
-  optimizeMarkdownLinkText(linkText: string): string | null {
+  optimizeMarkdownLinkText(
+    linkText: string
+  ): { displayed: string; link: string } | null {
     const activeFile = this.getActiveFile();
     if (!activeFile) {
       return null;
@@ -124,7 +127,7 @@ export class AppHelper {
 
     const path = this.linkText2Path(linkText);
     if (!path) {
-      return linkText;
+      return { displayed: linkText, link: linkText };
     }
 
     const file = this.getMarkdownFileByPath(path);
@@ -137,9 +140,16 @@ export class AppHelper {
       activeFile.path
     );
 
-    return markdownLink.startsWith("[[")
-      ? markdownLink.replace("[[", "").replace("]]", "")
-      : markdownLink.replace("[", "").replace(/\]\(.+\)/g, "");
+    if (markdownLink.startsWith("[[")) {
+      const text = markdownLink.matchAll(/^\[\[(?<text>.+)]]$/g).next().value
+        .groups?.text!; // dirty error handling
+      return { displayed: text, link: text };
+    } else {
+      const { displayed, link } = markdownLink
+        .matchAll(/^\[(?<displayed>.+)]\((?<link>.+)\.md\)$/g)
+        .next().value.groups!; // dirty error handling
+      return { displayed, link };
+    }
   }
 
   linkText2Path(linkText: string): string | null {
@@ -255,5 +265,11 @@ export class AppHelper {
 
   get useWikiLinks(): boolean {
     return !this.unsafeApp.vault.config.useMarkdownLinks;
+  }
+
+  get newLinkFormat(): NonNullable<
+    UnsafeAppInterface["vault"]["config"]["newLinkFormat"]
+  > {
+    return this.unsafeApp.vault.config.newLinkFormat ?? "shortest";
   }
 }
