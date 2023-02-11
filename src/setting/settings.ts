@@ -147,7 +147,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
-  updateInternalLinksOnSave: false,
+  updateInternalLinksOnSave: true,
 
   // front matter complement
   enableFrontMatterComplement: true,
