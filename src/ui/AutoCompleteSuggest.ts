@@ -26,7 +26,7 @@ import { MatchStrategy } from "../provider/MatchStrategy";
 import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
-import { uniqWith } from "../util/collection-helper";
+import { setEquals, uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import type { ProviderStatusBar } from "./ProviderStatusBar";
 import type { Word } from "../model/Word";
@@ -94,6 +94,7 @@ export class AutoCompleteSuggest
   contextStartCh: number;
 
   previousCurrentLine = "";
+  previousLinksCacheInActiveFile: Set<string> = new Set();
 
   // unsafe!!
   scope: UnsafeEditorSuggestInterface["scope"];
@@ -185,6 +186,13 @@ export class AutoCompleteSuggest
       ins.updateFrontMatterTokenIndex(f);
       if (!ins.appHelper.isActiveFile(f)) {
         ins.updateFrontMatterToken();
+      }
+      if (settings.updateInternalLinksOnSave) {
+        const currentCache = ins.appHelper.getUnresolvedLinks(f);
+        if (!setEquals(ins.previousLinksCacheInActiveFile, currentCache)) {
+          ins.refreshInternalLinkTokens();
+          ins.previousLinksCacheInActiveFile = currentCache;
+        }
       }
     });
 

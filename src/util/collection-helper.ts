@@ -60,6 +60,14 @@ export function arrayEqualsUntil(arr1: unknown[], arr2: unknown[]): number {
   return l - 1;
 }
 
+export function setEquals(set1: Set<unknown>, set2: Set<unknown>): boolean {
+  if (set1.size !== set2.size) {
+    return false;
+  }
+
+  return Array.from(set1).every((element) => set2.has(element));
+}
+
 export function mirrorMap<T>(
   collection: T[],
   toValue: (t: T) => string

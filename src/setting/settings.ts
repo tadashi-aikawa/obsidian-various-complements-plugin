@@ -69,6 +69,7 @@ export interface Settings {
   enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
+  updateInternalLinksOnSave: boolean;
 
   // front matter complement
   enableFrontMatterComplement: boolean;
@@ -146,6 +147,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
+  updateInternalLinksOnSave: false,
 
   // front matter complement
   enableFrontMatterComplement: true,
@@ -797,6 +799,16 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.suggestInternalLinkWithAlias = value;
             await this.plugin.saveSettings({ internalLink: true });
           });
+        });
+      new Setting(containerEl)
+        .setName("Update internal links on save")
+        .addToggle((tc) => {
+          tc.setValue(this.plugin.settings.updateInternalLinksOnSave).onChange(
+            async (value) => {
+              this.plugin.settings.updateInternalLinksOnSave = value;
+              await this.plugin.saveSettings({ internalLink: true });
+            }
+          );
         });
       new Setting(containerEl)
         .setName("Exclude prefix path patterns")

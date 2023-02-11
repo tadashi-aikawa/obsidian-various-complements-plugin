@@ -4,6 +4,7 @@ import {
   arrayEqualsUntil,
   groupBy,
   mirrorMap,
+  setEquals,
   uniq,
   uniqBy,
   uniqWith,
@@ -85,6 +86,23 @@ describe.each<{ arr1: unknown[]; arr2: unknown[]; expected: number }>`
 `("arrayEqualsUntil", ({ arr1, arr2, expected }) => {
   test(`arrayEqualsUntil(${arr1}, ${arr2}) = ${expected}`, () => {
     expect(arrayEqualsUntil(arr1, arr2)).toStrictEqual(expected);
+  });
+});
+
+describe.each<{
+  set1: Set<unknown>;
+  set2: Set<unknown>;
+  expected: boolean;
+}>`
+  set1                   | set2                   | expected
+  ${["aa", "iii", "uu"]} | ${["aa", "iii", "uu"]} | ${true}
+  ${[]}                  | ${[]}                  | ${true}
+  ${["aa", "iii", "UU"]} | ${["aa", "iii", "uu"]} | ${false}
+  ${["aa", "iii"]}       | ${["aa", "iii", "uu"]} | ${false}
+  ${["aa", "iii", "uu"]} | ${["aa", "iii"]}       | ${false}
+`("setEquals", ({ set1, set2, expected }) => {
+  test(`setEquals(${set1}, ${set2}) = ${expected}`, () => {
+    expect(setEquals(new Set(set1), new Set(set2))).toStrictEqual(expected);
   });
 });
 
