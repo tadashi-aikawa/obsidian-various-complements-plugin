@@ -182,14 +182,16 @@ export class AutoCompleteSuggest
       }
     );
 
-    ins.metadataCacheChangeRef = app.metadataCache.on("changed", (f) => {
+    ins.metadataCacheChangeRef = app.metadataCache.on("changed", async (f) => {
       ins.updateFrontMatterTokenIndex(f);
       if (!ins.appHelper.isActiveFile(f)) {
         ins.updateFrontMatterToken();
       }
       if (settings.updateInternalLinksOnSave) {
+        await sleep(50); // Wait for cache updated
         const currentCache = ins.appHelper.getUnresolvedLinks(f);
         if (!setEquals(ins.previousLinksCacheInActiveFile, currentCache)) {
+          console.log("refresh");
           ins.refreshInternalLinkTokens();
           ins.previousLinksCacheInActiveFile = currentCache;
         }
