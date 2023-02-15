@@ -191,7 +191,6 @@ export class AutoCompleteSuggest
         await sleep(50); // Wait for cache updated
         const currentCache = ins.appHelper.getUnresolvedLinks(f);
         if (!setEquals(ins.previousLinksCacheInActiveFile, currentCache)) {
-          console.log("refresh");
           ins.refreshInternalLinkTokens();
           ins.previousLinksCacheInActiveFile = currentCache;
         }
