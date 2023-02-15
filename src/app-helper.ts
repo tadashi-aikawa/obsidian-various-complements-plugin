@@ -174,7 +174,7 @@ export class AppHelper {
 
   getUnresolvedLinks(file: TFile): Set<string> {
     const countsByLink =
-      this.unsafeApp.metadataCache.unresolvedLinks[file.path];
+      this.unsafeApp.metadataCache.unresolvedLinks[file.path] ?? {};
     return new Set(Object.keys(countsByLink));
   }
 
