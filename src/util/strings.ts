@@ -37,6 +37,10 @@ export function lowerStartsWithoutSpace(one: string, other: string): boolean {
   return lowerStartsWith(excludeSpace(one), excludeSpace(other));
 }
 
+export function lowerFuzzy(a: string, b: string): boolean {
+  return microFuzzy(a.toLowerCase(), b.toLowerCase());
+}
+
 export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -80,4 +84,17 @@ export function findCommonPrefix(strs: string[]): string | null {
   }
 
   return strs[0].substring(0, min);
+}
+
+export function microFuzzy(value: string, query: string): boolean {
+  let i = 0;
+  for (let j = 0; j < value.length; j++) {
+    if (value[j] === query[i]) {
+      i++;
+    }
+    if (i === query.length) {
+      return true;
+    }
+  }
+  return false;
 }

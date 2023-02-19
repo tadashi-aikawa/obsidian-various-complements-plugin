@@ -9,6 +9,7 @@ import {
   lowerIncludes,
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
+  microFuzzy,
   splitRaw,
   startsSmallLetterOnlyFirst,
 } from "./strings";
@@ -155,5 +156,20 @@ describe.each<{ strs: string[]; expected: string | null }>`
 `("findCommonPrefix", ({ strs, expected }) => {
   test(`findCommonPrefix(${strs}) = ${expected}`, () => {
     expect(findCommonPrefix(strs)).toStrictEqual(expected);
+  });
+});
+
+describe.each<{ query: string; value: string; expected: boolean }>`
+  query      | value       | expected
+  ${"abcde"} | ${"ab"}     | ${true}
+  ${"abcde"} | ${"bc"}     | ${true}
+  ${"abcde"} | ${"ace"}    | ${true}
+  ${"abcde"} | ${"abcde"}  | ${true}
+  ${"abcde"} | ${"abcdef"} | ${false}
+  ${"abcde"} | ${"bd"}     | ${true}
+  ${"abcde"} | ${"ba"}     | ${false}
+`("microFuzzy", ({ query, value, expected }) => {
+  test(`microFuzzy(${query}, ${value}) = ${expected}`, () => {
+    expect(microFuzzy(query, value)).toBe(expected);
   });
 });

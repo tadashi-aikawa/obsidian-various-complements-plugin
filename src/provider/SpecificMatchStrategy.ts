@@ -12,6 +12,7 @@ type Handler = (
   option: {
     frontMatter?: string;
     selectionHistoryStorage?: SelectionHistoryStorage;
+    fuzzy?: boolean;
   }
 ) => Word[];
 

@@ -56,26 +56,41 @@ describe.each<{
   word: Word;
   query: string;
   queryStartWithUpper: boolean;
+  fuzzy: boolean;
   expected: Judgement;
 }>`
-  word                                                                   | query   | queryStartWithUpper | expected
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["ab"], type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-`("judge", ({ word, query, queryStartWithUpper, expected }) => {
+  word                                                                   | query   | queryStartWithUpper | fuzzy    | expected
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${false} | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bd"} | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"cb"} | ${false}            | ${true}  | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"ab"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"bc"} | ${false}            | ${false} | ${{ word: { value: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"ac"} | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"cb"} | ${false}            | ${true}  | ${{ word: { value: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"bd"} | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${true}             | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${false} | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bd"} | ${true}             | ${true}  | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${false} | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${false} | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${false} | ${{ word: { value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bb"} | ${true}             | ${true}  | ${{ value: "abab", word: { value: "ce", hit: "abab", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"ce"} | ${false}            | ${false} | ${{ value: "ce", word: { value: "ce", hit: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"ce"} | ${false}            | ${true}  | ${{ value: "ce", word: { value: "ce", hit: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+`("judge", ({ word, query, queryStartWithUpper, fuzzy, expected }) => {
   test(`judge(${JSON.stringify(
     word
-  )}, ${query}, ${queryStartWithUpper}) = ${JSON.stringify(expected)}`, () => {
-    expect(judge(word, query, queryStartWithUpper)).toStrictEqual(expected);
+  )}, ${query}, ${queryStartWithUpper}, ${fuzzy}) = ${JSON.stringify(
+    expected
+  )}`, () => {
+    expect(judge(word, query, queryStartWithUpper, fuzzy)).toStrictEqual(
+      expected
+    );
   });
 });
 
@@ -83,30 +98,46 @@ describe.each<{
   word: Word;
   query: string;
   queryStartWithUpper: boolean;
+  fuzzy: boolean;
   expected: Judgement;
 }>`
-  word                                                                   | query   | queryStartWithUpper | expected
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", aliases: ["ab"], type: "customDictionary" }}       | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["ab"], type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${{ word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
-  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${{ word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, value: "abc", alias: true }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ce"} | ${false}            | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
-`("judgeByPartialMatch", ({ word, query, queryStartWithUpper, expected }) => {
-  test(`judgeByPartialMatch(${JSON.stringify(
-    word
-  )}, ${query}, ${queryStartWithUpper}) = ${JSON.stringify(expected)}`, () => {
-    expect(judgeByPartialMatch(word, query, queryStartWithUpper)).toStrictEqual(
+  word                                                                   | query   | queryStartWithUpper | fuzzy    | expected
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"ab"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bc"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"bd"} | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"cb"} | ${false}            | ${true}  | ${{ word: { value: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"ab"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"bc"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"ac"} | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", aliases: ["abc"], type: "customDictionary" }}      | ${"cb"} | ${false}            | ${true}  | ${{ word: { value: "abcde", aliases: ["abc"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"ab"} | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"bd"} | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "internalLink" }}                            | ${"Ab"} | ${true}             | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "internalLink" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Ab"} | ${true}             | ${false} | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bd"} | ${true}             | ${true}  | ${{ value: "Abcde", word: { value: "Abcde", hit: "Abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${"Bc"} | ${true}             | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Ab"} | ${true}             | ${false} | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bc"} | ${true}             | ${false} | ${{ value: "abc", word: { value: "ce", hit: "abc", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"Bb"} | ${true}             | ${true}  | ${{ value: "abab", word: { value: "ce", hit: "abab", aliases: ["abc", "abab"], type: "customDictionary" }, alias: true }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"ce"} | ${false}            | ${false} | ${{ value: "ce", word: { value: "ce", hit: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "ce", aliases: ["abc", "abab"], type: "customDictionary" }} | ${"ce"} | ${false}            | ${true}  | ${{ value: "ce", word: { value: "ce", hit: "ce", aliases: ["abc", "abab"], type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${true}             | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${false} | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+  ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${true}  | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
+`(
+  "judgeByPartialMatch",
+  ({ word, query, queryStartWithUpper, fuzzy, expected }) => {
+    test(`judgeByPartialMatch(${JSON.stringify(
+      word
+    )}, ${query}, ${queryStartWithUpper}, ${fuzzy}) = ${JSON.stringify(
       expected
-    );
-  });
-});
+    )}`, () => {
+      expect(
+        judgeByPartialMatch(word, query, queryStartWithUpper, fuzzy)
+      ).toStrictEqual(expected);
+    });
+  }
+);
 
 describe("suggestWords", () => {
   const createIndexedWords = (): IndexedWords => ({

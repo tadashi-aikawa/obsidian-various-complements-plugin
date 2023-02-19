@@ -17,6 +17,7 @@ export interface Settings {
   strategy: string;
   cedictPath: string;
   matchStrategy: string;
+  fuzzyMatch: boolean;
   maxNumberOfSuggestions: number;
   maxNumberOfWordsAsPhrase: number;
   minNumberOfCharactersTriggered: number;
@@ -96,6 +97,7 @@ export const DEFAULT_SETTINGS: Settings = {
   strategy: "default",
   cedictPath: "./cedict_ts.u8",
   matchStrategy: "prefix",
+  fuzzyMatch: false,
 
   maxNumberOfSuggestions: 5,
   maxNumberOfWordsAsPhrase: 3,
@@ -255,6 +257,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         cls: "various-complements__settings__warning",
       });
     }
+
+    new Setting(containerEl).setName("Fuzzy match").addToggle((tc) => {
+      tc.setValue(this.plugin.settings.fuzzyMatch).onChange(async (value) => {
+        this.plugin.settings.fuzzyMatch = value;
+        await this.plugin.saveSettings();
+      });
+    });
 
     new Setting(containerEl)
       .setName("Max number of suggestions")
