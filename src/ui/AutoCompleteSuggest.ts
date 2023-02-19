@@ -29,7 +29,7 @@ import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { setEquals, uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import type { ProviderStatusBar } from "./ProviderStatusBar";
-import type { Word } from "../model/Word";
+import type { InternalLinkWord, Word } from "../model/Word";
 import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
@@ -1009,6 +1009,47 @@ export class AutoCompleteSuggest
     }
   }
 
+  constructInternalLinkText(word: InternalLinkWord): string {
+    // With aliases
+    if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
+      const { link } = this.appHelper.optimizeMarkdownLinkText(
+        word.aliasMeta.origin
+      )!;
+      return this.appHelper.useWikiLinks
+        ? `[[${link}|${word.value}]]`
+        : `[${word.value}](${encodeSpace(link)}.md)`;
+    }
+
+    const pattern =
+      this.settings.excludedRegExpFromDisplayedInternalLink.length > 0
+        ? new RegExp(this.settings.excludedRegExpFromDisplayedInternalLink)
+        : null;
+    const match = (value: string) =>
+      pattern ? Boolean(value.match(pattern)) : false;
+    const excludes = (value: string) =>
+      pattern ? value.replace(pattern, "") : value;
+
+    const { displayed, link } = this.appHelper.optimizeMarkdownLinkText(
+      word.phantom ? word.value : word.createdPath
+    )!;
+    if (
+      this.appHelper.newLinkFormat === "shortest" &&
+      displayed.includes("/")
+    ) {
+      return this.appHelper.useWikiLinks
+        ? `[[${link}|${word.value}]]`
+        : `[${word.value}](${encodeSpace(link)}.md)`;
+    }
+
+    if (this.appHelper.useWikiLinks) {
+      return match(link) ? `[[${link}|${excludes(link)}]]` : `[[${link}]]`;
+    }
+
+    return match(displayed)
+      ? `[${excludes(displayed)}](${encodeSpace(link)}.md)`
+      : `[${displayed}](${encodeSpace(link)}.md)`;
+  }
+
   selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {
     if (!this.context) {
       return;
@@ -1016,30 +1057,7 @@ export class AutoCompleteSuggest
 
     let insertedText = word.value;
     if (word.type === "internalLink") {
-      if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
-        const { link } = this.appHelper.optimizeMarkdownLinkText(
-          word.aliasMeta.origin
-        )!;
-        insertedText = this.appHelper.useWikiLinks
-          ? `[[${link}|${word.value}]]`
-          : `[${word.value}](${encodeSpace(link)}.md)`;
-      } else {
-        const { displayed, link } = this.appHelper.optimizeMarkdownLinkText(
-          word.phantom ? word.value : word.createdPath
-        )!;
-        if (
-          this.appHelper.newLinkFormat === "shortest" &&
-          displayed.includes("/")
-        ) {
-          insertedText = this.appHelper.useWikiLinks
-            ? `[[${link}|${word.value}]]`
-            : `[${word.value}](${encodeSpace(link)}.md)`;
-        } else {
-          insertedText = this.appHelper.useWikiLinks
-            ? `[[${link}]]`
-            : `[${displayed}](${encodeSpace(link)}.md)`;
-        }
-      }
+      insertedText = this.constructInternalLinkText(word);
     }
 
     if (

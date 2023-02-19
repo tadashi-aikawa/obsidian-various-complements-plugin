@@ -70,6 +70,7 @@ export interface Settings {
   suggestInternalLinkWithAlias: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
   updateInternalLinksOnSave: boolean;
+  excludedRegExpFromDisplayedInternalLink: string;
 
   // front matter complement
   enableFrontMatterComplement: boolean;
@@ -148,6 +149,7 @@ export const DEFAULT_SETTINGS: Settings = {
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
   updateInternalLinksOnSave: true,
+  excludedRegExpFromDisplayedInternalLink: "",
 
   // front matter complement
   enableFrontMatterComplement: true,
@@ -809,6 +811,22 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               await this.plugin.saveSettings({ internalLink: true });
             }
           );
+        });
+      new Setting(containerEl)
+        .setName(
+          "An excluded regular expression pattern from the displayed internal link"
+        )
+        .setDesc(
+          "If set '\\([^)]+\\)$', [[hoge(huga)]] will transform [[hoge(huga)|hoge]]"
+        )
+        .addText((cb) => {
+          cb.setValue(
+            this.plugin.settings.excludedRegExpFromDisplayedInternalLink
+          ).onChange(async (value) => {
+            this.plugin.settings.excludedRegExpFromDisplayedInternalLink =
+              value;
+            await this.plugin.saveSettings();
+          });
         });
       new Setting(containerEl)
         .setName("Exclude prefix path patterns")
