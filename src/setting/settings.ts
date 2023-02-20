@@ -71,7 +71,11 @@ export interface Settings {
   suggestInternalLinkWithAlias: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
   updateInternalLinksOnSave: boolean;
-  excludedRegExpFromDisplayedInternalLink: string;
+  insertAliasTransformedFromDisplayedInternalLink: {
+    enabled: boolean;
+    beforeRegExp: string;
+    after: string;
+  };
 
   // front matter complement
   enableFrontMatterComplement: boolean;
@@ -151,7 +155,11 @@ export const DEFAULT_SETTINGS: Settings = {
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
   updateInternalLinksOnSave: true,
-  excludedRegExpFromDisplayedInternalLink: "",
+  insertAliasTransformedFromDisplayedInternalLink: {
+    enabled: false,
+    beforeRegExp: "",
+    after: "",
+  },
 
   // front matter complement
   enableFrontMatterComplement: true,
@@ -821,22 +829,57 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             }
           );
         });
+
       new Setting(containerEl)
         .setName(
-          "An excluded regular expression pattern from the displayed internal link"
+          "Insert an alias that is transformed from the displayed internal link"
         )
-        .setDesc(
-          "If set '\\([^)]+\\)$', [[hoge(huga)]] will transform [[hoge(huga)|hoge]]"
-        )
-        .addText((cb) => {
-          cb.setValue(
-            this.plugin.settings.excludedRegExpFromDisplayedInternalLink
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
+              .enabled
           ).onChange(async (value) => {
-            this.plugin.settings.excludedRegExpFromDisplayedInternalLink =
+            this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.enabled =
               value;
             await this.plugin.saveSettings();
+            this.display();
           });
         });
+
+      if (
+        this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
+          .enabled
+      ) {
+        new Setting(containerEl)
+          .setName("Before: regular expression pattern with captures")
+          .setDesc(String.raw`Ex: (?<name>.+) \(.+\)$`)
+          .setClass("various-complements__settings__nested")
+          .addText((cb) => {
+            cb.setValue(
+              this.plugin.settings
+                .insertAliasTransformedFromDisplayedInternalLink.beforeRegExp
+            ).onChange(async (value) => {
+              this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp =
+                value;
+              await this.plugin.saveSettings();
+            });
+          });
+        new Setting(containerEl)
+          .setName("After")
+          .setDesc("Ex: $<name>")
+          .setClass("various-complements__settings__nested")
+          .addText((cb) => {
+            cb.setValue(
+              this.plugin.settings
+                .insertAliasTransformedFromDisplayedInternalLink.after
+            ).onChange(async (value) => {
+              this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.after =
+                value;
+              await this.plugin.saveSettings();
+            });
+          });
+      }
+
       new Setting(containerEl)
         .setName("Exclude prefix path patterns")
         .setDesc("Prefix match path patterns to exclude files.")

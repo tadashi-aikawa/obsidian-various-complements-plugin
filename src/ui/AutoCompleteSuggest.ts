@@ -1021,14 +1021,21 @@ export class AutoCompleteSuggest
         : `[${word.value}](${encodeSpace(link)}.md)`;
     }
 
-    const pattern =
-      this.settings.excludedRegExpFromDisplayedInternalLink.length > 0
-        ? new RegExp(this.settings.excludedRegExpFromDisplayedInternalLink)
-        : null;
+    const pattern = this.settings
+      .insertAliasTransformedFromDisplayedInternalLink.enabled
+      ? new RegExp(
+          this.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp
+        )
+      : null;
     const match = (value: string) =>
       pattern ? Boolean(value.match(pattern)) : false;
-    const excludes = (value: string) =>
-      pattern ? value.replace(pattern, "") : value;
+    const replaceByPattern = (value: string) =>
+      pattern
+        ? value.replace(
+            pattern,
+            this.settings.insertAliasTransformedFromDisplayedInternalLink.after
+          )
+        : value;
 
     const { displayed, link } = this.appHelper.optimizeMarkdownLinkText(
       word.phantom ? word.value : word.createdPath
@@ -1043,11 +1050,13 @@ export class AutoCompleteSuggest
     }
 
     if (this.appHelper.useWikiLinks) {
-      return match(link) ? `[[${link}|${excludes(link)}]]` : `[[${link}]]`;
+      return match(link)
+        ? `[[${link}|${replaceByPattern(link)}]]`
+        : `[[${link}]]`;
     }
 
     return match(displayed)
-      ? `[${excludes(displayed)}](${encodeSpace(link)}.md)`
+      ? `[${replaceByPattern(displayed)}](${encodeSpace(link)}.md)`
       : `[${displayed}](${encodeSpace(link)}.md)`;
   }
 
