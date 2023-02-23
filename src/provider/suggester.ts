@@ -1,6 +1,7 @@
 import {
   capitalizeFirstLetter,
   lowerFuzzy,
+  lowerFuzzyStarsWith,
   lowerIncludes,
   lowerStartsWith,
 } from "../util/strings";
@@ -75,7 +76,8 @@ export function judge(
 
   const matcher = fuzzy ? lowerFuzzy : lowerStartsWith;
 
-  if (matcher(word.value, query)) {
+  const matched = matcher(word.value, query);
+  if (matched) {
     if (
       queryStartWithUpper &&
       word.type !== "internalLink" &&
@@ -87,6 +89,7 @@ export function judge(
           ...word,
           value: c,
           hit: c,
+          fuzzy: matched === "fuzzy",
         },
         value: c,
         alias: false,
@@ -96,20 +99,25 @@ export function judge(
         word: {
           ...word,
           hit: word.value,
+          fuzzy: matched === "fuzzy",
         },
         value: word.value,
         alias: false,
       };
     }
   }
-  const matchedAlias = word.aliases?.find((a) => matcher(a, query));
-  if (matchedAlias) {
+
+  const matchedAlias = word.aliases
+    ?.map((a) => ({ aliases: a, matched: matcher(a, query) }))
+    .find((x) => x.matched);
+  if (matchedAlias?.matched) {
     return {
       word: {
         ...word,
-        hit: matchedAlias,
+        hit: matchedAlias.aliases,
+        fuzzy: matchedAlias.matched === "fuzzy",
       },
-      value: matchedAlias,
+      value: matchedAlias.aliases,
       alias: true,
     };
   }
@@ -189,6 +197,10 @@ export function suggestWords(
       const aWord = a.word as HitWord;
       const bWord = b.word as HitWord;
 
+      if (a.word.fuzzy !== b.word.fuzzy) {
+        return a.word.fuzzy ? 1 : -1;
+      }
+
       const notSameWordType = aWord.type !== bWord.type;
       if (frontMatter && notSameWordType) {
         return bWord.type === "frontMatter" ? 1 : -1;
@@ -242,52 +254,75 @@ export function judgeByPartialMatch(
     };
   }
 
-  const startsWithMatcher = fuzzy ? lowerFuzzy : lowerStartsWith;
+  const startsWithMatcher = fuzzy ? lowerFuzzyStarsWith : lowerStartsWith;
   const includesMatcher = fuzzy ? lowerFuzzy : lowerIncludes;
 
-  if (startsWithMatcher(word.value, query)) {
+  const startsWithMatched = startsWithMatcher(word.value, query);
+  if (startsWithMatched) {
     if (
       queryStartWithUpper &&
       word.type !== "internalLink" &&
       word.type !== "frontMatter"
     ) {
       const c = capitalizeFirstLetter(word.value);
-      return { word: { ...word, value: c, hit: c }, value: c, alias: false };
+      return {
+        word: {
+          ...word,
+          value: c,
+          hit: c,
+          fuzzy: startsWithMatched === "fuzzy",
+        },
+        value: c,
+        alias: false,
+      };
     } else {
       return {
-        word: { ...word, hit: word.value },
+        word: {
+          ...word,
+          hit: word.value,
+          fuzzy: startsWithMatched === "fuzzy",
+        },
         value: word.value,
         alias: false,
       };
     }
   }
 
-  const matchedAliasStarts = word.aliases?.find((a) =>
-    startsWithMatcher(a, query)
-  );
-  if (matchedAliasStarts) {
+  const startsWithAliasMatched = word.aliases
+    ?.map((a) => ({ aliases: a, matched: startsWithMatcher(a, query) }))
+    .find((x) => x.matched);
+  if (startsWithAliasMatched) {
     return {
-      word: { ...word, hit: matchedAliasStarts },
-      value: matchedAliasStarts,
+      word: {
+        ...word,
+        hit: startsWithAliasMatched.aliases,
+        fuzzy: startsWithAliasMatched.matched === "fuzzy",
+      },
+      value: startsWithAliasMatched.aliases,
       alias: true,
     };
   }
 
-  if (includesMatcher(word.value, query)) {
+  const includesMatched = includesMatcher(word.value, query);
+  if (includesMatched) {
     return {
-      word: { ...word, hit: word.value },
+      word: { ...word, hit: word.value, fuzzy: includesMatched === "fuzzy" },
       value: word.value,
       alias: false,
     };
   }
 
-  const matchedAliasIncluded = word.aliases?.find((a) =>
-    includesMatcher(a, query)
-  );
+  const matchedAliasIncluded = word.aliases
+    ?.map((a) => ({ aliases: a, matched: includesMatcher(a, query) }))
+    .find((x) => x.matched);
   if (matchedAliasIncluded) {
     return {
-      word: { ...word, hit: matchedAliasIncluded },
-      value: matchedAliasIncluded,
+      word: {
+        ...word,
+        hit: matchedAliasIncluded.aliases,
+        fuzzy: matchedAliasIncluded.matched === "fuzzy",
+      },
+      value: matchedAliasIncluded.aliases,
       alias: true,
     };
   }
@@ -347,6 +382,10 @@ export function suggestWordsByPartialMatch(
     .sort((a, b) => {
       const aWord = a.word as HitWord;
       const bWord = b.word as HitWord;
+
+      if (a.word.fuzzy !== b.word.fuzzy) {
+        return a.word.fuzzy ? 1 : -1;
+      }
 
       const notSameWordType = aWord.type !== bWord.type;
       if (frontMatter && notSameWordType) {

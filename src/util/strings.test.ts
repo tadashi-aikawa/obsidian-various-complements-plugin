@@ -6,6 +6,7 @@ import {
   excludeEmoji,
   excludeSpace,
   findCommonPrefix,
+  type FuzzyResult,
   lowerIncludes,
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
@@ -159,17 +160,17 @@ describe.each<{ strs: string[]; expected: string | null }>`
   });
 });
 
-describe.each<{ query: string; value: string; expected: boolean }>`
-  query      | value       | expected
+describe.each<{ value: string; query: string; expected: FuzzyResult }>`
+  value      | query       | expected
   ${"abcde"} | ${"ab"}     | ${true}
   ${"abcde"} | ${"bc"}     | ${true}
-  ${"abcde"} | ${"ace"}    | ${true}
+  ${"abcde"} | ${"ace"}    | ${"fuzzy"}
   ${"abcde"} | ${"abcde"}  | ${true}
   ${"abcde"} | ${"abcdef"} | ${false}
-  ${"abcde"} | ${"bd"}     | ${true}
+  ${"abcde"} | ${"bd"}     | ${"fuzzy"}
   ${"abcde"} | ${"ba"}     | ${false}
-`("microFuzzy", ({ query, value, expected }) => {
-  test(`microFuzzy(${query}, ${value}) = ${expected}`, () => {
-    expect(microFuzzy(query, value)).toBe(expected);
+`("microFuzzy", ({ value, query, expected }) => {
+  test(`microFuzzy(${value}, ${query}) = ${expected}`, () => {
+    expect(microFuzzy(value, query)).toBe(expected);
   });
 });

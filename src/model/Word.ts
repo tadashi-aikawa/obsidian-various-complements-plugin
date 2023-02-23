@@ -14,6 +14,7 @@ export interface DefaultWord {
   // Add after judge
   offset?: number;
   hit?: string;
+  fuzzy?: boolean;
 }
 export interface CurrentFileWord extends DefaultWord {
   type: "currentFile";

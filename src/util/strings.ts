@@ -37,8 +37,14 @@ export function lowerStartsWithoutSpace(one: string, other: string): boolean {
   return lowerStartsWith(excludeSpace(one), excludeSpace(other));
 }
 
-export function lowerFuzzy(a: string, b: string): boolean {
+export function lowerFuzzy(a: string, b: string): FuzzyResult {
   return microFuzzy(a.toLowerCase(), b.toLowerCase());
+}
+
+export function lowerFuzzyStarsWith(a: string, b: string): FuzzyResult {
+  const aLower = a.toLowerCase();
+  const bLower = b.toLowerCase();
+  return aLower[0] !== bLower[0] ? false : microFuzzy(aLower, bLower);
 }
 
 export function capitalizeFirstLetter(str: string): string {
@@ -86,14 +92,23 @@ export function findCommonPrefix(strs: string[]): string | null {
   return strs[0].substring(0, min);
 }
 
-export function microFuzzy(value: string, query: string): boolean {
+export type FuzzyResult = boolean | "fuzzy";
+
+export function microFuzzy(value: string, query: string): FuzzyResult {
   let i = 0;
+  let lastMatchIndex = null;
+  let isFuzzy = false;
+
   for (let j = 0; j < value.length; j++) {
     if (value[j] === query[i]) {
+      if (lastMatchIndex != null && j - lastMatchIndex > 1) {
+        isFuzzy = true;
+      }
+      lastMatchIndex = j;
       i++;
     }
     if (i === query.length) {
-      return true;
+      return isFuzzy ? "fuzzy" : true;
     }
   }
   return false;
