@@ -101,7 +101,7 @@ export const DEFAULT_SETTINGS: Settings = {
   strategy: "default",
   cedictPath: "./cedict_ts.u8",
   matchStrategy: "prefix",
-  fuzzyMatch: false,
+  fuzzyMatch: true,
 
   maxNumberOfSuggestions: 5,
   maxNumberOfWordsAsPhrase: 3,
