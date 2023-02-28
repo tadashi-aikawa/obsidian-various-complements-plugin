@@ -11,6 +11,7 @@ import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
 import { smartLineBreakSplit } from "../util/strings";
+import { TextComponentEvent } from "./settings-helper";
 
 export interface Settings {
   // general
@@ -186,13 +187,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
+  async display(): Promise<void> {
     let { containerEl } = this;
 
     containerEl.empty();
 
     containerEl.createEl("h2", { text: "Various Complements - Settings" });
-    this.addMainSettings(containerEl);
+    await this.addMainSettings(containerEl);
     this.addAppearanceSettings(containerEl);
     this.addKeyCustomizationSettings(containerEl);
     this.addCurrentFileComplementSettings(containerEl);
@@ -204,7 +205,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     this.addDebugSettings(containerEl);
   }
 
-  private addMainSettings(containerEl: HTMLElement) {
+  private async addMainSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", { text: "Main" });
 
     new Setting(containerEl).setName("Strategy").addDropdown((tc) =>
@@ -235,18 +236,28 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           text: " the site ",
         })
       );
+
       new Setting(containerEl)
         .setName("CC-CEDICT path")
         .setDesc(df)
         .setClass("various-complements__settings__nested")
         .addText((cb) => {
-          cb.setValue(this.plugin.settings.cedictPath).onChange(
-            async (value) => {
-              this.plugin.settings.cedictPath = value;
-              await this.plugin.saveSettings();
-            }
-          );
+          TextComponentEvent.onChange(cb, async (value) => {
+            this.plugin.settings.cedictPath = value;
+            await this.plugin.saveSettings();
+            await this.display();
+          }).setValue(this.plugin.settings.cedictPath);
         });
+
+      const hasCedict = await app.vault.adapter.exists(
+        this.plugin.settings.cedictPath
+      );
+      if (!hasCedict) {
+        containerEl.createEl("div", {
+          text: `⚠ cedict_ts.u8 doesn't exist in ${this.plugin.settings.cedictPath}.`,
+          cls: "various-complements__settings__warning",
+        });
+      }
     }
 
     new Setting(containerEl).setName("Match strategy").addDropdown((tc) =>

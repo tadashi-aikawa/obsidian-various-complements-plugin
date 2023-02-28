@@ -32,7 +32,7 @@ export async function createTokenizer(
       const hasCedict = await app.vault.adapter.exists(settings.cedictPath);
       if (!hasCedict) {
         return Promise.reject(
-          new Error(`cedict_ts.U8 doesn't exist in ${settings.cedictPath}.`)
+          new Error(`cedict_ts.u8 doesn't exist in ${settings.cedictPath}.`)
         );
       }
       const dict = await app.vault.adapter.read(settings.cedictPath);

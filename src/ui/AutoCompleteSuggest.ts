@@ -338,7 +338,7 @@ export class AutoCompleteSuggest
         this.settings
       );
     } catch (e: any) {
-      new Notice(e.message, 0);
+      new Notice(e.message);
     }
     this.currentFileWordProvider.setSettings(this.tokenizer);
     this.currentVaultWordProvider.setSettings(
