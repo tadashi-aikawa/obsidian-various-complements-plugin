@@ -206,7 +206,11 @@ export default class VariousComponents extends Plugin {
           return;
         }
 
-        await provider.addWordWithDictionary(word, dictionaryPath);
+        await provider.addWordWithDictionary(word, dictionaryPath, {
+          emoji: this.settings.matchingWithoutEmoji,
+          accentsDiacritics:
+            this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+        });
         // noinspection ObjectAllocationIgnored
         new Notice(`Added ${word.value}`);
         modal.close();

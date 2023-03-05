@@ -5,7 +5,7 @@ import type { Tokenizer } from "../tokenizer/tokenizer";
 import type { AppHelper } from "../app-helper";
 import type { Word } from "../model/Word";
 import { dirname } from "../util/path";
-import { startsSmallLetterOnlyFirst } from "../util/strings";
+import { startsSmallLetterOnlyFirst, synonymAliases } from "../util/strings";
 
 export class CurrentVaultWordProvider {
   wordsByFirstLetter: WordsByFirstLetter = {};
@@ -17,7 +17,11 @@ export class CurrentVaultWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  async refreshWords(minNumberOfCharacters: number): Promise<void> {
+  async refreshWords(option: {
+    minNumberOfCharacters: number;
+    makeSynonymAboutEmoji: boolean;
+    makeSynonymAboutAccentsDiacritics: boolean;
+  }): Promise<void> {
     this.clearWords();
 
     const currentDirname = this.appHelper.getCurrentDirname();
@@ -39,7 +43,7 @@ export class CurrentVaultWordProvider {
         .tokenize(content)
         .filter(
           (x) =>
-            x.length >= minNumberOfCharacters &&
+            x.length >= option.minNumberOfCharacters &&
             !this.tokenizer.shouldIgnoreOnCurrent(x)
         )
         .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
@@ -49,6 +53,10 @@ export class CurrentVaultWordProvider {
           type: "currentVault",
           createdPath: path,
           description: path,
+          aliases: synonymAliases(token, {
+            emoji: option.makeSynonymAboutEmoji,
+            accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+          }),
         };
       }
     }

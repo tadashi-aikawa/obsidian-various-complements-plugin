@@ -1,4 +1,5 @@
 import { uniq } from "./collection-helper";
+import diacriticsMap from "./diacritics-map";
 
 const regEmoji = new RegExp(
   /[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]|[\uFE0E-\uFE0F]/,
@@ -19,6 +20,28 @@ export function excludeSpace(text: string): string {
 
 export function encodeSpace(text: string): string {
   return text.replace(/ /g, "%20");
+}
+
+export function normalizeAccentsDiacritics(text: string): string {
+  // https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
+  return text.replace(/[^\u0000-\u007E]/g, (x) => diacriticsMap[x] ?? x);
+}
+
+export function synonymAliases(
+  value: string,
+  option: { emoji: boolean; accentsDiacritics: boolean }
+): string[] {
+  let synonym = value;
+
+  if (option.emoji) {
+    synonym = excludeEmoji(synonym);
+  }
+
+  if (option.accentsDiacritics) {
+    synonym = normalizeAccentsDiacritics(synonym);
+  }
+
+  return synonym === value ? [] : [synonym];
 }
 
 export function lowerIncludes(one: string, other: string): boolean {

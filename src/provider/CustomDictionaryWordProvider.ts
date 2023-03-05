@@ -3,7 +3,7 @@ import { pushWord, type WordsByFirstLetter } from "./suggester";
 import type { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
 import type { CustomDictionaryWord } from "../model/Word";
-import { excludeEmoji } from "../util/strings";
+import { synonymAliases } from "../util/strings";
 import type { AppHelper } from "../app-helper";
 
 type JsonDictionary = {
@@ -112,16 +112,13 @@ function wordToLine(
   );
 }
 
-function synonymAliases(name: string): string[] {
-  const lessEmojiValue = excludeEmoji(name);
-  return name === lessEmojiValue ? [] : [lessEmojiValue];
-}
-
 type Option = {
   regexp: string;
   delimiterForHide?: string;
   delimiterForDisplay?: string;
   caretSymbol?: string;
+  makeSynonymAboutEmoji: boolean;
+  makeSynonymAboutAccentsDiacritics: boolean;
 };
 
 export class CustomDictionaryWordProvider {
@@ -180,7 +177,12 @@ export class CustomDictionaryWordProvider {
     for (const path of this.paths) {
       try {
         const words = await this.loadWords(path, option);
-        words.forEach((x) => this.addWord(x));
+        words.forEach((x) =>
+          this.addWord(x, {
+            emoji: option.makeSynonymAboutEmoji,
+            accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+          })
+        );
       } catch (e) {
         // noinspection ObjectAllocationIgnored
         new Notice(
@@ -193,22 +195,35 @@ export class CustomDictionaryWordProvider {
 
   async addWordWithDictionary(
     word: CustomDictionaryWord,
-    dictionaryPath: string
+    dictionaryPath: string,
+    synonymOption: {
+      emoji: boolean;
+      accentsDiacritics: boolean;
+    }
   ): Promise<void> {
-    this.addWord(word);
+    this.addWord(word, synonymOption);
     await this.fileSystemAdapter.append(
       dictionaryPath,
       "\n" + wordToLine(word, this.delimiter, this.dividerForDisplay)
     );
   }
 
-  private addWord(word: CustomDictionaryWord) {
+  private addWord(
+    word: CustomDictionaryWord,
+    synonymOption: {
+      emoji: boolean;
+      accentsDiacritics: boolean;
+    }
+  ) {
     this.words.push(word);
 
     // Add aliases as a synonym
     const wordWithSynonym = {
       ...word,
-      aliases: [...(word.aliases ?? []), ...synonymAliases(word.value)],
+      aliases: [
+        ...(word.aliases ?? []),
+        ...synonymAliases(word.value, synonymOption),
+      ],
     };
 
     this.wordByValue[wordWithSynonym.value] = wordWithSynonym;

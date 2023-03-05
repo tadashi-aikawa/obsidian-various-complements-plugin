@@ -3,7 +3,11 @@ import { groupBy, uniq } from "../util/collection-helper";
 import type { WordsByFirstLetter } from "./suggester";
 import type { Tokenizer } from "../tokenizer/tokenizer";
 import type { AppHelper } from "../app-helper";
-import { allAlphabets, startsSmallLetterOnlyFirst } from "../util/strings";
+import {
+  allAlphabets,
+  startsSmallLetterOnlyFirst,
+  synonymAliases,
+} from "../util/strings";
 import type { Word } from "../model/Word";
 
 export class CurrentFileWordProvider {
@@ -13,10 +17,12 @@ export class CurrentFileWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  async refreshWords(
-    onlyEnglish: boolean,
-    minNumberOfCharacters: number
-  ): Promise<void> {
+  async refreshWords(option: {
+    onlyEnglish: boolean;
+    minNumberOfCharacters: number;
+    makeSynonymAboutEmoji: boolean;
+    makeSynonymAboutAccentsDiacritics: boolean;
+  }): Promise<void> {
     this.clearWords();
 
     const editor = this.appHelper.getCurrentEditor();
@@ -39,13 +45,13 @@ export class CurrentFileWordProvider {
     const tokens = this.tokenizer
       .tokenize(content)
       .filter((x) => {
-        if (x.length < minNumberOfCharacters) {
+        if (x.length < option.minNumberOfCharacters) {
           return false;
         }
         if (this.tokenizer.shouldIgnoreOnCurrent(x)) {
           return false;
         }
-        return onlyEnglish ? allAlphabets(x) : true;
+        return option.onlyEnglish ? allAlphabets(x) : true;
       })
       .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
     this.words = uniq(tokens)
@@ -54,6 +60,10 @@ export class CurrentFileWordProvider {
         value: x,
         type: "currentFile",
         createdPath: file.path,
+        aliases: synonymAliases(x, {
+          emoji: option.makeSynonymAboutEmoji,
+          accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+        }),
       }));
     this.wordsByFirstLetter = groupBy(this.words, (x) => x.value.charAt(0));
   }

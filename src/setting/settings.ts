@@ -19,6 +19,8 @@ export interface Settings {
   cedictPath: string;
   matchStrategy: string;
   fuzzyMatch: boolean;
+  matchingWithoutEmoji: boolean;
+  treatAccentDiacriticsAsAlphabeticCharacters: boolean;
   maxNumberOfSuggestions: number;
   maxNumberOfWordsAsPhrase: number;
   minNumberOfCharactersTriggered: number;
@@ -103,6 +105,8 @@ export const DEFAULT_SETTINGS: Settings = {
   cedictPath: "./cedict_ts.u8",
   matchStrategy: "prefix",
   fuzzyMatch: true,
+  matchingWithoutEmoji: true,
+  treatAccentDiacriticsAsAlphabeticCharacters: false,
 
   maxNumberOfSuggestions: 5,
   maxNumberOfWordsAsPhrase: 3,
@@ -283,6 +287,41 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
+
+    new Setting(containerEl)
+      .setName("Treat accent diacritics as alphabetic characters.")
+      .setDesc("Ex: If enabled, 'aaa' matches with 'áäā'")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.treatAccentDiacriticsAsAlphabeticCharacters
+        ).onChange(async (value) => {
+          this.plugin.settings.treatAccentDiacriticsAsAlphabeticCharacters =
+            value;
+          await this.plugin.saveSettings({
+            internalLink: true,
+            customDictionary: true,
+            currentVault: true,
+            currentFile: true,
+          });
+        });
+      });
+
+    new Setting(containerEl)
+      .setName("Matching without emoji")
+      .setDesc("Ex: If enabled, 'aaa' matches with '😀aaa'")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.matchingWithoutEmoji).onChange(
+          async (value) => {
+            this.plugin.settings.matchingWithoutEmoji = value;
+            await this.plugin.saveSettings({
+              internalLink: true,
+              customDictionary: true,
+              currentVault: true,
+              currentFile: true,
+            });
+          }
+        );
+      });
 
     new Setting(containerEl)
       .setName("Max number of suggestions")

@@ -13,6 +13,7 @@ import {
   microFuzzy,
   splitRaw,
   startsSmallLetterOnlyFirst,
+  synonymAliases,
 } from "./strings";
 
 describe.each<{ text: string; expected: boolean }>`
@@ -172,5 +173,36 @@ describe.each<{ value: string; query: string; expected: FuzzyResult }>`
 `("microFuzzy", ({ value, query, expected }) => {
   test(`microFuzzy(${value}, ${query}) = ${expected}`, () => {
     expect(microFuzzy(value, query)).toBe(expected);
+  });
+});
+
+describe.each<{
+  value: Parameters<typeof synonymAliases>[0];
+  emoji: Parameters<typeof synonymAliases>[1]["emoji"];
+  accentsDiacritics: Parameters<typeof synonymAliases>[1]["accentsDiacritics"];
+  expected: ReturnType<typeof synonymAliases>;
+}>`
+  value      | emoji    | accentsDiacritics | expected
+  ${"cba"}   | ${true}  | ${true}           | ${[]}
+  ${"cba"}   | ${true}  | ${false}          | ${[]}
+  ${"cba"}   | ${false} | ${true}           | ${[]}
+  ${"cba"}   | ${false} | ${false}          | ${[]}
+  ${"cbá"}   | ${true}  | ${true}           | ${["cba"]}
+  ${"cbá"}   | ${true}  | ${false}          | ${[]}
+  ${"cbá"}   | ${false} | ${true}           | ${["cba"]}
+  ${"cbá"}   | ${false} | ${false}          | ${[]}
+  ${"cba😆"} | ${true}  | ${true}           | ${["cba"]}
+  ${"cba😆"} | ${true}  | ${false}          | ${["cba"]}
+  ${"cba😆"} | ${false} | ${true}           | ${[]}
+  ${"cba😆"} | ${false} | ${false}          | ${[]}
+  ${"cbá😆"} | ${true}  | ${true}           | ${["cba"]}
+  ${"cbá😆"} | ${true}  | ${false}          | ${["cbá"]}
+  ${"cbá😆"} | ${false} | ${true}           | ${["cba😆"]}
+  ${"cbá😆"} | ${false} | ${false}          | ${[]}
+`("synonymAliases", ({ value, emoji, accentsDiacritics, expected }) => {
+  test(`${value} (emoji: ${emoji}, accentsDiacritics: ${accentsDiacritics})`, () => {
+    expect(synonymAliases(value, { emoji, accentsDiacritics })).toStrictEqual(
+      expected
+    );
   });
 });

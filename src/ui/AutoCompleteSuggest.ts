@@ -630,10 +630,13 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.currentFileWordProvider.refreshWords(
-      this.settings.onlyComplementEnglishOnCurrentFileComplement,
-      this.currentFileMinNumberOfCharacters
-    );
+    await this.currentFileWordProvider.refreshWords({
+      onlyEnglish: this.settings.onlyComplementEnglishOnCurrentFileComplement,
+      minNumberOfCharacters: this.currentFileMinNumberOfCharacters,
+      makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
+      makeSynonymAboutAccentsDiacritics:
+        this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+    });
 
     this.statusBar.setCurrentFileIndexed(
       this.currentFileWordProvider.wordCount
@@ -659,9 +662,12 @@ export class AutoCompleteSuggest
       return;
     }
 
-    await this.currentVaultWordProvider.refreshWords(
-      this.currentVaultMinNumberOfCharacters
-    );
+    await this.currentVaultWordProvider.refreshWords({
+      minNumberOfCharacters: this.currentVaultMinNumberOfCharacters,
+      makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
+      makeSynonymAboutAccentsDiacritics:
+        this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+    });
 
     this.statusBar.setCurrentVaultIndexed(
       this.currentVaultWordProvider.wordCount
@@ -695,6 +701,9 @@ export class AutoCompleteSuggest
         undefined,
       caretSymbol:
         this.settings.caretLocationSymbolAfterComplement || undefined,
+      makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
+      makeSynonymAboutAccentsDiacritics:
+        this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
     });
 
     this.statusBar.setCustomDictionaryIndexed(
@@ -724,10 +733,13 @@ export class AutoCompleteSuggest
       return;
     }
 
-    this.internalLinkWordProvider.refreshWords(
-      this.settings.suggestInternalLinkWithAlias,
-      this.excludeInternalLinkPrefixPathPatterns
-    );
+    this.internalLinkWordProvider.refreshWords({
+      wordAsInternalLinkAlias: this.settings.suggestInternalLinkWithAlias,
+      excludePathPrefixPatterns: this.excludeInternalLinkPrefixPathPatterns,
+      makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
+      makeSynonymAboutAccentsDiacritics:
+        this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+    });
 
     this.statusBar.setInternalLinkIndexed(
       this.internalLinkWordProvider.wordCount

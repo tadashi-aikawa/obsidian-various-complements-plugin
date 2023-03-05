@@ -1,7 +1,7 @@
 import type { App } from "obsidian";
 import { pushWord, type WordsByFirstLetter } from "./suggester";
 import type { AppHelper } from "../app-helper";
-import { excludeEmoji } from "../util/strings";
+import { synonymAliases } from "../util/strings";
 import type { InternalLinkWord, Word } from "../model/Word";
 
 export class InternalLinkWordProvider {
@@ -10,39 +10,42 @@ export class InternalLinkWordProvider {
 
   constructor(private app: App, private appHelper: AppHelper) {}
 
-  refreshWords(
-    wordAsInternalLinkAlias: boolean,
-    excludePathPrefixPatterns: string[]
-  ): void {
+  refreshWords(option: {
+    wordAsInternalLinkAlias: boolean;
+    excludePathPrefixPatterns: string[];
+    makeSynonymAboutEmoji: boolean;
+    makeSynonymAboutAccentsDiacritics: boolean;
+  }): void {
     this.clearWords();
-
-    const synonymAliases = (name: string): string[] => {
-      const lessEmojiValue = excludeEmoji(name);
-      return name === lessEmojiValue ? [] : [lessEmojiValue];
-    };
 
     const resolvedInternalLinkWords: InternalLinkWord[] = this.app.vault
       .getMarkdownFiles()
       .filter((f) =>
-        excludePathPrefixPatterns.every((x) => !f.path.startsWith(x))
+        option.excludePathPrefixPatterns.every((x) => !f.path.startsWith(x))
       )
       .flatMap((x) => {
         const aliases = this.appHelper.getAliases(x);
 
-        if (wordAsInternalLinkAlias) {
+        if (option.wordAsInternalLinkAlias) {
           return [
             {
               value: x.basename,
               type: "internalLink",
               createdPath: x.path,
-              aliases: synonymAliases(x.basename),
+              aliases: synonymAliases(x.basename, {
+                emoji: option.makeSynonymAboutEmoji,
+                accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+              }),
               description: x.path,
             },
             ...aliases.map((a) => ({
               value: a,
               type: "internalLink",
               createdPath: x.path,
-              aliases: synonymAliases(a),
+              aliases: synonymAliases(a, {
+                emoji: option.makeSynonymAboutEmoji,
+                accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+              }),
               description: x.path,
               aliasMeta: {
                 origin: x.path,
@@ -56,9 +59,17 @@ export class InternalLinkWordProvider {
               type: "internalLink",
               createdPath: x.path,
               aliases: [
-                ...synonymAliases(x.basename),
+                ...synonymAliases(x.basename, {
+                  emoji: option.makeSynonymAboutEmoji,
+                  accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+                }),
                 ...aliases,
-                ...aliases.flatMap(synonymAliases),
+                ...aliases.flatMap((al) =>
+                  synonymAliases(al, {
+                    emoji: option.makeSynonymAboutEmoji,
+                    accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+                  })
+                ),
               ],
               description: x.path,
             },
@@ -73,7 +84,10 @@ export class InternalLinkWordProvider {
           value: link,
           type: "internalLink",
           createdPath: path,
-          aliases: synonymAliases(link),
+          aliases: synonymAliases(link, {
+            emoji: option.makeSynonymAboutEmoji,
+            accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+          }),
           description: `Appeared in -> ${path}`,
           phantom: true,
         };
