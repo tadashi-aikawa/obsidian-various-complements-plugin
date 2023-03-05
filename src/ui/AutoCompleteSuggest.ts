@@ -397,7 +397,8 @@ export class AutoCompleteSuggest
               }
             ).map((word) => ({ ...word, offset: q.offset }));
           })
-          .flat();
+          .flat()
+          .sort((a, b) => Number(a.fuzzy) - Number(b.fuzzy));
 
         cb(
           uniqWith(words, suggestionUniqPredicate).slice(
