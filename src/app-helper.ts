@@ -12,6 +12,7 @@ import {
 } from "obsidian";
 
 interface UnsafeAppInterface {
+  isMobile: boolean;
   vault: Vault & {
     config: {
       spellcheckDictionary?: string[];
@@ -263,6 +264,10 @@ export class AppHelper {
 
     // cm5
     return !!cm5or6?.display?.input?.composing;
+  }
+
+  isMobile(): boolean {
+    return this.unsafeApp.isMobile;
   }
 
   async writeLog(log: string) {

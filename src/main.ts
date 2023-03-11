@@ -25,6 +25,14 @@ export default class VariousComponents extends Plugin {
   async onload() {
     this.appHelper = new AppHelper(this.app);
 
+    await this.loadSettings();
+    this.settingTab = new VariousComplementsSettingTab(this.app, this);
+    this.addSettingTab(this.settingTab);
+    if (this.appHelper.isMobile() && this.settings.disableOnMobile) {
+      // End
+      return;
+    }
+
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu) => {
         if (!this.appHelper.getSelection()) {
@@ -41,11 +49,6 @@ export default class VariousComponents extends Plugin {
         );
       })
     );
-
-    await this.loadSettings();
-
-    this.settingTab = new VariousComplementsSettingTab(this.app, this);
-    this.addSettingTab(this.settingTab);
 
     this.statusBar = ProviderStatusBar.new(
       this.addStatusBarItem(),

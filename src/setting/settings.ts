@@ -92,6 +92,9 @@ export interface Settings {
     maxNumberOfHistoryToKeep: number;
   };
 
+  // mobile
+  disableOnMobile: boolean;
+
   // debug
   showLogAboutPerformanceInConsole: boolean;
 
@@ -176,6 +179,9 @@ export const DEFAULT_SETTINGS: Settings = {
     maxNumberOfHistoryToKeep: 0,
   },
 
+  // mobile
+  disableOnMobile: false,
+
   // debug
   showLogAboutPerformanceInConsole: false,
 
@@ -206,6 +212,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     this.addInternalLinkComplementSettings(containerEl);
     this.addFrontMatterComplementSettings(containerEl);
     this.addIntelligentSuggestionPrioritizationSettings(containerEl);
+    this.addMobileSettings(containerEl);
     this.addDebugSettings(containerEl);
   }
 
@@ -1040,6 +1047,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+  }
+
+  private addMobileSettings(containerEl: HTMLElement) {
+    containerEl.createEl("h3", { text: "Mobile" });
+
+    new Setting(containerEl).setName("Disable on mobile").addToggle((tc) => {
+      tc.setValue(this.plugin.settings.disableOnMobile).onChange(
+        async (value) => {
+          this.plugin.settings.disableOnMobile = value;
+          await this.plugin.saveSettings();
+        }
+      );
+    });
   }
 
   private addDebugSettings(containerEl: HTMLElement) {
