@@ -739,6 +739,8 @@ export class AutoCompleteSuggest
       makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
       makeSynonymAboutAccentsDiacritics:
         this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+      frontMatterKeyForExclusion:
+        this.settings.frontMatterKeyForExclusionInternalLink,
     });
 
     this.statusBar.setInternalLinkIndexed(

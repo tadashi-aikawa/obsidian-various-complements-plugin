@@ -79,6 +79,7 @@ export interface Settings {
     beforeRegExp: string;
     after: string;
   };
+  frontMatterKeyForExclusionInternalLink: string;
 
   // front matter complement
   enableFrontMatterComplement: boolean;
@@ -168,6 +169,7 @@ export const DEFAULT_SETTINGS: Settings = {
     beforeRegExp: "",
     after: "",
   },
+  frontMatterKeyForExclusionInternalLink: "",
 
   // front matter complement
   enableFrontMatterComplement: true,
@@ -954,6 +956,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           el.inputEl.className =
             "various-complements__settings__text-area-path";
           return el;
+        });
+
+      new Setting(containerEl)
+        .setName("Front matter key for exclusion")
+        .setDesc(
+          "Exclude internal links from the suggestions if whose front matters have the key whose name is same as this setting, and the value is 'true'"
+        )
+        .addText((cb) => {
+          TextComponentEvent.onChange(cb, async (value) => {
+            this.plugin.settings.frontMatterKeyForExclusionInternalLink = value;
+            await this.plugin.saveSettings({ internalLink: true });
+          }).setValue(
+            this.plugin.settings.frontMatterKeyForExclusionInternalLink
+          );
         });
     }
   }

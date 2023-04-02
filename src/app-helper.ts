@@ -69,6 +69,12 @@ export class AppHelper {
     };
   }
 
+  getBoolFrontMatter(file: TFile, key: string): boolean {
+    return Boolean(
+      this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter?.[key]
+    );
+  }
+
   getMarkdownViewInActiveLeaf(): MarkdownView | null {
     if (!this.unsafeApp.workspace.getActiveViewOfType(MarkdownView)) {
       return null;

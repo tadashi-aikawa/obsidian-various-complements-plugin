@@ -15,14 +15,28 @@ export class InternalLinkWordProvider {
     excludePathPrefixPatterns: string[];
     makeSynonymAboutEmoji: boolean;
     makeSynonymAboutAccentsDiacritics: boolean;
+    frontMatterKeyForExclusion: string;
   }): void {
     this.clearWords();
 
     const resolvedInternalLinkWords: InternalLinkWord[] = this.app.vault
       .getMarkdownFiles()
-      .filter((f) =>
-        option.excludePathPrefixPatterns.every((x) => !f.path.startsWith(x))
-      )
+      .filter((f) => {
+        if (
+          option.excludePathPrefixPatterns.some((x) => f.path.startsWith(x))
+        ) {
+          return false;
+        }
+
+        if (!option.frontMatterKeyForExclusion) {
+          return true;
+        }
+
+        return !this.appHelper.getBoolFrontMatter(
+          f,
+          option.frontMatterKeyForExclusion
+        );
+      })
       .flatMap((x) => {
         const aliases = this.appHelper.getAliases(x);
 
