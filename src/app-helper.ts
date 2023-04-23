@@ -31,7 +31,7 @@ export class AppHelper {
     this.unsafeApp = app as any;
   }
 
-  equalsAsEditorPostion(one: EditorPosition, other: EditorPosition): boolean {
+  equalsAsEditorPosition(one: EditorPosition, other: EditorPosition): boolean {
     return one.line === other.line && one.ch === other.ch;
   }
 
