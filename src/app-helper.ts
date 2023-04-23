@@ -31,6 +31,25 @@ export class AppHelper {
     this.unsafeApp = app as any;
   }
 
+  async exists(path: string): Promise<boolean> {
+    return await this.unsafeApp.vault.adapter.exists(path);
+  }
+
+  async loadFile(path: string): Promise<string> {
+    if (!(await this.exists(path))) {
+      throw Error(`The file is not found: ${path}`);
+    }
+    return this.unsafeApp.vault.adapter.read(path);
+  }
+
+  async loadJson<T>(path: string): Promise<T> {
+    return JSON.parse(await this.loadFile(path)) as T;
+  }
+
+  async saveJson<T>(path: string, data: T): Promise<void> {
+    await this.unsafeApp.vault.adapter.write(path, JSON.stringify(data));
+  }
+
   equalsAsEditorPosition(one: EditorPosition, other: EditorPosition): boolean {
     return one.line === other.line && one.ch === other.ch;
   }

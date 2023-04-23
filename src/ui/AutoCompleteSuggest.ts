@@ -10,7 +10,9 @@ import {
   type EventRef,
   type KeymapEventHandler,
   type Modifier,
+  normalizePath,
   Notice,
+  type PluginManifest,
   Scope,
   TFile,
 } from "obsidian";
@@ -19,6 +21,7 @@ import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import type { Settings } from "../setting/settings";
 import { AppHelper } from "../app-helper";
 import type { WordsByFirstLetter } from "../provider/suggester";
+import { suggestionUniqPredicate } from "../provider/suggester";
 import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
@@ -37,14 +40,15 @@ import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 import {
   type HitWord,
   SelectionHistoryStorage,
+  type SelectionHistoryTree,
 } from "../storage/SelectionHistoryStorage";
-import { suggestionUniqPredicate } from "../provider/suggester";
 import {
   encodeSpace,
   equalsAsLiterals,
   excludeEmoji,
   findCommonPrefix,
 } from "../util/strings";
+import { DEFAULT_HISTORIES_PATH } from "../util/path";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -132,8 +136,30 @@ export class AutoCompleteSuggest
     this.close();
   }
 
+  /**
+   * This method update settings
+   */
+  async unsafeLoadHistoryData(): Promise<SelectionHistoryTree> {
+    const historyPath = normalizePath(
+      this.settings.intelligentSuggestionPrioritization.historyFilePath ||
+        DEFAULT_HISTORIES_PATH
+    );
+    if (await this.appHelper.exists(historyPath)) {
+      this.settings.selectionHistoryTree = {}; // TODO: Remove in the future
+      return this.appHelper.loadJson<SelectionHistoryTree>(historyPath);
+    }
+
+    // TODO: Remove in the future
+    if (Object.keys(this.settings.selectionHistoryTree).length > 0) {
+      return this.settings.selectionHistoryTree;
+    }
+
+    return {};
+  }
+
   static async new(
     app: App,
+    manifest: PluginManifest,
     settings: Settings,
     statusBar: ProviderStatusBar,
     onPersistSelectionHistory: () => void
@@ -161,19 +187,19 @@ export class AutoCompleteSuggest
       ins.appHelper
     );
 
+    await ins.updateSettings(settings);
+
+    // Need to migration
     ins.selectionHistoryStorage = new SelectionHistoryStorage(
-      settings.selectionHistoryTree,
+      await ins.unsafeLoadHistoryData(),
       settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory,
       settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep
     );
     ins.selectionHistoryStorage.purge();
 
-    await ins.updateSettings(settings);
-
     ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
       if (ins.selectionHistoryStorage?.shouldPersist) {
-        ins.settings.selectionHistoryTree = ins.selectionHistoryStorage.data;
         ins.selectionHistoryStorage.syncPersistVersion();
         onPersistSelectionHistory();
       }

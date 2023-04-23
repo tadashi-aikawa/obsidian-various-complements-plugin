@@ -1,4 +1,4 @@
-import { debounce, Notice, Plugin } from "obsidian";
+import { debounce, normalizePath, Notice, Plugin } from "obsidian";
 import { AutoCompleteSuggest } from "./ui/AutoCompleteSuggest";
 import {
   DEFAULT_SETTINGS,
@@ -9,6 +9,7 @@ import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
 import merge from "ts-deepmerge";
+import { DEFAULT_HISTORIES_PATH } from "./util/path";
 
 export default class VariousComponents extends Plugin {
   appHelper: AppHelper;
@@ -64,11 +65,18 @@ export default class VariousComponents extends Plugin {
     });
 
     const debouncedSaveData = debounce(async () => {
-      await this.saveData(this.settings);
+      await this.appHelper.saveJson(
+        normalizePath(
+          this.settings.intelligentSuggestionPrioritization.historyFilePath ||
+            DEFAULT_HISTORIES_PATH
+        ),
+        this.suggester.selectionHistoryStorage?.data ?? {}
+      );
     }, 5000);
 
     this.suggester = await AutoCompleteSuggest.new(
       this.app,
+      this.manifest,
       this.settings,
       this.statusBar,
       debouncedSaveData

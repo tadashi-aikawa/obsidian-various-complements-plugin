@@ -15,3 +15,6 @@ export function dirname(path: string): string {
 export function isURL(path: string): boolean {
   return Boolean(path.match(new RegExp("^https?://")));
 }
+
+export const DEFAULT_HISTORIES_PATH =
+  ".obsidian/plugins/various-complements/histories.json";

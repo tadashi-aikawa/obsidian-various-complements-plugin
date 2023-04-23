@@ -12,6 +12,7 @@ import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
 import { smartLineBreakSplit } from "../util/strings";
 import { TextComponentEvent } from "./settings-helper";
+import { DEFAULT_HISTORIES_PATH } from "../util/path";
 
 export interface Settings {
   // general
@@ -87,6 +88,7 @@ export interface Settings {
   insertCommaAfterFrontMatterCompletion: boolean;
 
   intelligentSuggestionPrioritization: {
+    historyFilePath: string;
     // If set 0, it will never remove
     maxDaysToKeepHistory: number;
     // If set 0, it will never remove
@@ -100,6 +102,7 @@ export interface Settings {
   showLogAboutPerformanceInConsole: boolean;
 
   // others
+  // TODO: Want to remove in the future version
   selectionHistoryTree: SelectionHistoryTree;
 }
 
@@ -177,6 +180,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertCommaAfterFrontMatterCompletion: false,
 
   intelligentSuggestionPrioritization: {
+    historyFilePath: "",
     maxDaysToKeepHistory: 30,
     maxNumberOfHistoryToKeep: 0,
   },
@@ -188,6 +192,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showLogAboutPerformanceInConsole: false,
 
   // others
+  // TODO: Want to remove in the future version
   selectionHistoryTree: {},
 };
 
@@ -1029,6 +1034,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     new Setting(containerEl)
+      .setName("history file path")
+      .setDesc(`Default: ${DEFAULT_HISTORIES_PATH}`)
+      .addText((cb) => {
+        TextComponentEvent.onChange(cb, async (value) => {
+          this.plugin.settings.intelligentSuggestionPrioritization.historyFilePath =
+            value;
+          await this.plugin.saveSettings();
+        }).setValue(
+          this.plugin.settings.intelligentSuggestionPrioritization
+            .historyFilePath
+        );
+      });
+
+    new Setting(containerEl)
       .setName("Max days to keep history")
       .setDesc("If set 0, it will never remove")
       .addSlider((sc) =>
@@ -1137,7 +1156,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       {
         version: this.plugin.manifest.version,
         mobile: (this.app as any).isMobile,
-        settings: { ...this.plugin.settings, selectionHistoryTree: null },
+        settings: this.plugin.settings,
       },
       null,
       4
