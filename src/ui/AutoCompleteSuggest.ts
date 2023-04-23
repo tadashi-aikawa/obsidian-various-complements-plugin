@@ -446,6 +446,8 @@ export class AutoCompleteSuggest
     this.scope.unregister(this.scope.keys.find((x) => x.key === "Enter")!);
     this.scope.unregister(this.scope.keys.find((x) => x.key === "ArrowUp")!);
     this.scope.unregister(this.scope.keys.find((x) => x.key === "ArrowDown")!);
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "Home")!);
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "End")!);
 
     // selectSuggestionKeys
     const selectSuggestionKey = SelectSuggestionKey.fromName(
