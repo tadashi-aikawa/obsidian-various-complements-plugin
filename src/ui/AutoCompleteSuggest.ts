@@ -39,7 +39,12 @@ import {
   SelectionHistoryStorage,
 } from "../storage/SelectionHistoryStorage";
 import { suggestionUniqPredicate } from "../provider/suggester";
-import { encodeSpace, excludeEmoji, findCommonPrefix } from "../util/strings";
+import {
+  encodeSpace,
+  equalsAsLiterals,
+  excludeEmoji,
+  findCommonPrefix,
+} from "../util/strings";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -856,7 +861,7 @@ export class AutoCompleteSuggest
     }
 
     const cl = this.appHelper.getCurrentLine(editor);
-    if (this.previousCurrentLine === cl && !this.runManually) {
+    if (equalsAsLiterals(this.previousCurrentLine, cl) && !this.runManually) {
       this.previousCurrentLine = cl;
       onReturnNull("Don't show suggestions because there are no changes");
       return null;

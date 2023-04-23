@@ -6,6 +6,10 @@ const regEmoji = new RegExp(
   "g"
 );
 
+export function equalsAsLiterals(one: string, another: string): boolean {
+  return one.replace(/[ \t]/g, "") === another.replace(/[ \t]/g, "");
+}
+
 export function allAlphabets(text: string): boolean {
   return Boolean(text.match(/^[a-zA-Z0-9_-]+$/));
 }

@@ -3,6 +3,7 @@ import {
   allAlphabets,
   capitalizeFirstLetter,
   encodeSpace,
+  equalsAsLiterals,
   excludeEmoji,
   excludeSpace,
   findCommonPrefix,
@@ -15,6 +16,20 @@ import {
   startsSmallLetterOnlyFirst,
   synonymAliases,
 } from "./strings";
+
+describe.each<{ one: string; another: string; expected: boolean }>`
+  one            | another          | expected
+  ${"aaa"}       | ${"aaa"}         | ${true}
+  ${" \taaa\t "} | ${"aaa"}         | ${true}
+  ${"aaa"}       | ${" \taaa\t "}   | ${true}
+  ${" a a a "}   | ${"\ta\ta\ta\t"} | ${true}
+  ${"aaa"}       | ${"aaA"}         | ${false}
+  ${" aaa "}     | ${"aaA"}         | ${false}
+`("equalsAsLiterals", ({ one, another, expected }) => {
+  test(`equalsAsLiterals(${one}, ${another}) = ${expected}`, () => {
+    expect(equalsAsLiterals(one, another)).toBe(expected);
+  });
+});
 
 describe.each<{ text: string; expected: boolean }>`
   text      | expected
