@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import {
   allAlphabets,
+  allNumbersOrFewSymbols,
   capitalizeFirstLetter,
   encodeSpace,
   equalsAsLiterals,
@@ -8,6 +9,7 @@ import {
   excludeSpace,
   findCommonPrefix,
   type FuzzyResult,
+  joinNumberWithSymbol,
   lowerIncludes,
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
@@ -28,6 +30,18 @@ describe.each<{ one: string; another: string; expected: boolean }>`
 `("equalsAsLiterals", ({ one, another, expected }) => {
   test(`equalsAsLiterals(${one}, ${another}) = ${expected}`, () => {
     expect(equalsAsLiterals(one, another)).toBe(expected);
+  });
+});
+
+describe.each<{ text: string; expected: boolean }>`
+  text            | expected
+  ${"2020-01-01"} | ${true}
+  ${"2.3.4"}      | ${true}
+  ${"hoge2.3.4"}  | ${false}
+  ${"hoge2020"}   | ${false}
+`("allNumbersOrFewSymbols", ({ text, expected }) => {
+  test(`allNumbersOrFewSymbols(${text}) = ${expected}`, () => {
+    expect(allNumbersOrFewSymbols(text)).toBe(expected);
   });
 });
 
@@ -219,5 +233,22 @@ describe.each<{
     expect(synonymAliases(value, { emoji, accentsDiacritics })).toStrictEqual(
       expected
     );
+  });
+});
+
+describe.each<{ tokens: string[]; expected: string[] }>`
+  tokens                                                        | expected
+  ${[]}                                                         | ${[]}
+  ${["one"]}                                                    | ${["one"]}
+  ${["1"]}                                                      | ${["1"]}
+  ${["1", "."]}                                                 | ${["1."]}
+  ${["1", ".", "2"]}                                            | ${["1.2"]}
+  ${["1", ".", "2", ".", "3"]}                                  | ${["1.2.3"]}
+  ${["hoge", "v", "1", ".", "2", ".", "3"]}                     | ${["hoge", "v", "1.2.3"]}
+  ${["2", "0", "2", "0", "-", "0", "1", "-", "0", "1"]}         | ${["2020-01-01"]}
+  ${["2", "0", "2", "0", "-", "0", "1", "-", "0", "1", "hoge"]} | ${["2020-01-01", "hoge"]}
+`("joinNumberWithSymbol", ({ tokens, expected }) => {
+  test(`joinNumberWithSymbol(${tokens}) = ${expected}`, () => {
+    expect(joinNumberWithSymbol(tokens)).toStrictEqual(expected);
   });
 });

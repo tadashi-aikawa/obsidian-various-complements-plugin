@@ -10,8 +10,12 @@ export function equalsAsLiterals(one: string, another: string): boolean {
   return one.replace(/[ \t]/g, "") === another.replace(/[ \t]/g, "");
 }
 
+export function allNumbersOrFewSymbols(text: string): boolean {
+  return Boolean(text.match(/^[0-9_\-.]+$/));
+}
+
 export function allAlphabets(text: string): boolean {
-  return Boolean(text.match(/^[a-zA-Z0-9_-]+$/));
+  return Boolean(text.match(/^[a-zA-Z0-9_\-]+$/));
 }
 
 export function excludeEmoji(text: string): string {
@@ -139,4 +143,26 @@ export function microFuzzy(value: string, query: string): FuzzyResult {
     }
   }
   return false;
+}
+
+export function joinNumberWithSymbol(tokens: string[]): string[] {
+  if (tokens.length === 0) {
+    return [];
+  }
+
+  let stock = tokens.shift()!;
+  const ret: string[] = [];
+  for (const token of tokens) {
+    if (allNumbersOrFewSymbols(token) && allNumbersOrFewSymbols(stock)) {
+      stock += token;
+    } else {
+      if (stock) {
+        ret.push(stock);
+      }
+      stock = token;
+    }
+  }
+
+  ret.push(stock);
+  return ret;
 }
