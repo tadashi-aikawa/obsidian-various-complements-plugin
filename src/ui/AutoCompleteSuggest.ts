@@ -42,12 +42,7 @@ import {
   SelectionHistoryStorage,
   type SelectionHistoryTree,
 } from "../storage/SelectionHistoryStorage";
-import {
-  encodeSpace,
-  equalsAsLiterals,
-  excludeEmoji,
-  findCommonPrefix,
-} from "../util/strings";
+import { encodeSpace, excludeEmoji, findCommonPrefix } from "../util/strings";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
 
 function buildLogMessage(message: string, msec: number) {
@@ -102,7 +97,7 @@ export class AutoCompleteSuggest
 
   contextStartCh: number;
 
-  previousCurrentLine = "";
+  pastCurrentTokenSeparatedWhiteSpace = "";
   previousLinksCacheInActiveFile: Set<string> = new Set();
 
   // unsafe!!
@@ -888,14 +883,6 @@ export class AutoCompleteSuggest
       return null;
     }
 
-    const cl = this.appHelper.getCurrentLine(editor);
-    if (equalsAsLiterals(this.previousCurrentLine, cl) && !this.runManually) {
-      this.previousCurrentLine = cl;
-      onReturnNull("Don't show suggestions because there are no changes");
-      return null;
-    }
-    this.previousCurrentLine = cl;
-
     const currentLineUntilCursor =
       this.appHelper.getCurrentLineUntilCursor(editor);
     if (currentLineUntilCursor.startsWith("---")) {
@@ -934,6 +921,17 @@ export class AutoCompleteSuggest
 
     const currentTokenSeparatedWhiteSpace =
       currentLineUntilCursor.split(" ").last() ?? "";
+    if (
+      currentTokenSeparatedWhiteSpace ===
+        this.pastCurrentTokenSeparatedWhiteSpace &&
+      !this.runManually
+    ) {
+      onReturnNull(
+        `Don't show suggestions because currentTokenSeparatedWhiteSpace doesn't change`
+      );
+      return null;
+    }
+    this.pastCurrentTokenSeparatedWhiteSpace = currentTokenSeparatedWhiteSpace;
     if (
       new RegExp(`^[${this.settings.firstCharactersDisableSuggestions}]`).test(
         currentTokenSeparatedWhiteSpace
