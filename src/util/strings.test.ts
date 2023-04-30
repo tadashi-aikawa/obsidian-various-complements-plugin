@@ -76,9 +76,12 @@ describe.each`
   text           | expected
   ${"a🍰b"}      | ${"ab"}
   ${"🍰pre"}     | ${"pre"}
+  ${"🍰 pre"}    | ${"pre"}
   ${"suf🍰"}     | ${"suf"}
+  ${"suf 🍰"}    | ${"suf"}
   ${"🍰both😌"}  | ${"both"}
   ${"🍰a🍊ll🅰️"} | ${"all"}
+  ${"🪦pre"}     | ${"pre"}
 `("excludeEmoji", ({ text, expected }) => {
   test(`excludeEmoji(${text}) = ${expected}`, () => {
     expect(excludeEmoji(text)).toBe(expected);

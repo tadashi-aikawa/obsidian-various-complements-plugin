@@ -1,10 +1,8 @@
 import { uniq } from "./collection-helper";
 import diacriticsMap from "./diacritics-map";
+import emojiRegex from "emoji-regex";
 
-const regEmoji = new RegExp(
-  /[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]|[\uFE0E-\uFE0F]/,
-  "g"
-);
+const regEmoji = new RegExp(` *(${emojiRegex().source}) *`, "g");
 
 export function allNumbersOrFewSymbols(text: string): boolean {
   return Boolean(text.match(/^[0-9_\-.]+$/));
