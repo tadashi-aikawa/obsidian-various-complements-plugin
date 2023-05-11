@@ -8,11 +8,12 @@ function pickTokens(content: string, trimPattern: RegExp): string[] {
 export const TRIM_CHAR_PATTERN = /[\n\t\[\]$/:?!=()<>"',|;*~ `]/g;
 export class DefaultTokenizer implements Tokenizer {
   tokenize(content: string, raw?: boolean): string[] {
-    return raw
+    const tokens = raw
       ? Array.from(splitRaw(content, this.getTrimPattern())).filter(
           (x) => x !== " "
         )
       : pickTokens(content, this.getTrimPattern());
+    return tokens.map((x) => x.replace(/\.+$/g, ""));
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
