@@ -42,7 +42,12 @@ import {
   SelectionHistoryStorage,
   type SelectionHistoryTree,
 } from "../storage/SelectionHistoryStorage";
-import { encodeSpace, excludeEmoji, findCommonPrefix } from "../util/strings";
+import {
+  encodeSpace,
+  equalsAsLiterals,
+  excludeEmoji,
+  findCommonPrefix,
+} from "../util/strings";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
 
 function buildLogMessage(message: string, msec: number) {
@@ -98,6 +103,7 @@ export class AutoCompleteSuggest
   contextStartCh: number;
 
   pastCurrentTokenSeparatedWhiteSpace = "";
+  previousCurrentLine = "";
   previousLinksCacheInActiveFile: Set<string> = new Set();
 
   // unsafe!!
@@ -882,6 +888,14 @@ export class AutoCompleteSuggest
       onReturnNull("Don't show suggestions for IME");
       return null;
     }
+
+    const cl = this.appHelper.getCurrentLine(editor);
+    if (equalsAsLiterals(this.previousCurrentLine, cl) && !this.runManually) {
+      this.previousCurrentLine = cl;
+      onReturnNull("Don't show suggestions because there are no changes");
+      return null;
+    }
+    this.previousCurrentLine = cl;
 
     const currentLineUntilCursor =
       this.appHelper.getCurrentLineUntilCursor(editor);

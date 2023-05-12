@@ -4,6 +4,10 @@ import emojiRegex from "emoji-regex";
 
 const regEmoji = new RegExp(` *(${emojiRegex().source}) *`, "g");
 
+export function equalsAsLiterals(one: string, another: string): boolean {
+  return one.replace(/[ \t]/g, "") === another.replace(/[ \t]/g, "");
+}
+
 export function allNumbersOrFewSymbols(text: string): boolean {
   return Boolean(text.match(/^[0-9_\-.]+$/));
 }
