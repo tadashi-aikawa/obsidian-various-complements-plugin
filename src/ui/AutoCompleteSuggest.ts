@@ -425,7 +425,11 @@ export class AutoCompleteSuggest
               {
                 frontMatter: parsedQuery.currentFrontMatter,
                 selectionHistoryStorage: this.selectionHistoryStorage,
-                fuzzy: this.settings.fuzzyMatch,
+                fuzzy: this.settings.fuzzyMatch
+                  ? {
+                      minMatchScore: this.settings.minFuzzyMatchScore,
+                    }
+                  : undefined,
               }
             ).map((word) => ({ ...word, offset: q.offset }));
           })

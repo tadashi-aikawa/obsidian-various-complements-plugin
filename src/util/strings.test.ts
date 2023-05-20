@@ -194,17 +194,18 @@ describe.each<{ strs: string[]; expected: string | null }>`
 });
 
 describe.each<{ value: string; query: string; expected: FuzzyResult }>`
-  value      | query       | expected
-  ${"abcde"} | ${"ab"}     | ${true}
-  ${"abcde"} | ${"bc"}     | ${true}
-  ${"abcde"} | ${"ace"}    | ${"fuzzy"}
-  ${"abcde"} | ${"abcde"}  | ${true}
-  ${"abcde"} | ${"abcdef"} | ${false}
-  ${"abcde"} | ${"bd"}     | ${"fuzzy"}
-  ${"abcde"} | ${"ba"}     | ${false}
+  value                 | query       | expected
+  ${"abcde"}            | ${"ab"}     | ${{ type: "concrete_match" }}
+  ${"abcde"}            | ${"bc"}     | ${{ type: "concrete_match" }}
+  ${"abcde"}            | ${"ace"}    | ${{ type: "fuzzy_match", score: 1.2 }}
+  ${"abcde"}            | ${"abcde"}  | ${{ type: "concrete_match" }}
+  ${"abcde"}            | ${"abcdef"} | ${{ type: "none" }}
+  ${"abcde"}            | ${"bd"}     | ${{ type: "fuzzy_match", score: 0.8 }}
+  ${"abcde"}            | ${"ba"}     | ${{ type: "none" }}
+  ${"fuzzy name match"} | ${"match"}  | ${{ type: "fuzzy_match", score: 1.125 }}
 `("microFuzzy", ({ value, query, expected }) => {
   test(`microFuzzy(${value}, ${query}) = ${expected}`, () => {
-    expect(microFuzzy(value, query)).toBe(expected);
+    expect(microFuzzy(value, query)).toStrictEqual(expected);
   });
 });
 

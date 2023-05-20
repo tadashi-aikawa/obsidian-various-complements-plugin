@@ -4,6 +4,7 @@ import {
   lowerFuzzyStarsWith,
   lowerIncludes,
   lowerStartsWith,
+  wrapFuzzy,
 } from "../util/strings";
 import type { IndexedWords } from "../ui/AutoCompleteSuggest";
 import { max, uniqWith } from "../util/collection-helper";
@@ -61,7 +62,11 @@ export function judge(
   word: Word,
   query: string,
   queryStartWithUpper: boolean,
-  fuzzy: boolean
+  options?: {
+    fuzzy?: {
+      minMatchScore: number;
+    };
+  }
 ): Judgement {
   if (query === "") {
     return {
@@ -74,10 +79,14 @@ export function judge(
     };
   }
 
-  const matcher = fuzzy ? lowerFuzzy : lowerStartsWith;
+  const matcher = options?.fuzzy ? lowerFuzzy : wrapFuzzy(lowerStartsWith);
 
   const matched = matcher(word.value, query);
-  if (matched) {
+  if (
+    matched.type === "concrete_match" ||
+    (matched.type === "fuzzy_match" &&
+      matched.score > options?.fuzzy?.minMatchScore!)
+  ) {
     if (
       queryStartWithUpper &&
       word.type !== "internalLink" &&
@@ -89,7 +98,7 @@ export function judge(
           ...word,
           value: c,
           hit: c,
-          fuzzy: matched === "fuzzy",
+          fuzzy: matched.type === "fuzzy_match",
         },
         value: c,
         alias: false,
@@ -99,7 +108,7 @@ export function judge(
         word: {
           ...word,
           hit: word.value,
-          fuzzy: matched === "fuzzy",
+          fuzzy: matched.type === "fuzzy_match",
         },
         value: word.value,
         alias: false,
@@ -109,13 +118,23 @@ export function judge(
 
   const matchedAlias = word.aliases
     ?.map((a) => ({ aliases: a, matched: matcher(a, query) }))
-    .find((x) => x.matched);
-  if (matchedAlias?.matched) {
+    .sort((a, b) =>
+      a.matched.type === "concrete_match" && b.matched.type !== "concrete_match"
+        ? -1
+        : 0
+    )
+    .find((x) => x.matched.type !== "none");
+  if (
+    matchedAlias &&
+    (matchedAlias.matched.type === "concrete_match" ||
+      (matchedAlias.matched.type === "fuzzy_match" &&
+        matchedAlias.matched.score > options?.fuzzy?.minMatchScore!))
+  ) {
     return {
       word: {
         ...word,
         hit: matchedAlias.aliases,
-        fuzzy: matchedAlias.matched === "fuzzy",
+        fuzzy: matchedAlias.matched.type === "fuzzy_match",
       },
       value: matchedAlias.aliases,
       alias: true,
@@ -135,12 +154,13 @@ export function suggestWords(
   option: {
     frontMatter?: string;
     selectionHistoryStorage?: SelectionHistoryStorage;
-    fuzzy?: boolean;
+    fuzzy?: {
+      minMatchScore: number;
+    };
   } = {}
 ): Word[] {
   const { frontMatter, selectionHistoryStorage } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
-  const fuzzy = option.fuzzy ?? false;
 
   const flattenFrontMatterWords = () => {
     if (frontMatter === "alias" || frontMatter === "aliases") {
@@ -180,7 +200,7 @@ export function suggestWords(
       ];
 
   const filteredJudgement = Array.from(words)
-    .map((x) => judge(x, query, queryStartWithUpper, fuzzy))
+    .map((x) => judge(x, query, queryStartWithUpper, option))
     .filter((x) => x.value !== undefined);
 
   const latestUpdated = max(
@@ -244,7 +264,11 @@ export function judgeByPartialMatch(
   word: Word,
   query: string,
   queryStartWithUpper: boolean,
-  fuzzy: boolean
+  options?: {
+    fuzzy?: {
+      minMatchScore: number;
+    };
+  }
 ): Judgement {
   if (query === "") {
     return {
@@ -254,11 +278,19 @@ export function judgeByPartialMatch(
     };
   }
 
-  const startsWithMatcher = fuzzy ? lowerFuzzyStarsWith : lowerStartsWith;
-  const includesMatcher = fuzzy ? lowerFuzzy : lowerIncludes;
+  const startsWithMatcher = options?.fuzzy
+    ? lowerFuzzyStarsWith
+    : wrapFuzzy(lowerStartsWith);
+  const includesMatcher = options?.fuzzy
+    ? lowerFuzzy
+    : wrapFuzzy(lowerIncludes);
 
   const startsWithMatched = startsWithMatcher(word.value, query);
-  if (startsWithMatched) {
+  if (
+    startsWithMatched.type === "concrete_match" ||
+    (startsWithMatched.type === "fuzzy_match" &&
+      startsWithMatched.score > options?.fuzzy?.minMatchScore!)
+  ) {
     if (
       queryStartWithUpper &&
       word.type !== "internalLink" &&
@@ -270,7 +302,7 @@ export function judgeByPartialMatch(
           ...word,
           value: c,
           hit: c,
-          fuzzy: startsWithMatched === "fuzzy",
+          fuzzy: startsWithMatched.type === "fuzzy_match",
         },
         value: c,
         alias: false,
@@ -280,7 +312,7 @@ export function judgeByPartialMatch(
         word: {
           ...word,
           hit: word.value,
-          fuzzy: startsWithMatched === "fuzzy",
+          fuzzy: startsWithMatched.type === "fuzzy_match",
         },
         value: word.value,
         alias: false,
@@ -290,13 +322,23 @@ export function judgeByPartialMatch(
 
   const startsWithAliasMatched = word.aliases
     ?.map((a) => ({ aliases: a, matched: startsWithMatcher(a, query) }))
-    .find((x) => x.matched);
-  if (startsWithAliasMatched) {
+    .sort((a, b) =>
+      a.matched.type === "concrete_match" && b.matched.type !== "concrete_match"
+        ? -1
+        : 0
+    )
+    .find((x) => x.matched.type !== "none");
+  if (
+    startsWithAliasMatched &&
+    (startsWithAliasMatched.matched.type === "concrete_match" ||
+      (startsWithAliasMatched.matched.type === "fuzzy_match" &&
+        startsWithAliasMatched.matched.score > options?.fuzzy?.minMatchScore!))
+  ) {
     return {
       word: {
         ...word,
         hit: startsWithAliasMatched.aliases,
-        fuzzy: startsWithAliasMatched.matched === "fuzzy",
+        fuzzy: startsWithAliasMatched.matched.type === "fuzzy_match",
       },
       value: startsWithAliasMatched.aliases,
       alias: true,
@@ -304,9 +346,18 @@ export function judgeByPartialMatch(
   }
 
   const includesMatched = includesMatcher(word.value, query);
-  if (includesMatched) {
+  if (
+    includesMatched &&
+    (includesMatched.type === "concrete_match" ||
+      (includesMatched.type === "fuzzy_match" &&
+        includesMatched.score > options?.fuzzy?.minMatchScore!))
+  ) {
     return {
-      word: { ...word, hit: word.value, fuzzy: includesMatched === "fuzzy" },
+      word: {
+        ...word,
+        hit: word.value,
+        fuzzy: includesMatched.type === "fuzzy_match",
+      },
       value: word.value,
       alias: false,
     };
@@ -314,13 +365,23 @@ export function judgeByPartialMatch(
 
   const matchedAliasIncluded = word.aliases
     ?.map((a) => ({ aliases: a, matched: includesMatcher(a, query) }))
-    .find((x) => x.matched);
-  if (matchedAliasIncluded) {
+    .sort((a, b) =>
+      a.matched.type === "concrete_match" && b.matched.type !== "concrete_match"
+        ? -1
+        : 0
+    )
+    .find((x) => x.matched.type !== "none");
+  if (
+    matchedAliasIncluded &&
+    (matchedAliasIncluded.matched.type === "concrete_match" ||
+      (matchedAliasIncluded.matched.type === "fuzzy_match" &&
+        matchedAliasIncluded.matched.score > options?.fuzzy?.minMatchScore!))
+  ) {
     return {
       word: {
         ...word,
         hit: matchedAliasIncluded.aliases,
-        fuzzy: matchedAliasIncluded.matched === "fuzzy",
+        fuzzy: matchedAliasIncluded.matched.type === "fuzzy_match",
       },
       value: matchedAliasIncluded.aliases,
       alias: true,
@@ -337,12 +398,13 @@ export function suggestWordsByPartialMatch(
   option: {
     frontMatter?: string;
     selectionHistoryStorage?: SelectionHistoryStorage;
-    fuzzy?: boolean;
+    fuzzy?: {
+      minMatchScore: number;
+    };
   } = {}
 ): Word[] {
   const { frontMatter, selectionHistoryStorage } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
-  const fuzzy = option.fuzzy ?? false;
 
   const flatObjectValues = (object: { [firstLetter: string]: Word[] }) =>
     Object.values(object).flat();
@@ -366,7 +428,7 @@ export function suggestWordsByPartialMatch(
         ...flatObjectValues(indexedWords.internalLink),
       ];
   const filteredJudgement = Array.from(words)
-    .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper, fuzzy))
+    .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper, option))
     .filter((x) => x.value !== undefined);
 
   const latestUpdated = max(

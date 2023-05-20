@@ -20,6 +20,7 @@ export interface Settings {
   cedictPath: string;
   matchStrategy: string;
   fuzzyMatch: boolean;
+  minFuzzyMatchScore: number;
   matchingWithoutEmoji: boolean;
   treatAccentDiacriticsAsAlphabeticCharacters: boolean;
   maxNumberOfSuggestions: number;
@@ -112,6 +113,7 @@ export const DEFAULT_SETTINGS: Settings = {
   cedictPath: "./cedict_ts.u8",
   matchStrategy: "prefix",
   fuzzyMatch: true,
+  minFuzzyMatchScore: 0.5,
   matchingWithoutEmoji: true,
   treatAccentDiacriticsAsAlphabeticCharacters: false,
 
@@ -301,6 +303,22 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
+
+    new Setting(containerEl)
+      .setName("Min fuzzy match score")
+      .setDesc(
+        "Only show suggestions those score is more than the specific score"
+      )
+      .addSlider((sc) =>
+        sc
+          .setLimits(0, 5.0, 0.1)
+          .setValue(this.plugin.settings.minFuzzyMatchScore)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.minFuzzyMatchScore = value;
+            await this.plugin.saveSettings();
+          })
+      );
 
     new Setting(containerEl)
       .setName("Treat accent diacritics as alphabetic characters.")

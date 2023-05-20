@@ -62,6 +62,13 @@ export function lowerStartsWith(a: string, b: string): boolean {
   return a.toLowerCase().startsWith(b.toLowerCase());
 }
 
+export function wrapFuzzy<ARGS extends unknown[]>(
+  func: (...args: ARGS) => boolean
+): (...args: ARGS) => FuzzyResult {
+  return (...xs) =>
+    func(...xs) ? { type: "concrete_match" } : { type: "none" };
+}
+
 export function lowerStartsWithoutSpace(one: string, other: string): boolean {
   return lowerStartsWith(excludeSpace(one), excludeSpace(other));
 }
@@ -73,7 +80,9 @@ export function lowerFuzzy(a: string, b: string): FuzzyResult {
 export function lowerFuzzyStarsWith(a: string, b: string): FuzzyResult {
   const aLower = a.toLowerCase();
   const bLower = b.toLowerCase();
-  return aLower[0] !== bLower[0] ? false : microFuzzy(aLower, bLower);
+  return aLower[0] === bLower[0]
+    ? microFuzzy(aLower, bLower)
+    : { type: "none" };
 }
 
 export function capitalizeFirstLetter(str: string): string {
@@ -121,12 +130,17 @@ export function findCommonPrefix(strs: string[]): string | null {
   return strs[0].substring(0, min);
 }
 
-export type FuzzyResult = boolean | "fuzzy";
+export type FuzzyResult =
+  | { type: "concrete_match" }
+  | { type: "fuzzy_match"; score: number }
+  | { type: "none" };
 
 export function microFuzzy(value: string, query: string): FuzzyResult {
   let i = 0;
   let lastMatchIndex = null;
   let isFuzzy = false;
+  let scoreSeed = 0;
+  let combo = 0;
 
   for (let j = 0; j < value.length; j++) {
     if (value[j] === query[i]) {
@@ -134,13 +148,25 @@ export function microFuzzy(value: string, query: string): FuzzyResult {
         isFuzzy = true;
       }
       lastMatchIndex = j;
+      combo++;
       i++;
+    } else {
+      if (combo > 0) {
+        scoreSeed += 2 ** combo;
+        combo = 0;
+      }
     }
     if (i === query.length) {
-      return isFuzzy ? "fuzzy" : true;
+      if (combo > 0) {
+        scoreSeed += 2 ** combo;
+      }
+      return isFuzzy
+        ? { type: "fuzzy_match", score: scoreSeed / value.length }
+        : { type: "concrete_match" };
     }
   }
-  return false;
+
+  return { type: "none" };
 }
 
 export function joinNumberWithSymbol(tokens: string[]): string[] {

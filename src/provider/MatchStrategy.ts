@@ -12,6 +12,9 @@ type Handler = (
   option: {
     frontMatter?: string;
     selectionHistoryStorage?: SelectionHistoryStorage;
+    fuzzy?: {
+      minMatchScore: number;
+    };
   }
 ) => Word[];
 
