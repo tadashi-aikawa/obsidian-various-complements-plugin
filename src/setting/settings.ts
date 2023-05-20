@@ -307,7 +307,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Min fuzzy match score")
       .setDesc(
-        "Only show suggestions those score is more than the specific score"
+        "It only shows suggestions whose fuzzy matched score is more than the specific value."
       )
       .addSlider((sc) =>
         sc
