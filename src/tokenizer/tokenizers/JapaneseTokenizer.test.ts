@@ -8,6 +8,8 @@ describe.each<{ content: string; raw: boolean; expected: string[] }>`
   ${"$\\alpha"}                | ${false} | ${["\\alpha"]}
   ${"2022-10-02"}              | ${false} | ${["2022-10-02"]}
   ${"TypeScript5.0.1リリース"} | ${false} | ${["TypeScript", "5.0.1", "リリース"]}
+  ${"**bold** *italic*"}       | ${false} | ${["bold", "italic"]}
+  ${"__a _b __c__ d_ e__"}     | ${false} | ${["a", "b", "c", "d", "e"]}
 `("tokenize", ({ content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(new JapaneseTokenizer().tokenize(content, raw)).toStrictEqual(
@@ -32,6 +34,7 @@ describe.each<{
   ${"- :smile"}                | ${[{ word: "- :smile", offset: 0 }, { word: ":smile", offset: 2 }, { word: "smile", offset: 3 }]}
   ${"2022-10-02"}              | ${[{ word: "2022-10-02", offset: 0 }]}
   ${"TypeScript5.0.1リリース"} | ${[{ word: "TypeScript5.0.1リリース", offset: 0 }, { word: "5.0.1リリース", offset: 10 }, { word: "リリース", offset: 15 }]}
+  ${"__a _b __c__ d_ e__"}     | ${[{ word: "__a _b __c__ d_ e__", offset: 0 }, { word: "a _b __c__ d_ e__", offset: 2 }, { word: "_b __c__ d_ e__", offset: 4 }, { word: "b __c__ d_ e__", offset: 5 }, { word: "__c__ d_ e__", offset: 7 }, { word: "c__ d_ e__", offset: 9 }, { word: "__ d_ e__", offset: 10 }, { word: "d_ e__", offset: 13 }, { word: "_ e__", offset: 14 }, { word: "e__", offset: 16 }, { word: "__", offset: 17 }]}
 `("recursiveTokenize", ({ content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
     expect(new JapaneseTokenizer().recursiveTokenize(content)).toStrictEqual(
