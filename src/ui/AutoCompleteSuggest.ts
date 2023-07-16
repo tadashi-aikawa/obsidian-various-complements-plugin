@@ -861,8 +861,7 @@ export class AutoCompleteSuggest
 
   onTrigger(
     cursor: EditorPosition,
-    editor: Editor,
-    file: TFile
+    editor: Editor
   ): EditorSuggestTriggerInfo | null {
     const start = performance.now();
 
@@ -893,8 +892,17 @@ export class AutoCompleteSuggest
       return null;
     }
 
+    const currentFrontMatter = this.settings.enableFrontMatterComplement
+      ? this.appHelper.getCurrentFrontMatter()
+      : undefined;
+    showDebugLog(`Current front matter is ${currentFrontMatter}`);
+
     const cl = this.appHelper.getCurrentLine(editor);
-    if (equalsAsLiterals(this.previousCurrentLine, cl) && !this.runManually) {
+    if (
+      equalsAsLiterals(this.previousCurrentLine, cl) &&
+      !this.runManually &&
+      !currentFrontMatter
+    ) {
       this.previousCurrentLine = cl;
       onReturnNull("Don't show suggestions because there are no changes");
       return null;
@@ -970,11 +978,6 @@ export class AutoCompleteSuggest
       );
       return null;
     }
-
-    const currentFrontMatter = this.settings.enableFrontMatterComplement
-      ? this.appHelper.getCurrentFrontMatter()
-      : undefined;
-    showDebugLog(`Current front matter is ${currentFrontMatter}`);
 
     if (
       !this.runManually &&
