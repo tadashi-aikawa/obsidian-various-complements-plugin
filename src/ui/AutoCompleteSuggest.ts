@@ -501,9 +501,11 @@ export class AutoCompleteSuggest
         this.scope.register(
           selectSuggestionKey.keyBind.modifiers,
           selectSuggestionKey.keyBind.key,
-          () => {
-            this.suggestions.useSelectedItem({});
-            return false;
+          (evt, ctx) => {
+            if (!evt.isComposing) {
+              this.suggestions.useSelectedItem({});
+              return false;
+            }
           }
         )
       );
