@@ -886,7 +886,6 @@ export class AutoCompleteSuggest
     editor: Editor
   ): EditorSuggestTriggerInfo | null {
     const start = performance.now();
-    this.setSelectionLock(this.settings.noAutoFocusUntilCycle);
 
     const showDebugLog = (message: string) => {
       this.showDebugLog(() => `[onTrigger] ${message}`);
@@ -1011,6 +1010,12 @@ export class AutoCompleteSuggest
         "Don't show suggestions because currentToken is less than minNumberTriggered option"
       );
       return null;
+    }
+
+    if (this.runManually) {
+      this.setSelectionLock(false);
+    } else {
+      this.setSelectionLock(this.settings.noAutoFocusUntilCycle);
     }
 
     showDebugLog(buildLogMessage("onTrigger", performance.now() - start));
