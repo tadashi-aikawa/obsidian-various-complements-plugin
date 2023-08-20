@@ -503,13 +503,14 @@ export class AutoCompleteSuggest
           selectSuggestionKey.keyBind.modifiers,
           selectSuggestionKey.keyBind.key,
           (evt, ctx) => {
-            if (this.selectionLock) {
-              this.close();
-              return true;
-            }
             if (!evt.isComposing) {
-              this.suggestions.useSelectedItem({});
-              return false;
+              if (this.selectionLock) {
+                this.close();
+                return true;
+              } else {
+                this.suggestions.useSelectedItem({});
+                return false;
+              }
             }
           }
         )
