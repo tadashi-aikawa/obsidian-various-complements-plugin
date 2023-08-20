@@ -35,6 +35,7 @@ export interface Settings {
   firstCharactersDisableSuggestions: string;
   useCommonPrefixCompletionOfSuggestion: boolean;
   patternsToSuppressTrigger: string[];
+  noAutoFocusUntilCycle: boolean;
 
   // appearance
   showMatchStrategy: boolean;
@@ -128,6 +129,7 @@ export const DEFAULT_SETTINGS: Settings = {
   firstCharactersDisableSuggestions: ":/^",
   useCommonPrefixCompletionOfSuggestion: false,
   patternsToSuppressTrigger: ["^~~~.*", "^```.*"],
+  noAutoFocusUntilCycle: false,
 
   // appearance
   showMatchStrategy: true,
@@ -492,6 +494,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("No auto-focus until the cycle")
+      .setDesc("No focus on the suggestions until the cycle key is pressed.")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.noAutoFocusUntilCycle).onChange(
+          async (value) => {
+            this.plugin.settings.noAutoFocusUntilCycle = value;
+            await this.plugin.saveSettings();
+          }
+        );
+      });
   }
 
   private addAppearanceSettings(containerEl: HTMLElement) {

@@ -98,6 +98,7 @@ export class AutoCompleteSuggest
   debounceClose: Debouncer<[], void>;
 
   runManually: boolean;
+  selectionLock = false;
   declare isOpen: boolean;
 
   contextStartCh: number;
@@ -502,6 +503,10 @@ export class AutoCompleteSuggest
           selectSuggestionKey.keyBind.modifiers,
           selectSuggestionKey.keyBind.key,
           (evt, ctx) => {
+            if (this.selectionLock) {
+              this.close();
+              return true;
+            }
             if (!evt.isComposing) {
               this.suggestions.useSelectedItem({});
               return false;
@@ -519,11 +524,25 @@ export class AutoCompleteSuggest
 
     // cycleThroughSuggestionsKeys
     const selectNext = (evt: KeyboardEvent) => {
-      this.suggestions.setSelectedItem(this.suggestions.selectedItem + 1, evt);
+      if (this.settings.noAutoFocusUntilCycle && this.selectionLock) {
+        this.setSelectionLock(false);
+      } else {
+        this.suggestions.setSelectedItem(
+          this.suggestions.selectedItem + 1,
+          evt
+        );
+      }
       return false;
     };
     const selectPrevious = (evt: KeyboardEvent) => {
-      this.suggestions.setSelectedItem(this.suggestions.selectedItem - 1, evt);
+      if (this.settings.noAutoFocusUntilCycle && this.selectionLock) {
+        this.setSelectionLock(false);
+      } else {
+        this.suggestions.setSelectedItem(
+          this.suggestions.selectedItem - 1,
+          evt
+        );
+      }
       return false;
     };
 
@@ -866,6 +885,7 @@ export class AutoCompleteSuggest
     editor: Editor
   ): EditorSuggestTriggerInfo | null {
     const start = performance.now();
+    this.setSelectionLock(this.settings.noAutoFocusUntilCycle);
 
     const showDebugLog = (message: string) => {
       this.showDebugLog(() => `[onTrigger] ${message}`);
@@ -1214,6 +1234,18 @@ export class AutoCompleteSuggest
   private showDebugLog(toMessage: () => string) {
     if (this.settings.showLogAboutPerformanceInConsole) {
       console.log(toMessage());
+    }
+  }
+
+  private setSelectionLock(lock: boolean) {
+    this.selectionLock = lock;
+    const lockClass = "various-complements__selection-lock";
+
+    const body = document.querySelector("body")!;
+    if (lock) {
+      body.addClass(lockClass);
+    } else {
+      body.removeClass(lockClass);
     }
   }
 }
