@@ -27,8 +27,8 @@
   export let onClickFileIcon: (dictionaryPath: string) => void;
 
   let aliasesStr = aliases.join("\n");
-  let wordRef = null;
-  let displayedWordRef = null;
+  let wordRef: HTMLElement | null = null;
+  let displayedWordRef: HTMLElement | null  = null;
 
   $: enableSubmit = inputWord.length > 0;
   $: enableDisplayedWord = Boolean(dividerForDisplay);
@@ -51,7 +51,7 @@
   };
 
   onMount(() => {
-    setTimeout(() => wordRef.focus(), 50);
+    setTimeout(() => wordRef?.focus(), 50);
   });
 </script>
 

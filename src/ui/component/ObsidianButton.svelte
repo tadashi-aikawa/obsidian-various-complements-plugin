@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  export let popup: string;
+  export let popup: string = "";
   export let disabled = false;
 
   const dispatcher = createEventDispatcher();
