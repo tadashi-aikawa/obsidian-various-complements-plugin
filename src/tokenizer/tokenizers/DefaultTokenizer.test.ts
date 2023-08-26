@@ -18,6 +18,25 @@ describe.each<{
   ${"::one::two"}          | ${["one", "two"]}
   ${"**bold** *italic*"}   | ${["bold", "italic"]}
   ${"__a _b __c__ d_ e__"} | ${["a", "b", "c", "d", "e"]}
+  ${'"aaa" "bbb"'}         | ${["aaa", "bbb"]}
+  ${"'aaa' 'bbb'"}         | ${["aaa", "bbb"]}
+  ${"„aaa“ „bbb“"}         | ${["aaa", "bbb"]}
+  ${"‚aaa’ ‚bbb’"}         | ${["aaa", "bbb"]}
+  ${"“aaa” “bbb”"}         | ${["aaa", "bbb"]}
+  ${"‘aaa’ ‘bbb’"}         | ${["aaa", "bbb"]}
+  ${"„aaa” „bbb”"}         | ${["aaa", "bbb"]}
+  ${"‚aaa’ ‚bbb’"}         | ${["aaa", "bbb"]}
+  ${"«aaa» «bbb»"}         | ${["aaa", "bbb"]}
+  ${"‹aaa› ‹bbb›"}         | ${["aaa", "bbb"]}
+  ${"»aaa« »bbb«"}         | ${["aaa", "bbb"]}
+  ${"›aaa‹ ›bbb‹"}         | ${["aaa", "bbb"]}
+  ${"”aaa” ”bbb”"}         | ${["aaa", "bbb"]}
+  ${"’aaa’ ’bbb’"}         | ${["aaa", "bbb"]}
+  ${"»aaa» »bbb»"}         | ${["aaa", "bbb"]}
+  ${"›aaa› ›bbb›"}         | ${["aaa", "bbb"]}
+  ${"“aaa„ “bbb„"}         | ${["aaa", "bbb"]}
+  ${"‘aaa‚ ‘bbb‚"}         | ${["aaa", "bbb"]}
+  ${"‘aaa’ ‘bbb’"}         | ${["aaa", "bbb"]}
 `("tokenize", ({ content, expected }) => {
   test(`tokenize(${content}) = ${expected}`, () => {
     expect(new DefaultTokenizer().tokenize(content)).toStrictEqual(expected);
