@@ -19,6 +19,23 @@ export function select(
   }
 }
 
+export function insertAsText(popup: AutoCompleteSuggest): CommandReturnType {
+  if (!popup.context) {
+    return;
+  }
+
+  const item = popup.suggestions.values[popup.suggestions.selectedItem];
+  const editor = popup.context.editor;
+  editor.replaceRange(
+    item.value,
+    {
+      ...popup.context.start,
+      ch: popup.contextStartCh + item.offset!,
+    },
+    popup.context.end
+  );
+}
+
 export function selectNext(
   popup: AutoCompleteSuggest,
   evt: KeyboardEvent

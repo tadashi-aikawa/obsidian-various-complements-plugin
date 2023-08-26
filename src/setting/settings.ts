@@ -49,6 +49,7 @@ export interface Settings {
     down: Hotkey[];
     open: Hotkey[];
     completion: Hotkey[];
+    "insert as text": Hotkey[];
   };
   propagateEsc: boolean;
 
@@ -145,6 +146,7 @@ export const DEFAULT_SETTINGS: Settings = {
     down: [{ modifiers: [], key: "ArrowDown" }],
     open: [],
     completion: [],
+    "insert as text": [],
   },
   propagateEsc: false,
 
