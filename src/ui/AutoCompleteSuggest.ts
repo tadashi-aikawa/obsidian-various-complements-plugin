@@ -39,13 +39,9 @@ import {
   SelectionHistoryStorage,
   type SelectionHistoryTree,
 } from "../storage/SelectionHistoryStorage";
-import {
-  encodeSpace,
-  equalsAsLiterals,
-  excludeEmoji,
-  findCommonPrefix,
-} from "../util/strings";
+import { encodeSpace, equalsAsLiterals } from "../util/strings";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
+import * as commands from "./popup-commands";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -484,129 +480,38 @@ export class AutoCompleteSuggest
         return this.settings.propagateEsc;
       };
 
-    // commands
-    const select = (evt: KeyboardEvent) => {
-      if (!evt.isComposing) {
-        if (this.selectionLock) {
-          this.close();
-          return true;
-        } else {
-          this.suggestions.useSelectedItem({});
-          return false;
-        }
-      }
-    };
-    const selectNext = (evt: KeyboardEvent) => {
-      if (this.settings.noAutoFocusUntilCycle && this.selectionLock) {
-        this.setSelectionLock(false);
-      } else {
-        this.suggestions.setSelectedItem(
-          this.suggestions.selectedItem + 1,
-          evt
-        );
-      }
-      return false;
-    };
-    const selectPrevious = (evt: KeyboardEvent) => {
-      if (this.settings.noAutoFocusUntilCycle && this.selectionLock) {
-        this.setSelectionLock(false);
-      } else {
-        this.suggestions.setSelectedItem(
-          this.suggestions.selectedItem - 1,
-          evt
-        );
-      }
-      return false;
-    };
-    const open = () => {
-      const item = this.suggestions.values[this.suggestions.selectedItem];
-      if (
-        item.type !== "currentVault" &&
-        item.type !== "internalLink" &&
-        item.type !== "frontMatter"
-      ) {
-        return false;
-      }
-
-      const markdownFile = this.appHelper.getMarkdownFileByPath(
-        item.createdPath
-      );
-      if (!markdownFile) {
-        // noinspection ObjectAllocationIgnored
-        new Notice(`Can't open ${item.createdPath}`);
-        return false;
-      }
-      this.appHelper.openMarkdownFile(markdownFile, true);
-      return false;
-    };
-    const completion = () => {
-      if (!this.context) {
-        return;
-      }
-
-      const editor = this.context.editor;
-      const currentPhrase = editor.getRange(
-        {
-          ...this.context.start,
-          ch: this.contextStartCh,
-        },
-        this.context.end
-      );
-
-      const tokens = this.tokenizer.recursiveTokenize(currentPhrase);
-      const commonPrefixWithToken = tokens
-        .map((t) => ({
-          token: t,
-          commonPrefix: findCommonPrefix(
-            this.suggestions.values
-              .map((x) => excludeEmoji(x.value))
-              .filter((x) => x.toLowerCase().startsWith(t.word.toLowerCase()))
-          ),
-        }))
-        .find((x) => x.commonPrefix != null);
-
-      if (
-        !commonPrefixWithToken ||
-        currentPhrase === commonPrefixWithToken.commonPrefix
-      ) {
-        return false;
-      }
-
-      editor.replaceRange(
-        commonPrefixWithToken.commonPrefix!,
-        {
-          ...this.context.start,
-          ch: this.contextStartCh + commonPrefixWithToken.token.offset,
-        },
-        this.context.end
-      );
-      return true;
-    };
-
     // Set hotkeys
     this.settings.hotkeys.select.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, select)
+        this.scope.register(hk.modifiers, hk.key, (evt) =>
+          commands.select(this, evt)
+        )
       );
     });
     this.settings.hotkeys.up.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, selectPrevious)
+        this.scope.register(hk.modifiers, hk.key, (evt) =>
+          commands.selectPrevious(this, evt)
+        )
       );
     });
     this.settings.hotkeys.down.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, selectNext)
+        this.scope.register(hk.modifiers, hk.key, (evt) =>
+          commands.selectNext(this, evt)
+        )
       );
     });
     this.settings.hotkeys.open.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, open)
+        this.scope.register(hk.modifiers, hk.key, (evt) => commands.open(this))
       );
     });
     this.settings.hotkeys.completion.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, completion)
+        this.scope.register(hk.modifiers, hk.key, (evt) =>
+          commands.completion(this)
+        )
       );
     });
 
@@ -1183,7 +1088,7 @@ export class AutoCompleteSuggest
     }
   }
 
-  private setSelectionLock(lock: boolean) {
+  setSelectionLock(lock: boolean) {
     this.selectionLock = lock;
     const lockClass = "various-complements__selection-lock";
 
