@@ -68,6 +68,10 @@ export function setEquals(set1: Set<unknown>, set2: Set<unknown>): boolean {
   return Array.from(set1).every((element) => set2.has(element));
 }
 
+export function equalsAsSet(ary1: string[], ary2: string[]): boolean {
+  return setEquals(new Set(ary1), new Set(ary2));
+}
+
 export function mirrorMap<T>(
   collection: T[],
   toValue: (t: T) => string

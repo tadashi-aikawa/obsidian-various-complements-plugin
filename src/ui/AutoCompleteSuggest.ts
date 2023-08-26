@@ -26,14 +26,11 @@ import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordPr
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
-import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
-import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { setEquals, uniqWith } from "../util/collection-helper";
 import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
 import type { ProviderStatusBar } from "./ProviderStatusBar";
 import type { InternalLinkWord, Word } from "../model/Word";
-import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
@@ -459,71 +456,46 @@ export class AutoCompleteSuggest
     this.registerKeymaps();
   }
 
-  private registerKeymaps() {
-    const registerKeyAsIgnored = (
-      modifiers: Modifier[],
-      key: string | null
-    ) => {
-      this.keymapEventHandler.push(
-        this.scope.register(modifiers, key, () => {
-          this.close();
-          return true;
-        })
-      );
-    };
+  private registerKeyAsIgnored(modifiers: Modifier[], key: string | null) {
+    this.keymapEventHandler.push(
+      this.scope.register(modifiers, key, () => {
+        this.close();
+        return true;
+      })
+    );
+  }
 
+  private registerKeymaps() {
     // Clear
     this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
     this.keymapEventHandler = [];
-    this.scope.unregister(this.scope.keys.find((x) => x.key === "Enter")!);
-    this.scope.unregister(this.scope.keys.find((x) => x.key === "ArrowUp")!);
-    this.scope.unregister(this.scope.keys.find((x) => x.key === "ArrowDown")!);
-    this.scope.unregister(this.scope.keys.find((x) => x.key === "Home")!);
-    this.scope.unregister(this.scope.keys.find((x) => x.key === "End")!);
 
-    // selectSuggestionKeys
-    const selectSuggestionKey = SelectSuggestionKey.fromName(
-      this.settings.selectSuggestionKeys
-    );
-    if (selectSuggestionKey !== SelectSuggestionKey.ENTER) {
-      registerKeyAsIgnored(
-        SelectSuggestionKey.ENTER.keyBind.modifiers,
-        SelectSuggestionKey.ENTER.keyBind.key
-      );
-    }
-    if (selectSuggestionKey !== SelectSuggestionKey.TAB) {
-      registerKeyAsIgnored(
-        SelectSuggestionKey.TAB.keyBind.modifiers,
-        SelectSuggestionKey.TAB.keyBind.key
-      );
-    }
-    if (selectSuggestionKey !== SelectSuggestionKey.None) {
-      this.keymapEventHandler.push(
-        this.scope.register(
-          selectSuggestionKey.keyBind.modifiers,
-          selectSuggestionKey.keyBind.key,
-          (evt, ctx) => {
-            if (!evt.isComposing) {
-              if (this.selectionLock) {
-                this.close();
-                return true;
-              } else {
-                this.suggestions.useSelectedItem({});
-                return false;
-              }
-            }
-          }
-        )
-      );
-    }
-
+    // Ignored
+    const ipKeys = ["Enter", "Tab", "ArrowUp", "ArrowDown", "Home", "End"];
+    this.scope.keys
+      .filter((x) =>
+        ipKeys.map((x) => x.toLowerCase()).includes((x.key ?? "").toLowerCase())
+      )
+      .forEach((x) => this.scope.unregister(x));
     // propagateESC
-    this.scope.keys.find((x) => x.key === "Escape")!.func = () => {
-      this.close();
-      return this.settings.propagateEsc;
-    };
+    this.scope.keys.find((x) => x.key?.toLowerCase() === "escape")!.func =
+      () => {
+        this.close();
+        return this.settings.propagateEsc;
+      };
 
-    // cycleThroughSuggestionsKeys
+    // commands
+    const select = (evt: KeyboardEvent) => {
+      if (!evt.isComposing) {
+        if (this.selectionLock) {
+          this.close();
+          return true;
+        } else {
+          this.suggestions.useSelectedItem({});
+          return false;
+        }
+      }
+    };
     const selectNext = (evt: KeyboardEvent) => {
       if (this.settings.noAutoFocusUntilCycle && this.selectionLock) {
         this.setSelectionLock(false);
@@ -546,132 +518,100 @@ export class AutoCompleteSuggest
       }
       return false;
     };
-
-    const cycleThroughSuggestionsKeys = CycleThroughSuggestionsKeys.fromName(
-      this.settings.additionalCycleThroughSuggestionsKeys
-    );
-    if (this.settings.disableUpDownKeysForCycleThroughSuggestionsKeys) {
-      this.keymapEventHandler.push(
-        this.scope.register([], "ArrowDown", () => {
-          this.close();
-          return true;
-        }),
-        this.scope.register([], "ArrowUp", () => {
-          this.close();
-          return true;
-        })
-      );
-    } else {
-      this.keymapEventHandler.push(
-        this.scope.register([], "ArrowDown", selectNext),
-        this.scope.register([], "ArrowUp", selectPrevious)
-      );
-    }
-    if (cycleThroughSuggestionsKeys !== CycleThroughSuggestionsKeys.NONE) {
-      if (cycleThroughSuggestionsKeys === CycleThroughSuggestionsKeys.TAB) {
-        this.scope.unregister(
-          this.scope.keys.find((x) => x.modifiers === "" && x.key === "Tab")!
-        );
+    const open = () => {
+      const item = this.suggestions.values[this.suggestions.selectedItem];
+      if (
+        item.type !== "currentVault" &&
+        item.type !== "internalLink" &&
+        item.type !== "frontMatter"
+      ) {
+        return false;
       }
+
+      const markdownFile = this.appHelper.getMarkdownFileByPath(
+        item.createdPath
+      );
+      if (!markdownFile) {
+        // noinspection ObjectAllocationIgnored
+        new Notice(`Can't open ${item.createdPath}`);
+        return false;
+      }
+      this.appHelper.openMarkdownFile(markdownFile, true);
+      return false;
+    };
+    const completion = () => {
+      if (!this.context) {
+        return;
+      }
+
+      const editor = this.context.editor;
+      const currentPhrase = editor.getRange(
+        {
+          ...this.context.start,
+          ch: this.contextStartCh,
+        },
+        this.context.end
+      );
+
+      const tokens = this.tokenizer.recursiveTokenize(currentPhrase);
+      const commonPrefixWithToken = tokens
+        .map((t) => ({
+          token: t,
+          commonPrefix: findCommonPrefix(
+            this.suggestions.values
+              .map((x) => excludeEmoji(x.value))
+              .filter((x) => x.toLowerCase().startsWith(t.word.toLowerCase()))
+          ),
+        }))
+        .find((x) => x.commonPrefix != null);
+
+      if (
+        !commonPrefixWithToken ||
+        currentPhrase === commonPrefixWithToken.commonPrefix
+      ) {
+        return false;
+      }
+
+      editor.replaceRange(
+        commonPrefixWithToken.commonPrefix!,
+        {
+          ...this.context.start,
+          ch: this.contextStartCh + commonPrefixWithToken.token.offset,
+        },
+        this.context.end
+      );
+      return true;
+    };
+
+    // Set hotkeys
+    this.settings.hotkeys.select.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(
-          cycleThroughSuggestionsKeys.nextKey.modifiers,
-          cycleThroughSuggestionsKeys.nextKey.key,
-          selectNext
-        ),
-        this.scope.register(
-          cycleThroughSuggestionsKeys.previousKey.modifiers,
-          cycleThroughSuggestionsKeys.previousKey.key,
-          selectPrevious
-        )
+        this.scope.register(hk.modifiers, hk.key, select)
       );
-    }
-
-    const openSourceFileKey = OpenSourceFileKeys.fromName(
-      this.settings.openSourceFileKey
-    );
-    if (openSourceFileKey !== OpenSourceFileKeys.NONE) {
+    });
+    this.settings.hotkeys.up.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(
-          openSourceFileKey.keyBind.modifiers,
-          openSourceFileKey.keyBind.key,
-          () => {
-            const item = this.suggestions.values[this.suggestions.selectedItem];
-            if (
-              item.type !== "currentVault" &&
-              item.type !== "internalLink" &&
-              item.type !== "frontMatter"
-            ) {
-              return false;
-            }
-
-            const markdownFile = this.appHelper.getMarkdownFileByPath(
-              item.createdPath
-            );
-            if (!markdownFile) {
-              // noinspection ObjectAllocationIgnored
-              new Notice(`Can't open ${item.createdPath}`);
-              return false;
-            }
-            this.appHelper.openMarkdownFile(markdownFile, true);
-            return false;
-          }
-        )
+        this.scope.register(hk.modifiers, hk.key, selectPrevious)
       );
-    }
-
-    if (this.settings.useCommonPrefixCompletionOfSuggestion) {
-      this.scope.unregister(
-        this.scope.keys.find((x) => x.modifiers === "" && x.key === "Tab")!
-      );
+    });
+    this.settings.hotkeys.down.forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register([], "Tab", () => {
-          if (!this.context) {
-            return;
-          }
-
-          const editor = this.context.editor;
-          const currentPhrase = editor.getRange(
-            {
-              ...this.context.start,
-              ch: this.contextStartCh,
-            },
-            this.context.end
-          );
-
-          const tokens = this.tokenizer.recursiveTokenize(currentPhrase);
-          const commonPrefixWithToken = tokens
-            .map((t) => ({
-              token: t,
-              commonPrefix: findCommonPrefix(
-                this.suggestions.values
-                  .map((x) => excludeEmoji(x.value))
-                  .filter((x) =>
-                    x.toLowerCase().startsWith(t.word.toLowerCase())
-                  )
-              ),
-            }))
-            .find((x) => x.commonPrefix != null);
-
-          if (
-            !commonPrefixWithToken ||
-            currentPhrase === commonPrefixWithToken.commonPrefix
-          ) {
-            return false;
-          }
-
-          editor.replaceRange(
-            commonPrefixWithToken.commonPrefix!,
-            {
-              ...this.context.start,
-              ch: this.contextStartCh + commonPrefixWithToken.token.offset,
-            },
-            this.context.end
-          );
-          return true;
-        })
+        this.scope.register(hk.modifiers, hk.key, selectNext)
       );
-    }
+    });
+    this.settings.hotkeys.open.forEach((hk) => {
+      this.keymapEventHandler.push(
+        this.scope.register(hk.modifiers, hk.key, open)
+      );
+    });
+    this.settings.hotkeys.completion.forEach((hk) => {
+      this.keymapEventHandler.push(
+        this.scope.register(hk.modifiers, hk.key, completion)
+      );
+    });
+
+    // propagate
+    ipKeys.forEach((x) => this.registerKeyAsIgnored([], x));
   }
 
   async refreshCurrentFileTokens(): Promise<void> {

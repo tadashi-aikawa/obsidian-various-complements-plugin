@@ -2,17 +2,17 @@ import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import type VariousComponents from "../main";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { MatchStrategy } from "../provider/MatchStrategy";
-import { CycleThroughSuggestionsKeys } from "../option/CycleThroughSuggestionsKeys";
 import { ColumnDelimiter } from "../option/ColumnDelimiter";
-import { SelectSuggestionKey } from "../option/SelectSuggestionKey";
 import { mirrorMap } from "../util/collection-helper";
-import { OpenSourceFileKeys } from "../option/OpenSourceFileKeys";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
 import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
 import { smartLineBreakSplit } from "../util/strings";
 import { TextComponentEvent } from "./settings-helper";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
+import type { Hotkey } from "../keys";
+import { hotkey2String, string2Hotkey } from "../keys";
+import { isPresent } from "../types";
 
 export interface Settings {
   // general
@@ -44,10 +44,13 @@ export interface Settings {
   descriptionOnSuggestion: string;
 
   // key customization
-  selectSuggestionKeys: string;
-  additionalCycleThroughSuggestionsKeys: string;
-  disableUpDownKeysForCycleThroughSuggestionsKeys: boolean;
-  openSourceFileKey: string;
+  hotkeys: {
+    select: Hotkey[];
+    up: Hotkey[];
+    down: Hotkey[];
+    open: Hotkey[];
+    completion: Hotkey[];
+  };
   propagateEsc: boolean;
 
   // current file complement
@@ -138,10 +141,13 @@ export const DEFAULT_SETTINGS: Settings = {
   descriptionOnSuggestion: "Short",
 
   // key customization
-  selectSuggestionKeys: "Enter",
-  additionalCycleThroughSuggestionsKeys: "None",
-  disableUpDownKeysForCycleThroughSuggestionsKeys: false,
-  openSourceFileKey: "None",
+  hotkeys: {
+    select: [{ modifiers: [], key: "Enter" }],
+    up: [{ modifiers: [], key: "ArrowUp" }],
+    down: [{ modifiers: [], key: "ArrowDown" }],
+    open: [],
+    completion: [],
+  },
   propagateEsc: false,
 
   // current file complement
@@ -571,53 +577,54 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   private addKeyCustomizationSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", { text: "Key customization" });
 
-    new Setting(containerEl)
-      .setName("Select a suggestion key")
-      .addDropdown((tc) =>
-        tc
-          .addOptions(mirrorMap(SelectSuggestionKey.values(), (x) => x.name))
-          .setValue(this.plugin.settings.selectSuggestionKeys)
-          .onChange(async (value) => {
-            this.plugin.settings.selectSuggestionKeys = value;
-            await this.plugin.saveSettings();
-          })
-      );
+    const div = createDiv({
+      cls: "various_complements__settings__dialog-hotkey",
+    });
+    containerEl.append(div);
 
-    new Setting(containerEl)
-      .setName("Additional cycle through suggestions keys")
-      .addDropdown((tc) =>
-        tc
-          .addOptions(
-            mirrorMap(CycleThroughSuggestionsKeys.values(), (x) => x.name)
-          )
-          .setValue(this.plugin.settings.additionalCycleThroughSuggestionsKeys)
-          .onChange(async (value) => {
-            this.plugin.settings.additionalCycleThroughSuggestionsKeys = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Disable the up/down keys for cycle through suggestions keys")
-      .addToggle((tc) => {
-        tc.setValue(
-          this.plugin.settings.disableUpDownKeysForCycleThroughSuggestionsKeys
-        ).onChange(async (value) => {
-          this.plugin.settings.disableUpDownKeysForCycleThroughSuggestionsKeys =
-            value;
-          await this.plugin.saveSettings();
-        });
-      });
-
-    new Setting(containerEl).setName("Open source file key").addDropdown((tc) =>
-      tc
-        .addOptions(mirrorMap(OpenSourceFileKeys.values(), (x) => x.name))
-        .setValue(this.plugin.settings.openSourceFileKey)
-        .onChange(async (value) => {
-          this.plugin.settings.openSourceFileKey = value;
-          await this.plugin.saveSettings();
-        })
+    const li = createEl("li");
+    li.append(
+      "You can know the keycode at ",
+      createEl("a", {
+        text: "keycode.info",
+        href: "https://keycode.info/",
+      }),
+      ". (Press any key and show 'event.key')"
     );
+
+    const ul = createEl("ul");
+    ul.createEl("li", {
+      text: "'Ctrl a' means pressing the Ctrl key and the A key.",
+    });
+    ul.createEl("li", {
+      text: "Use 'Mod' instead of 'Ctrl' on Windows or 'Cmd' on macOS.",
+    });
+    ul.append(li);
+
+    const df = document.createDocumentFragment();
+    df.append(ul);
+
+    new Setting(div).setHeading().setName("Hotkeys").setDesc(df);
+
+    const hotkeys = this.plugin.settings.hotkeys;
+    Object.keys(hotkeys).forEach((k: string) => {
+      const key = k as keyof Settings["hotkeys"];
+
+      new Setting(div)
+        .setName(key)
+        .setClass("various_complements__settings__dialog-hotkey-item")
+        .addText((cb) => {
+          return cb
+            .setValue(hotkeys[key].map(hotkey2String).join("|"))
+            .onChange(async (value: string) => {
+              hotkeys[key] = value
+                .split("|")
+                .map((x) => string2Hotkey(x, false))
+                .filter(isPresent);
+              await this.plugin.saveSettings();
+            });
+        });
+    });
 
     new Setting(containerEl)
       .setName("Propagate ESC")

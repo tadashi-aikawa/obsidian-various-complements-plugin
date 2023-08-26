@@ -2,6 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import {
   arrayEquals,
   arrayEqualsUntil,
+  equalsAsSet,
   groupBy,
   mirrorMap,
   setEquals,
@@ -103,6 +104,20 @@ describe.each<{
 `("setEquals", ({ set1, set2, expected }) => {
   test(`setEquals(${set1}, ${set2}) = ${expected}`, () => {
     expect(setEquals(new Set(set1), new Set(set2))).toStrictEqual(expected);
+  });
+});
+
+describe.each<{ ary1: string[]; ary2: string[]; expected: boolean }>`
+  ary1      | ary2      | expected
+  ${[1]}    | ${[1]}    | ${true}
+  ${[1, 2]} | ${[1, 2]} | ${true}
+  ${[1, 2]} | ${[2, 1]} | ${true}
+  ${[]}     | ${[]}     | ${true}
+  ${[1]}    | ${[2]}    | ${false}
+  ${[1, 2]} | ${[2, 2]} | ${false}
+`("equalsAsSet", ({ ary1, ary2, expected }) => {
+  test(`equalsAsSet(${ary1}, ${ary2}) = ${expected}`, () => {
+    expect(equalsAsSet(ary1, ary2)).toStrictEqual(expected);
   });
 });
 

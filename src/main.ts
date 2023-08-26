@@ -165,7 +165,11 @@ export default class VariousComponents extends Plugin {
 
   async loadSettings(): Promise<void> {
     const currentSettings = await this.loadData();
-    this.settings = merge(DEFAULT_SETTINGS, currentSettings ?? {});
+    this.settings = merge.withOptions(
+      { mergeArrays: false },
+      DEFAULT_SETTINGS,
+      currentSettings ?? {}
+    );
   }
 
   async saveSettings(
