@@ -597,6 +597,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       text: "'Ctrl a' means pressing the Ctrl key and the A key.",
     });
     ul.createEl("li", {
+      text: "'Enter|Tab' means pressing the Enter key or the Tab key.",
+    });
+    ul.createEl("li", {
       text: "Use 'Mod' instead of 'Ctrl' on Windows or 'Cmd' on macOS.",
     });
     ul.append(li);
