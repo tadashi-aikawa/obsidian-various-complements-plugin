@@ -517,7 +517,7 @@ export class AutoCompleteSuggest
     this.settings.hotkeys["insert as text"].forEach((hk) => {
       this.keymapEventHandler.push(
         this.scope.register(hk.modifiers, hk.key, (evt) =>
-          commands.insertAsText(this)
+          commands.insertAsText(this, evt)
         )
       );
     });

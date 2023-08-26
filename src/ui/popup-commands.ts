@@ -19,9 +19,17 @@ export function select(
   }
 }
 
-export function insertAsText(popup: AutoCompleteSuggest): CommandReturnType {
-  if (!popup.context) {
+export function insertAsText(
+  popup: AutoCompleteSuggest,
+  evt: KeyboardEvent
+): CommandReturnType {
+  if (!popup.context || evt.isComposing) {
     return;
+  }
+
+  if (popup.selectionLock) {
+    popup.close();
+    return true;
   }
 
   const item = popup.suggestions.values[popup.suggestions.selectedItem];
@@ -34,6 +42,8 @@ export function insertAsText(popup: AutoCompleteSuggest): CommandReturnType {
     },
     popup.context.end
   );
+
+  return false;
 }
 
 export function selectNext(
