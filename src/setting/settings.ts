@@ -234,7 +234,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   }
 
   private async addMainSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", { text: "Main" });
+    containerEl.createEl("h3", {
+      text: "Main",
+      cls: "various-complements__settings__header various-complements__settings__header__main",
+    });
 
     new Setting(containerEl).setName("Strategy").addDropdown((tc) =>
       tc
@@ -515,7 +518,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   }
 
   private addAppearanceSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", { text: "Appearance" });
+    containerEl.createEl("h3", {
+      text: "Appearance",
+      cls: "various-complements__settings__header various-complements__settings__header__appearance",
+    });
 
     new Setting(containerEl)
       .setName("Show Match strategy")
@@ -575,10 +581,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   }
 
   private addKeyCustomizationSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", { text: "Key customization" });
+    containerEl.createEl("h3", {
+      text: "Key customization",
+      cls: "various-complements__settings__header various-complements__settings__header__key-customization",
+    });
 
     const div = createDiv({
-      cls: "various_complements__settings__dialog-hotkey",
+      cls: "various-complements__settings__popup-hotkey",
     });
     containerEl.append(div);
 
@@ -615,7 +624,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(div)
         .setName(key)
-        .setClass("various_complements__settings__dialog-hotkey-item")
+        .setClass("various-complements__settings__popup-hotkey-item")
         .addText((cb) => {
           return cb
             .setValue(hotkeys[key].map(hotkey2String).join("|"))
@@ -1127,7 +1136,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   }
 
   private addMobileSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", { text: "Mobile" });
+    containerEl.createEl("h3", {
+      text: "Mobile",
+      cls: "various-complements__settings__header various-complements__settings__header__mobile",
+    });
 
     new Setting(containerEl).setName("Disable on mobile").addToggle((tc) => {
       tc.setValue(this.plugin.settings.disableOnMobile).onChange(
@@ -1140,7 +1152,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   }
 
   private addDebugSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", { text: "Debug" });
+    containerEl.createEl("h3", {
+      text: "Debug",
+      cls: "various-complements__settings__header various-complements__settings__header__debug",
+    });
 
     new Setting(containerEl)
       .setName("Show log about performance in a console")
