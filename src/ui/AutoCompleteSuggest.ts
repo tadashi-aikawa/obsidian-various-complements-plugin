@@ -42,6 +42,7 @@ import {
 import { encodeSpace, equalsAsLiterals } from "../util/strings";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
 import * as commands from "./popup-commands";
+import type { CommandReturnType } from "./popup-commands";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -449,7 +450,7 @@ export class AutoCompleteSuggest
       this.close();
     }, this.settings.delayMilliSeconds + 50);
 
-    this.registerKeymaps();
+    this.registerHotkeys();
   }
 
   private registerKeyAsIgnored(modifiers: Modifier[], key: string | null) {
@@ -461,7 +462,22 @@ export class AutoCompleteSuggest
     );
   }
 
-  private registerKeymaps() {
+  private setHotKey(
+    name: keyof Settings["hotkeys"],
+    handler: (evt: KeyboardEvent) => CommandReturnType
+  ) {
+    this.settings.hotkeys[name].forEach((hk) => {
+      this.keymapEventHandler.push(
+        this.scope.register(hk.modifiers, hk.key, handler)
+      );
+    });
+  }
+
+  private setHotKeys(...params: Parameters<typeof this.setHotKey>[]) {
+    params.forEach((args) => this.setHotKey(...args));
+  }
+
+  private registerHotkeys() {
     // Clear
     this.keymapEventHandler.forEach((x) => this.scope.unregister(x));
     this.keymapEventHandler = [];
@@ -481,46 +497,23 @@ export class AutoCompleteSuggest
       };
 
     // Set hotkeys
-    this.settings.hotkeys.select.forEach((hk) => {
-      this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, (evt) =>
-          commands.select(this, evt)
-        )
-      );
-    });
-    this.settings.hotkeys.up.forEach((hk) => {
-      this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, (evt) =>
-          commands.selectPrevious(this, evt)
-        )
-      );
-    });
-    this.settings.hotkeys.down.forEach((hk) => {
-      this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, (evt) =>
-          commands.selectNext(this, evt)
-        )
-      );
-    });
-    this.settings.hotkeys.open.forEach((hk) => {
-      this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, (evt) => commands.open(this))
-      );
-    });
-    this.settings.hotkeys.completion.forEach((hk) => {
-      this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, (evt) =>
-          commands.completion(this)
-        )
-      );
-    });
-    this.settings.hotkeys["insert as text"].forEach((hk) => {
-      this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, (evt) =>
-          commands.insertAsText(this, evt)
-        )
-      );
-    });
+    this.setHotKeys(
+      ["select", (evt) => commands.select(this, evt)],
+      ["up", (evt) => commands.selectPrevious(this, evt)],
+      ["down", (evt) => commands.selectNext(this, evt)],
+      ["select 1st", (evt) => commands.select(this, evt, 0)],
+      ["select 2nd", (evt) => commands.select(this, evt, 1)],
+      ["select 3rd", (evt) => commands.select(this, evt, 2)],
+      ["select 4th", (evt) => commands.select(this, evt, 3)],
+      ["select 5th", (evt) => commands.select(this, evt, 4)],
+      ["select 6th", (evt) => commands.select(this, evt, 5)],
+      ["select 7th", (evt) => commands.select(this, evt, 6)],
+      ["select 8th", (evt) => commands.select(this, evt, 7)],
+      ["select 9th", (evt) => commands.select(this, evt, 8)],
+      ["open", (_) => commands.open(this)],
+      ["completion", (_) => commands.completion(this)],
+      ["insert as text", (evt) => commands.insertAsText(this, evt)]
+    );
 
     // propagate
     ipKeys.forEach((x) => this.registerKeyAsIgnored([], x));

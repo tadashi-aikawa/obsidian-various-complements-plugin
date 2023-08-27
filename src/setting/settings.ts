@@ -47,6 +47,15 @@ export interface Settings {
     select: Hotkey[];
     up: Hotkey[];
     down: Hotkey[];
+    "select 1st": Hotkey[];
+    "select 2nd": Hotkey[];
+    "select 3rd": Hotkey[];
+    "select 4th": Hotkey[];
+    "select 5th": Hotkey[];
+    "select 6th": Hotkey[];
+    "select 7th": Hotkey[];
+    "select 8th": Hotkey[];
+    "select 9th": Hotkey[];
     open: Hotkey[];
     completion: Hotkey[];
     "insert as text": Hotkey[];
@@ -144,6 +153,15 @@ export const DEFAULT_SETTINGS: Settings = {
     select: [{ modifiers: [], key: "Enter" }],
     up: [{ modifiers: [], key: "ArrowUp" }],
     down: [{ modifiers: [], key: "ArrowDown" }],
+    "select 1st": [],
+    "select 2nd": [],
+    "select 3rd": [],
+    "select 4th": [],
+    "select 5th": [],
+    "select 6th": [],
+    "select 7th": [],
+    "select 8th": [],
+    "select 9th": [],
     open: [],
     completion: [],
     "insert as text": [],

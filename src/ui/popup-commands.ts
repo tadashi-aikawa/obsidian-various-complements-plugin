@@ -2,20 +2,28 @@ import type { AutoCompleteSuggest } from "./AutoCompleteSuggest";
 import { Notice } from "obsidian";
 import { excludeEmoji, findCommonPrefix } from "../util/strings";
 
-type CommandReturnType = boolean | undefined;
+export type CommandReturnType = boolean | undefined;
 
 export function select(
   popup: AutoCompleteSuggest,
-  evt: KeyboardEvent
+  evt: KeyboardEvent,
+  index?: number
 ): CommandReturnType {
-  if (!evt.isComposing) {
-    if (popup.selectionLock) {
-      popup.close();
-      return true;
-    } else {
-      popup.suggestions.useSelectedItem({});
-      return false;
-    }
+  if (evt.isComposing) {
+    return;
+  }
+
+  if (index !== undefined) {
+    popup.setSelectionLock(false);
+    popup.suggestions.setSelectedItem(index, evt);
+  }
+
+  if (popup.selectionLock) {
+    popup.close();
+    return true;
+  } else {
+    popup.suggestions.useSelectedItem({});
+    return false;
   }
 }
 
