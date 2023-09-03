@@ -93,6 +93,10 @@ export function startsSmallLetterOnlyFirst(str: string): boolean {
   return Boolean(str.match(/^[A-Z][^A-Z]+$/));
 }
 
+export function isInternalLink(text: string): boolean {
+  return Boolean(text.match(/^\[\[.+]]$/));
+}
+
 export function smartLineBreakSplit(text: string): string[] {
   return text.split("\n").filter((x) => x);
 }

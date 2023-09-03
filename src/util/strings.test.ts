@@ -17,6 +17,7 @@ import {
   splitRaw,
   startsSmallLetterOnlyFirst,
   synonymAliases,
+  isInternalLink,
 } from "./strings";
 
 describe.each<{ one: string; another: string; expected: boolean }>`
@@ -167,6 +168,18 @@ describe.each<{ text: string; expected: boolean }>`
 `("startsSmallLetterOnlyFirst", ({ text, expected }) => {
   test(`startsSmallLetterOnlyFirst(${text}) = ${expected}`, () => {
     expect(startsSmallLetterOnlyFirst(text)).toBe(expected);
+  });
+});
+
+describe.each<{ text: string; expected: boolean }>`
+  text            | expected
+  ${"abc"}        | ${false}
+  ${"[[abc]]"}    | ${true}
+  ${"[abc](abc)"} | ${false}
+  ${" [[abc]] "}  | ${false}
+`("isInternalLink", ({ text, expected }) => {
+  test(`isInternalLink(${text}) = ${expected}`, () => {
+    expect(isInternalLink(text)).toBe(expected);
   });
 });
 

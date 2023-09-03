@@ -39,7 +39,7 @@ import {
   SelectionHistoryStorage,
   type SelectionHistoryTree,
 } from "../storage/SelectionHistoryStorage";
-import { encodeSpace, equalsAsLiterals } from "../util/strings";
+import { encodeSpace, equalsAsLiterals, isInternalLink } from "../util/strings";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
 import * as commands from "./popup-commands";
 import type { CommandReturnType } from "./popup-commands";
@@ -1000,7 +1000,7 @@ export class AutoCompleteSuggest
       : `[${displayed}](${encodeSpace(link)}.md)`;
   }
 
-  selectSuggestion(word: Word, evt: MouseEvent | KeyboardEvent): void {
+  selectSuggestion(word: Word, _evt: MouseEvent | KeyboardEvent): void {
     if (!this.context) {
       return;
     }
@@ -1010,11 +1010,13 @@ export class AutoCompleteSuggest
       insertedText = this.constructInternalLinkText(word);
     }
 
-    if (
-      word.type === "frontMatter" &&
-      this.settings.insertCommaAfterFrontMatterCompletion
-    ) {
-      insertedText = `${insertedText}, `;
+    if (word.type === "frontMatter") {
+      if (isInternalLink(insertedText)) {
+        insertedText = `"${insertedText}"`;
+      }
+      if (this.settings.insertCommaAfterFrontMatterCompletion) {
+        insertedText = `${insertedText}, `;
+      }
     } else {
       if (
         this.settings.insertAfterCompletion &&
