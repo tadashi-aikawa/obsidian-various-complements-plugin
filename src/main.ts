@@ -179,6 +179,7 @@ export default class VariousComponents extends Plugin {
       customDictionary?: boolean;
       internalLink?: boolean;
       frontMatter?: boolean;
+      intelligentSuggestionPrioritization?: boolean;
     } = {}
   ): Promise<void> {
     await this.saveData(this.settings);
@@ -197,6 +198,9 @@ export default class VariousComponents extends Plugin {
     }
     if (needUpdateTokens.frontMatter) {
       await this.suggester.refreshFrontMatterTokens();
+    }
+    if (needUpdateTokens.intelligentSuggestionPrioritization) {
+      await this.suggester.refreshIntelligentSuggestionPrioritization();
     }
   }
 

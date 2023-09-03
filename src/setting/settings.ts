@@ -102,6 +102,7 @@ export interface Settings {
   insertCommaAfterFrontMatterCompletion: boolean;
 
   intelligentSuggestionPrioritization: {
+    enabled: boolean;
     historyFilePath: string;
     // If set 0, it will never remove
     maxDaysToKeepHistory: number;
@@ -208,6 +209,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertCommaAfterFrontMatterCompletion: false,
 
   intelligentSuggestionPrioritization: {
+    enabled: true,
     historyFilePath: "",
     maxDaysToKeepHistory: 30,
     maxNumberOfHistoryToKeep: 0,
@@ -1091,54 +1093,73 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     new Setting(containerEl)
-      .setName("history file path")
-      .setDesc(`Default: ${DEFAULT_HISTORIES_PATH}`)
-      .addText((cb) => {
-        TextComponentEvent.onChange(cb, async (value) => {
-          this.plugin.settings.intelligentSuggestionPrioritization.historyFilePath =
+      .setName("Enable Intelligent Suggestion Prioritization")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.intelligentSuggestionPrioritization.enabled
+        ).onChange(async (value) => {
+          this.plugin.settings.intelligentSuggestionPrioritization.enabled =
             value;
-          await this.plugin.saveSettings();
-        }).setValue(
-          this.plugin.settings.intelligentSuggestionPrioritization
-            .historyFilePath
-        );
+          await this.plugin.saveSettings({
+            intelligentSuggestionPrioritization: true,
+          });
+          this.display();
+        });
       });
 
-    new Setting(containerEl)
-      .setName("Max days to keep history")
-      .setDesc("If set 0, it will never remove")
-      .addSlider((sc) =>
-        sc
-          .setLimits(0, 365, 1)
-          .setValue(
-            this.plugin.settings.intelligentSuggestionPrioritization
-              .maxDaysToKeepHistory
-          )
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory =
+    if (this.plugin.settings.intelligentSuggestionPrioritization.enabled) {
+      new Setting(containerEl)
+        .setName("history file path")
+        .setDesc(`Default: ${DEFAULT_HISTORIES_PATH}`)
+        .addText((cb) => {
+          TextComponentEvent.onChange(cb, async (value) => {
+            this.plugin.settings.intelligentSuggestionPrioritization.historyFilePath =
               value;
-            await this.plugin.saveSettings();
-          })
-      );
+            await this.plugin.saveSettings({
+              intelligentSuggestionPrioritization: true,
+            });
+          }).setValue(
+            this.plugin.settings.intelligentSuggestionPrioritization
+              .historyFilePath
+          );
+        });
 
-    new Setting(containerEl)
-      .setName("Max number of history to keep")
-      .setDesc("If set 0, it will never remove")
-      .addSlider((sc) =>
-        sc
-          .setLimits(0, 10000, 1)
-          .setValue(
-            this.plugin.settings.intelligentSuggestionPrioritization
-              .maxNumberOfHistoryToKeep
-          )
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep =
-              value;
-            await this.plugin.saveSettings();
-          })
-      );
+      new Setting(containerEl)
+        .setName("Max days to keep history")
+        .setDesc("If set 0, it will never remove")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 365, 1)
+            .setValue(
+              this.plugin.settings.intelligentSuggestionPrioritization
+                .maxDaysToKeepHistory
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory =
+                value;
+              await this.plugin.saveSettings();
+            })
+        );
+
+      new Setting(containerEl)
+        .setName("Max number of history to keep")
+        .setDesc("If set 0, it will never remove")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 10000, 1)
+            .setValue(
+              this.plugin.settings.intelligentSuggestionPrioritization
+                .maxNumberOfHistoryToKeep
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep =
+                value;
+              await this.plugin.saveSettings();
+            })
+        );
+    }
   }
 
   private addMobileSettings(containerEl: HTMLElement) {

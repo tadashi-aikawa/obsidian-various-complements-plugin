@@ -184,14 +184,7 @@ export class AutoCompleteSuggest
     );
 
     await ins.updateSettings(settings);
-
-    // Need to migration
-    ins.selectionHistoryStorage = new SelectionHistoryStorage(
-      await ins.unsafeLoadHistoryData(),
-      settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory,
-      settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep
-    );
-    ins.selectionHistoryStorage.purge();
+    await ins.refreshIntelligentSuggestionPrioritization();
 
     ins.modifyEventRef = app.vault.on("modify", async (_) => {
       await ins.refreshCurrentFileTokens();
@@ -680,6 +673,20 @@ export class AutoCompleteSuggest
     this.showDebugLog(() =>
       buildLogMessage("Index front matter tokens", performance.now() - start)
     );
+  }
+
+  async refreshIntelligentSuggestionPrioritization(): Promise<void> {
+    // Need to migration
+    if (this.settings.intelligentSuggestionPrioritization.enabled) {
+      this.selectionHistoryStorage = new SelectionHistoryStorage(
+        await this.unsafeLoadHistoryData(),
+        this.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory,
+        this.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep
+      );
+      this.selectionHistoryStorage.purge();
+    } else {
+      this.selectionHistoryStorage = undefined;
+    }
   }
 
   updateFrontMatterTokenIndex(file: TFile): void {
