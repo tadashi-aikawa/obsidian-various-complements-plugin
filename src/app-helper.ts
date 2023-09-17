@@ -255,7 +255,9 @@ export class AppHelper {
       return null;
     }
 
-    const keyLocations = Array.from(editor.getValue().matchAll(/.+:/g));
+    const keyLocations = Array.from(
+      editor.getValue().matchAll(/\s*['"]?(?<key>.+?)['"]?:/g)
+    );
     if (keyLocations.length === 0) {
       return null;
     }
@@ -267,7 +269,7 @@ export class AppHelper {
       return null;
     }
 
-    return currentKeyLocation[0].split(":")[0];
+    return currentKeyLocation.groups?.key ?? null;
   }
 
   /**
