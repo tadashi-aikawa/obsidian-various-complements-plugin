@@ -6,12 +6,10 @@ import { joinNumberWithSymbol } from "../../util/strings";
 const segmenter = new TinySegmenter();
 
 function pickTokensAsJapanese(content: string, trimPattern: RegExp): string[] {
-  return joinNumberWithSymbol(
-    content
-      .split(trimPattern)
-      .filter((x) => x !== "")
-      .flatMap<string>((x) => segmenter.segment(x))
-  );
+  return content
+    .split(trimPattern)
+    .filter((x) => x !== "")
+    .flatMap<string>((x) => joinNumberWithSymbol(segmenter.segment(x)));
 }
 
 /**

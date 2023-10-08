@@ -10,6 +10,11 @@ describe.each<{ content: string; raw: boolean; expected: string[] }>`
   ${"TypeScript5.0.1リリース"} | ${false} | ${["TypeScript", "5.0.1", "リリース"]}
   ${"**bold** *italic*"}       | ${false} | ${["bold", "italic"]}
   ${"__a _b __c__ d_ e__"}     | ${false} | ${["a", "b", "c", "d", "e"]}
+  ${"2023-05-25"}              | ${false} | ${["2023-05-25"]}
+  ${"1.2.34"}                  | ${false} | ${["1.2.34"]}
+  ${"v1.2.34"}                 | ${false} | ${["v", "1.2.34"]}
+  ${"123\n456"}                | ${false} | ${["123", "456"]}
+  ${"- 123"}                   | ${false} | ${["-", "123"]}
 `("tokenize", ({ content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(new JapaneseTokenizer().tokenize(content, raw)).toStrictEqual(
