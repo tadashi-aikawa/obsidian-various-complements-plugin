@@ -3,6 +3,11 @@
     width: 500px;
 }
 
+.various-complements__settings__text-area-path-dense {
+    height: 120px;
+    width: 360px;
+}
+
 .various-complements__settings__current-settings-json {
     font-size: 0.75em;
     height: 800px;

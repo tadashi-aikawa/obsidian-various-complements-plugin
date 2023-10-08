@@ -34,6 +34,7 @@ export interface Settings {
   insertAfterCompletion: boolean;
   firstCharactersDisableSuggestions: string;
   patternsToSuppressTrigger: string[];
+  phrasePatternsToSuppressTrigger: string[];
   noAutoFocusUntilCycle: boolean;
 
   // appearance
@@ -141,6 +142,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertAfterCompletion: true,
   firstCharactersDisableSuggestions: ":/^",
   patternsToSuppressTrigger: ["^~~~.*", "^```.*"],
+  phrasePatternsToSuppressTrigger: [],
   noAutoFocusUntilCycle: false,
 
   // appearance
@@ -498,19 +500,42 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Patterns to suppress trigger")
+      .setName("Line patterns to suppress trigger")
       .setDesc(
-        "RegExp line patterns until the cursor, which suppresses the auto-completion trigger. It can set multi patterns by line breaks."
+        "RegExp line patterns (partial match) until the cursor, which suppresses the auto-completion trigger. It can set multi patterns by line breaks."
       )
-      .addTextArea((tc) =>
-        tc
+      .addTextArea((tc) => {
+        const el = tc
           .setValue(this.plugin.settings.patternsToSuppressTrigger.join("\n"))
           .onChange(async (value) => {
             this.plugin.settings.patternsToSuppressTrigger =
               smartLineBreakSplit(value);
             await this.plugin.saveSettings();
-          })
-      );
+          });
+        el.inputEl.className =
+          "various-complements__settings__text-area-path-dense";
+        return el;
+      });
+
+    new Setting(containerEl)
+      .setName("Phrase patterns to suppress trigger")
+      .setDesc(
+        "RegExp phrase patterns (perfect match), which suppresses the auto-completion trigger. It can set multi patterns by line breaks."
+      )
+      .addTextArea((tc) => {
+        const el = tc
+          .setValue(
+            this.plugin.settings.phrasePatternsToSuppressTrigger.join("\n")
+          )
+          .onChange(async (value) => {
+            this.plugin.settings.phrasePatternsToSuppressTrigger =
+              smartLineBreakSplit(value);
+            await this.plugin.saveSettings();
+          });
+        el.inputEl.className =
+          "various-complements__settings__text-area-path-dense";
+        return el;
+      });
 
     new Setting(containerEl)
       .setName("No auto-focus until the cycle")

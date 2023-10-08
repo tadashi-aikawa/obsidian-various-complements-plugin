@@ -805,17 +805,17 @@ export class AutoCompleteSuggest
     showDebugLog(`tokens is ${tokens}`);
 
     const tokenized = this.tokenizer.recursiveTokenize(currentLineUntilCursor);
-    const currentTokens = tokenized.slice(
+    let currentTokens = tokenized.slice(
       tokenized.length > this.settings.maxNumberOfWordsAsPhrase
         ? tokenized.length - this.settings.maxNumberOfWordsAsPhrase
         : 0
     );
     showDebugLog(`currentTokens is ${JSON.stringify(currentTokens)}`);
 
-    const currentToken = currentTokens[0]?.word;
-    showDebugLog(`currentToken is ${currentToken}`);
-    if (!currentToken) {
-      onReturnNull(`Don't show suggestions because currentToken is empty`);
+    const currentPhrase = currentTokens.first()?.word;
+    showDebugLog(`currentPhrase is ${currentPhrase}`);
+    if (!currentPhrase) {
+      onReturnNull(`Don't show suggestions because currentPhrase is empty`);
       return null;
     }
 
@@ -844,11 +844,11 @@ export class AutoCompleteSuggest
     }
 
     if (
-      currentToken.length === 1 &&
-      Boolean(currentToken.match(this.tokenizer.getTrimPattern()))
+      currentPhrase.length === 1 &&
+      Boolean(currentPhrase.match(this.tokenizer.getTrimPattern()))
     ) {
       onReturnNull(
-        `Don't show suggestions because currentToken is TRIM_PATTERN`
+        `Don't show suggestions because currentPhrase is TRIM_PATTERN`
       );
       return null;
     }
@@ -856,10 +856,10 @@ export class AutoCompleteSuggest
     if (
       !this.runManually &&
       !currentFrontMatter &&
-      currentToken.length < this.minNumberTriggered
+      currentPhrase.length < this.minNumberTriggered
     ) {
       onReturnNull(
-        "Don't show suggestions because currentToken is less than minNumberTriggered option"
+        "Don't show suggestions because currentPhrase is less than minNumberTriggered option"
       );
       return null;
     }
@@ -873,13 +873,29 @@ export class AutoCompleteSuggest
     showDebugLog(buildLogMessage("onTrigger", performance.now() - start));
     this.runManually = false;
 
+    const patterns = this.settings.phrasePatternsToSuppressTrigger;
+    const suppressedTokens =
+      patterns.length === 0 || currentFrontMatter
+        ? currentTokens
+        : currentTokens.filter((t) =>
+            patterns.every((p) => !new RegExp(`^${p}$`).test(t.word))
+          );
+    if (suppressedTokens.length === 0) {
+      onReturnNull(
+        `Don't show suggestions because all tokens are ignored by token pattern: ${String.raw`^[\u3040-\u309F\u30A0-\u30FF]{1,2}$`}`
+      );
+      return null;
+    }
+
     // Hack implementation for Front matter complement
-    if (currentFrontMatter && currentTokens.last()?.word.match(/[^ ] $/)) {
+    const currentToken = currentTokens.last()!.word;
+    if (currentFrontMatter && currentToken.match(/[^ ] $/)) {
       currentTokens.push({ word: "", offset: currentLineUntilCursor.length });
     }
 
     // For multi-word completion
-    this.contextStartCh = cursor.ch - currentToken.length;
+    this.contextStartCh = cursor.ch - currentPhrase.length;
+
     return {
       start: {
         ch: cursor.ch - (currentTokens.last()?.word?.length ?? 0), // For multi-word completion
@@ -888,7 +904,7 @@ export class AutoCompleteSuggest
       end: cursor,
       query: JSON.stringify({
         currentFrontMatter,
-        queries: currentTokens.map((x) => ({
+        queries: suppressedTokens.map((x) => ({
           ...x,
           offset: x.offset - currentTokens[0].offset,
         })),
