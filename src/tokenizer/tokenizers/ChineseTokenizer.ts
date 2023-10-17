@@ -1,6 +1,6 @@
-import { TRIM_CHAR_PATTERN } from "./DefaultTokenizer";
-import type { Tokenizer } from "../tokenizer";
+import { type Tokenizer, type TrimTarget } from "../tokenizer";
 import chineseTokenizer from "chinese-tokenizer";
+import { getTrimPattern } from "./DefaultTokenizer";
 
 /**
  * Chinese needs original logic.
@@ -16,7 +16,7 @@ export class ChineseTokenizer implements Tokenizer {
 
   tokenize(content: string, raw?: boolean): string[] {
     return content
-      .split(raw ? / /g : this.getTrimPattern())
+      .split(raw ? / /g : this.getTrimPattern("indexing"))
       .filter((x) => x !== "")
       .flatMap((x) => this._tokenize(x))
       .map((x) => x.text);
@@ -30,7 +30,7 @@ export class ChineseTokenizer implements Tokenizer {
       if (
         i === 0 ||
         tokens[i].length !== 1 ||
-        !Boolean(tokens[i].match(this.getTrimPattern()))
+        !Boolean(tokens[i].match(this.getTrimPattern("input")))
       ) {
         ret.push({
           word: tokens.slice(i).join(""),
@@ -42,8 +42,8 @@ export class ChineseTokenizer implements Tokenizer {
     return ret;
   }
 
-  getTrimPattern(): RegExp {
-    return TRIM_CHAR_PATTERN;
+  getTrimPattern(target: TrimTarget): RegExp {
+    return getTrimPattern(target);
   }
 
   shouldIgnoreOnCurrent(str: string): boolean {

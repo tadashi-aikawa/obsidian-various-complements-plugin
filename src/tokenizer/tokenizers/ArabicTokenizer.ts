@@ -1,8 +1,19 @@
+import { ExhaustiveError } from "../../errors";
+import type { TrimTarget } from "../tokenizer";
 import { DefaultTokenizer } from "./DefaultTokenizer";
 
-const ARABIC_TRIM_CHAR_PATTERN = /[\n\t\[\]$/:?!=()<>"'.,|;*~ `،؛]/g;
+const INPUT_ARABIC_TRIM_CHAR_PATTERN = /[\n\t\[\]/:?!=()<>"'.,|;*~ `،؛]/g;
+const INDEXING_ARABIC_TRIM_CHAR_PATTERN = /[\n\t\[\]$/:?!=()<>"'.,|;*~ `،؛]/g;
+
 export class ArabicTokenizer extends DefaultTokenizer {
-  getTrimPattern(): RegExp {
-    return ARABIC_TRIM_CHAR_PATTERN;
+  getTrimPattern(target: TrimTarget): RegExp {
+    switch (target) {
+      case "input":
+        return INPUT_ARABIC_TRIM_CHAR_PATTERN;
+      case "indexing":
+        return INDEXING_ARABIC_TRIM_CHAR_PATTERN;
+      default:
+        throw new ExhaustiveError(target);
+    }
   }
 }

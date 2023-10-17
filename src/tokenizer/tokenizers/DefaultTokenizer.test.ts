@@ -14,7 +14,7 @@ describe.each<{
   ${"word."}               | ${["word"]}
   ${"word.."}              | ${["word"]}
   ${"## @smi"}             | ${["##", "@smi"]}
-  ${"$\\alpha"}            | ${["\\alpha"]}
+  ${"$\\alpha"}            | ${["$\\alpha"]}
   ${"::one::two"}          | ${["one", "two"]}
   ${"**bold** *italic*"}   | ${["bold", "italic"]}
   ${"__a _b __c__ d_ e__"} | ${["a", "b", "c", "d", "e"]}

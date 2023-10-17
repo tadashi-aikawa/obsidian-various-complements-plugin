@@ -1,7 +1,7 @@
 import TinySegmenter from "../../external/tiny-segmenter";
-import { TRIM_CHAR_PATTERN } from "./DefaultTokenizer";
-import type { Tokenizer } from "../tokenizer";
+import { type Tokenizer, type TrimTarget } from "../tokenizer";
 import { joinNumberWithSymbol } from "../../util/strings";
+import { getTrimPattern } from "./DefaultTokenizer";
 // @ts-ignore
 const segmenter = new TinySegmenter();
 
@@ -17,7 +17,10 @@ function pickTokensAsJapanese(content: string, trimPattern: RegExp): string[] {
  */
 export class JapaneseTokenizer implements Tokenizer {
   tokenize(content: string, raw?: boolean): string[] {
-    return pickTokensAsJapanese(content, raw ? / /g : this.getTrimPattern());
+    return pickTokensAsJapanese(
+      content,
+      raw ? / /g : this.getTrimPattern("indexing")
+    );
   }
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
@@ -43,8 +46,8 @@ export class JapaneseTokenizer implements Tokenizer {
     return ret;
   }
 
-  getTrimPattern(): RegExp {
-    return TRIM_CHAR_PATTERN;
+  getTrimPattern(target: TrimTarget): RegExp {
+    return getTrimPattern(target);
   }
 
   shouldIgnoreOnCurrent(str: string): boolean {

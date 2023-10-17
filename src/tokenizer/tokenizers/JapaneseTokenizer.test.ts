@@ -5,7 +5,8 @@ describe.each<{ content: string; raw: boolean; expected: string[] }>`
   content                      | raw      | expected
   ${"aa bb cc"}                | ${false} | ${["aa", "bb", "cc"]}
   ${"イーディス旧市街"}        | ${false} | ${["イーディス", "旧", "市街"]}
-  ${"$\\alpha"}                | ${false} | ${["\\alpha"]}
+  ${"$\\alpha"}                | ${false} | ${["$", "\\", "alpha"]}
+  ${"$var"}                    | ${false} | ${["$var"]}
   ${"2022-10-02"}              | ${false} | ${["2022-10-02"]}
   ${"TypeScript5.0.1リリース"} | ${false} | ${["TypeScript", "5.0.1", "リリース"]}
   ${"**bold** *italic*"}       | ${false} | ${["bold", "italic"]}

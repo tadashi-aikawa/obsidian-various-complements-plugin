@@ -845,7 +845,7 @@ export class AutoCompleteSuggest
 
     if (
       currentPhrase.length === 1 &&
-      Boolean(currentPhrase.match(this.tokenizer.getTrimPattern()))
+      Boolean(currentPhrase.match(this.tokenizer.getTrimPattern("input")))
     ) {
       onReturnNull(
         `Don't show suggestions because currentPhrase is TRIM_PATTERN`

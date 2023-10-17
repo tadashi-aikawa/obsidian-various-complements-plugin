@@ -1,16 +1,19 @@
-import { ArabicTokenizer } from "./tokenizers/ArabicTokenizer";
+import type { App } from "obsidian";
+
 import { DefaultTokenizer } from "./tokenizers/DefaultTokenizer";
+import { ArabicTokenizer } from "./tokenizers/ArabicTokenizer";
 import { JapaneseTokenizer } from "./tokenizers/JapaneseTokenizer";
 import type { TokenizeStrategy } from "./TokenizeStrategy";
 import { EnglishOnlyTokenizer } from "./tokenizers/EnglishOnlyTokenizer";
-import type { App } from "obsidian";
 import { ChineseTokenizer } from "./tokenizers/ChineseTokenizer";
 import type { Settings } from "../setting/settings";
+
+export type TrimTarget = "input" | "indexing";
 
 export interface Tokenizer {
   tokenize(content: string, raw?: boolean): string[];
   recursiveTokenize(content: string): { word: string; offset: number }[];
-  getTrimPattern(): RegExp;
+  getTrimPattern(target: TrimTarget): RegExp;
   shouldIgnoreOnCurrent(query: string): boolean;
 }
 
