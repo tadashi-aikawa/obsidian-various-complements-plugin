@@ -54,7 +54,6 @@ export class CurrentFileWordProvider {
         return option.onlyEnglish ? allAlphabets(x) : true;
       })
       .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
-    console.log(tokens);
     this.words = uniq(tokens)
       .filter((x) => x !== currentToken)
       .map((x) => ({
