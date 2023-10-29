@@ -28,7 +28,7 @@
 
   let aliasesStr = aliases.join("\n");
   let wordRef: HTMLElement | null = null;
-  let displayedWordRef: HTMLElement | null  = null;
+  let displayedWordRef: HTMLElement | null = null;
 
   $: enableSubmit = inputWord.length > 0;
   $: enableDisplayedWord = Boolean(dividerForDisplay);
@@ -103,7 +103,7 @@
   <h3>Description</h3>
   <input type="text" bind:value={description} style="width: 100%;" />
 
-  <h3>Aliases (for each line)</h3>
+  <h3>Aliases (one per line)</h3>
   <textarea bind:value={aliasesStr} style="width: 100%;" rows="3" />
 
   <div style="text-align: center; width: 100%; padding-top: 15px;">

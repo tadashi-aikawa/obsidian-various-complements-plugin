@@ -155,6 +155,16 @@ export class CustomDictionaryWordProvider {
           .split(/\r\n|\n/)
           .map((x) => x.replace(/%%.*%%/g, ""))
           .filter((x) => x)
+          // If the line ends with the text '\n' then it is a continuation line.
+          .reduce((acc: string[], x: string) => {
+            const last = acc[acc.length - 1];
+            if (last && last.endsWith("\\n")) {
+              acc[acc.length - 1] = last + x;
+            } else {
+              acc.push(x);
+            }
+            return acc;
+          }, [])
           .map((x) =>
             lineToWord(
               x,
@@ -174,6 +184,28 @@ export class CustomDictionaryWordProvider {
   async refreshCustomWords(option: Option): Promise<void> {
     this.clearWords();
 
+    const allPaths = this.paths.filter((x) => !isURL(x));
+    const allUrls = this.paths.filter((x) => isURL(x));
+
+    // Get all markdown files from any given folders and add to the list
+    const allFilePaths = [];
+    for (const path of allPaths) {
+      const stat = await this.fileSystemAdapter.stat(path);
+      if (stat?.type === "folder") {
+        // Get all markdown files in the folder and add to the list
+        const files = await this.fileSystemAdapter.list(path);
+        for (const file of files.files) {
+          if (file.endsWith(".md")) {
+            allFilePaths.push(file);
+          }
+        }
+      } else {
+        allFilePaths.push(path);
+      }
+    }
+
+    this.paths = [...allFilePaths, ...allUrls];
+
     for (const path of this.paths) {
       try {
         const words = await this.loadWords(path, option);
@@ -186,7 +218,7 @@ export class CustomDictionaryWordProvider {
       } catch (e) {
         // noinspection ObjectAllocationIgnored
         new Notice(
-          `⚠ Fail to load ${path} -- Various Complements Plugin -- \n ${e}`,
+          `⚠ Failed to load ${path} -- Various Complements Plugin -- \n ${e}`,
           0
         );
       }

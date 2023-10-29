@@ -839,7 +839,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Custom dictionary paths")
         .setDesc(
-          "Specify either a relative path from Vault root or URL for each line."
+          "Specify either a relative path to a file or folder from the Vault root or enter a URL. Place one entry per line."
         )
         .addTextArea((tac) => {
           const el = tac
