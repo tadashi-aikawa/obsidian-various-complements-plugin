@@ -417,7 +417,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Min number of characters for trigger")
-      .setDesc("Setting the value to 0 does not mean the suggestion will be triggered without any inputted character. Depending on the Strategy you choose the actual value will be differ. Read the docs for more info.")
+      .setDesc("Setting the value to 0 does not mean the suggestion will be triggered without any inputted character. Instead, a designated value will be used depending on the Strategy you choose.")
       .addSlider((sc) =>
         sc
           .setLimits(0, 10, 1)
