@@ -417,7 +417,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Min number of characters for trigger")
-      .setDesc("Setting the value to 0 does not mean the suggestion will be triggered without any inputted character. Instead, a designated value will be used depending on the Strategy you choose.")
+      .setDesc(
+        "Setting the value to 0 does not mean the suggestion will be triggered without any inputted character. Instead, a designated value will be used depending on the Strategy you choose."
+      )
       .addSlider((sc) =>
         sc
           .setLimits(0, 10, 1)
@@ -502,7 +504,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Line patterns to suppress trigger")
       .setDesc(
-        "RegExp line patterns (partial match) until the cursor, which suppresses the auto-completion trigger. It can set multi patterns by line breaks."
+        "Regular expression line patterns (partial match) until the cursor, that suppresses the activation of autocomplete. Multiple patterns can be defined with line breaks."
       )
       .addTextArea((tc) => {
         const el = tc
@@ -520,7 +522,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Phrase patterns to suppress trigger")
       .setDesc(
-        "RegExp phrase patterns (perfect match), which suppresses the auto-completion trigger. It can set multi patterns by line breaks."
+        "Regular expression patterns (exact match) that suppress the activation of autocomplete. Multiple patterns can be defined with line breaks."
       )
       .addTextArea((tc) => {
         const el = tc
