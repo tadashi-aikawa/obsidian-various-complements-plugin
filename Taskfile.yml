@@ -12,7 +12,7 @@ tasks:
 
   build:dev: npm run dev
   build: npm run build
-  watch: watchexec --no-vcs-ignore --exts "js,json,css" cp main.js styles.css manifest.json $USERPROFILE/work/minerva/.obsidian/plugins/various-complements/
+  watch: watchexec --no-vcs-ignore --exts "js,json,css" cp main.js styles.css manifest.json /mnt/c/Users/syoum/work/minerva/.obsidian/plugins/various-complements/
 
   init:
     desc: Install dependencies
