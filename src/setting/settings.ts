@@ -275,10 +275,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         })
     );
     if (this.plugin.settings.strategy === TokenizeStrategy.CHINESE.name) {
-      const el = containerEl.createEl("div", {
-        cls: "various-complements__settings__warning",
-      });
-
       const df = document.createDocumentFragment();
       df.append(
         createSpan({
