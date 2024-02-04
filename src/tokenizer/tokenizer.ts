@@ -10,6 +10,10 @@ import type { Settings } from "../setting/settings";
 
 export type TrimTarget = "input" | "indexing";
 
+export interface FactoryArgs {
+  treatUnderscoreAsPartOfWord?: boolean;
+}
+
 export interface Tokenizer {
   tokenize(content: string, raw?: boolean): string[];
   recursiveTokenize(content: string): { word: string; offset: number }[];

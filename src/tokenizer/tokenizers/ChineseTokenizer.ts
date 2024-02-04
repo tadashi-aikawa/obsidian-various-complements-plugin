@@ -1,11 +1,10 @@
-import { type Tokenizer, type TrimTarget } from "../tokenizer";
 import chineseTokenizer from "chinese-tokenizer";
-import { getTrimPattern } from "./DefaultTokenizer";
+import { AbstractTokenizer } from "./AbstractTokenizer";
 
 /**
  * Chinese needs original logic.
  */
-export class ChineseTokenizer implements Tokenizer {
+export class ChineseTokenizer extends AbstractTokenizer {
   _tokenize: ReturnType<typeof chineseTokenizer.load>;
 
   static create(dict: string): ChineseTokenizer {
@@ -40,13 +39,5 @@ export class ChineseTokenizer implements Tokenizer {
     }
 
     return ret;
-  }
-
-  getTrimPattern(target: TrimTarget): RegExp {
-    return getTrimPattern(target);
-  }
-
-  shouldIgnoreOnCurrent(str: string): boolean {
-    return false;
   }
 }

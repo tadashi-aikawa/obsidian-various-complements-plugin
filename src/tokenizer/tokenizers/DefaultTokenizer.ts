@@ -1,26 +1,12 @@
-import { type Tokenizer, type TrimTarget } from "../tokenizer";
 import { splitRaw } from "../../util/strings";
-import { ExhaustiveError } from "../../errors";
+import type { FactoryArgs } from "../tokenizer";
+import { AbstractTokenizer } from "./AbstractTokenizer";
 
 function pickTokens(content: string, trimPattern: RegExp): string[] {
   return content.split(trimPattern).filter((x) => x !== "");
 }
 
-const INPUT_TRIM_CHAR_PATTERN = /[\n\t\[\]$/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”]/g;
-const INDEXING_TRIM_CHAR_PATTERN = /[\n\t\[\]/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”]/g;
-
-export function getTrimPattern(target: TrimTarget): RegExp {
-  switch (target) {
-    case "input":
-      return INPUT_TRIM_CHAR_PATTERN;
-    case "indexing":
-      return INDEXING_TRIM_CHAR_PATTERN;
-    default:
-      throw new ExhaustiveError(target);
-  }
-}
-
-export class DefaultTokenizer implements Tokenizer {
+export class DefaultTokenizer extends AbstractTokenizer {
   tokenize(content: string, raw?: boolean): string[] {
     const tokens = raw
       ? Array.from(splitRaw(content, this.getTrimPattern("indexing"))).filter(
@@ -43,13 +29,5 @@ export class DefaultTokenizer implements Tokenizer {
         offset: i + 1,
       })),
     ];
-  }
-
-  getTrimPattern(target: TrimTarget): RegExp {
-    return getTrimPattern(target);
-  }
-
-  shouldIgnoreOnCurrent(str: string): boolean {
-    return false;
   }
 }
