@@ -28,9 +28,13 @@ export async function createTokenizer(
 ): Promise<Tokenizer> {
   switch (strategy.name) {
     case "default":
-      return new DefaultTokenizer();
+      return new DefaultTokenizer({
+        treatUnderscoreAsPartOfWord: settings.treatUnderscoreAsPartOfWord,
+      });
     case "english-only":
-      return new EnglishOnlyTokenizer();
+      return new EnglishOnlyTokenizer({
+        treatUnderscoreAsPartOfWord: settings.treatUnderscoreAsPartOfWord,
+      });
     case "arabic":
       return new ArabicTokenizer();
     case "japanese":

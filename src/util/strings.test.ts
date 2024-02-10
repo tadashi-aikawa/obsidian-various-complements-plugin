@@ -18,7 +18,9 @@ import {
   startsSmallLetterOnlyFirst,
   synonymAliases,
   isInternalLink,
+  removeFromPattern,
 } from "./strings";
+import type { Regex } from "svelte-lucide-icons";
 
 describe.each<{ one: string; another: string; expected: boolean }>`
   one            | another          | expected
@@ -85,6 +87,18 @@ describe.each`
 `("encodeSpace", ({ text, expected }) => {
   test(`encodeSpace(${text}) = ${expected}`, () => {
     expect(encodeSpace(text)).toBe(expected);
+  });
+});
+
+describe.each<{ pattern: RegExp; removeChars: string; expected: RegExp }>`
+  pattern          | removeChars | expected
+  ${/[abc_+-]/}    | ${"_"}      | ${/[abc+-]/}
+  ${/[abc_+-]/}    | ${"+-"}     | ${/[abc_]/}
+  ${/[abc_+-\/]/g} | ${"ab"}     | ${/[c_+-\/]/g}
+  ${/[abc_+-\/]/g} | ${"+-"}     | ${/[abc_\/]/g}
+`("removeFromPattern", ({ pattern, removeChars, expected }) => {
+  test(`removeFromPattern(${pattern}, ${removeChars}) = ${expected}`, () => {
+    expect(removeFromPattern(pattern, removeChars)).toStrictEqual(expected);
   });
 });
 

@@ -23,6 +23,7 @@ export interface Settings {
   minFuzzyMatchScore: number;
   matchingWithoutEmoji: boolean;
   treatAccentDiacriticsAsAlphabeticCharacters: boolean;
+  treatUnderscoreAsPartOfWord: boolean;
   maxNumberOfSuggestions: number;
   maxNumberOfWordsAsPhrase: number;
   minNumberOfCharactersTriggered: number;
@@ -131,6 +132,7 @@ export const DEFAULT_SETTINGS: Settings = {
   minFuzzyMatchScore: 0.5,
   matchingWithoutEmoji: true,
   treatAccentDiacriticsAsAlphabeticCharacters: false,
+  treatUnderscoreAsPartOfWord: false,
 
   maxNumberOfSuggestions: 5,
   maxNumberOfWordsAsPhrase: 3,
@@ -366,6 +368,30 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
       });
+
+    if (
+      TokenizeStrategy.fromName(this.plugin.settings.strategy)
+        .canTreatUnderscoreAsPartOfWord
+    ) {
+      new Setting(containerEl)
+        .setName("Treat an underscore as a part of a word.")
+        .setDesc(
+          "If this setting is enabled, aaa_bbb will be tokenized as a single token aaa_bbb, rather than being split into aaa and bbb."
+        )
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.treatUnderscoreAsPartOfWord
+          ).onChange(async (value) => {
+            this.plugin.settings.treatUnderscoreAsPartOfWord = value;
+            await this.plugin.saveSettings({
+              internalLink: true,
+              customDictionary: true,
+              currentVault: true,
+              currentFile: true,
+            });
+          });
+        });
+    }
 
     new Setting(containerEl)
       .setName("Matching without emoji")

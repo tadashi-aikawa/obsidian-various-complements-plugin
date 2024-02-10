@@ -1,3 +1,4 @@
+import { removeFromPattern } from "../../util/strings";
 import { ExhaustiveError } from "../../errors";
 import {
   type FactoryArgs,
@@ -12,9 +13,13 @@ export abstract class AbstractTokenizer implements Tokenizer {
   protected inputTrimCharPattern: RegExp;
   protected indexingTrimCharPattern: RegExp;
 
-  constructor(_args?: FactoryArgs) {
-    this.inputTrimCharPattern = INPUT_TRIM_CHAR_PATTERN;
-    this.indexingTrimCharPattern = INDEXING_TRIM_CHAR_PATTERN;
+  constructor(args?: FactoryArgs) {
+    this.inputTrimCharPattern = args?.treatUnderscoreAsPartOfWord
+      ? removeFromPattern(INPUT_TRIM_CHAR_PATTERN, "_")
+      : INPUT_TRIM_CHAR_PATTERN;
+    this.indexingTrimCharPattern = args?.treatUnderscoreAsPartOfWord
+      ? removeFromPattern(INDEXING_TRIM_CHAR_PATTERN, "_")
+      : INDEXING_TRIM_CHAR_PATTERN;
   }
 
   getTrimPattern(target: TrimTarget): RegExp {

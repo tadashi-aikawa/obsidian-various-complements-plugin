@@ -28,6 +28,16 @@ export function encodeSpace(text: string): string {
   return text.replace(/ /g, "%20");
 }
 
+export function removeFromPattern(
+  pattern: RegExp,
+  removeChars: string
+): RegExp {
+  return new RegExp(
+    pattern.source.replace(new RegExp(`[${removeChars}]`, "g"), ""),
+    pattern.flags
+  );
+}
+
 export function normalizeAccentsDiacritics(text: string): string {
   // https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
   return text.replace(/[^\u0000-\u007E]/g, (x) => diacriticsMap[x] ?? x);
