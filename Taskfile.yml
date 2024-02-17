@@ -30,6 +30,11 @@ tasks:
     cmds:
       - npm test
 
+  test:watch:
+    desc: Unit tests --watch
+    cmds:
+      - npm test -- --watch
+
   ci:
     desc: For CI
     cmds:
