@@ -8,7 +8,7 @@ import {
 import { AppHelper } from "./app-helper";
 import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { DEFAULT_HISTORIES_PATH } from "./util/path";
 
 export default class VariousComponents extends Plugin {
@@ -46,16 +46,16 @@ export default class VariousComponents extends Plugin {
             .setIcon("stacked-levels")
             .onClick(() => {
               this.addWordToCustomDictionary();
-            })
+            }),
         );
-      })
+      }),
     );
 
     this.statusBar = ProviderStatusBar.new(
       this.addStatusBarItem(),
       this.settings.showMatchStrategy,
       this.settings.showIndexingStatus,
-      this.settings.showComplementAutomatically
+      this.settings.showComplementAutomatically,
     );
     this.statusBar.setOnClickStrategyListener(async () => {
       await this.settingTab.toggleMatchStrategy();
@@ -68,9 +68,9 @@ export default class VariousComponents extends Plugin {
       await this.appHelper.saveJson(
         normalizePath(
           this.settings.intelligentSuggestionPrioritization.historyFilePath ||
-            DEFAULT_HISTORIES_PATH
+          DEFAULT_HISTORIES_PATH,
         ),
-        this.suggester.selectionHistoryStorage?.data ?? {}
+        this.suggester.selectionHistoryStorage?.data ?? {},
       );
     }, 5000);
 
@@ -79,7 +79,7 @@ export default class VariousComponents extends Plugin {
       this.manifest,
       this.settings,
       this.statusBar,
-      debouncedSaveData
+      debouncedSaveData,
     );
     this.registerEditorSuggest(this.suggester);
 
@@ -155,7 +155,7 @@ export default class VariousComponents extends Plugin {
       name: "Copy plugin settings",
       callback: async () => {
         await navigator.clipboard.writeText(
-          this.settingTab.getPluginSettingsAsJsonString()
+          this.settingTab.getPluginSettingsAsJsonString(),
         );
         // noinspection ObjectAllocationIgnored
         new Notice("Copy settings of Various Complements");
@@ -164,11 +164,11 @@ export default class VariousComponents extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    const currentSettings = await this.loadData();
+    const currentSettings = (await this.loadData()) as Settings;
     this.settings = merge.withOptions(
       { mergeArrays: false },
       DEFAULT_SETTINGS,
-      currentSettings ?? {}
+      currentSettings ?? {},
     );
   }
 
@@ -180,7 +180,7 @@ export default class VariousComponents extends Plugin {
       internalLink?: boolean;
       frontMatter?: boolean;
       intelligentSuggestionPrioritization?: boolean;
-    } = {}
+    } = {},
   ): Promise<void> {
     await this.saveData(this.settings);
     await this.suggester.updateSettings(this.settings);
@@ -233,7 +233,7 @@ export default class VariousComponents extends Plugin {
         // noinspection ObjectAllocationIgnored
         new Notice(`Added ${word.value}`);
         modal.close();
-      }
+      },
     );
 
     modal.open();
