@@ -20,6 +20,8 @@ describe.each<{
   ${{}}                                    | ${"let hoge_huga = 1"}   | ${false} | ${["let", "hoge", "huga", "1"]}
   ${{ treatUnderscoreAsPartOfWord: true }} | ${"__a _b __c__ d_ e__"} | ${false} | ${["__a", "_b", "__c__", "d_", "e__"]}
   ${{ treatUnderscoreAsPartOfWord: true }} | ${"let hoge_huga = 1"}   | ${false} | ${["let", "hoge_huga", "1"]}
+  ${{}}                                    | ${"aaa\nbbb"}            | ${false} | ${["aaa", "bbb"]}
+  ${{}}                                    | ${"aaa\r\nbbb"}          | ${false} | ${["aaa", "bbb"]}
 `("tokenize", ({ constructorArgs, content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(

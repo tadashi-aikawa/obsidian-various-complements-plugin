@@ -24,6 +24,8 @@ describe.each<{
   ${{}}           | ${"v1.2.34"}                 | ${false} | ${["v", "1.2.34"]}
   ${{}}           | ${"123\n456"}                | ${false} | ${["123", "456"]}
   ${{}}           | ${"- 123"}                   | ${false} | ${["-", "123"]}
+  ${{}}           | ${"aaa\nbbb"}                | ${false} | ${["aaa", "bbb"]}
+  ${{}}           | ${"aaa\r\nbbb"}              | ${false} | ${["aaa", "bbb"]}
 `("tokenize", ({ constructorArgs, content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(

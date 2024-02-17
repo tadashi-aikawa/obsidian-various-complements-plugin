@@ -6,8 +6,8 @@ import {
   type TrimTarget,
 } from "../tokenizer";
 
-const INPUT_TRIM_CHAR_PATTERN = /[\n\t\[\]$/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”]/g;
-const INDEXING_TRIM_CHAR_PATTERN = /[\n\t\[\]/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”]/g;
+const INPUT_TRIM_CHAR_PATTERN = /[\r\n\t\[\]$/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”]/g;
+const INDEXING_TRIM_CHAR_PATTERN = /[\r\n\t\[\]/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”]/g;
 
 export abstract class AbstractTokenizer implements Tokenizer {
   protected inputTrimCharPattern: RegExp;

@@ -42,6 +42,8 @@ describe.each<{
   ${{}}                                    | ${"“aaa„ “bbb„"}         | ${["aaa", "bbb"]}
   ${{}}                                    | ${"‘aaa‚ ‘bbb‚"}         | ${["aaa", "bbb"]}
   ${{}}                                    | ${"‘aaa’ ‘bbb’"}         | ${["aaa", "bbb"]}
+  ${{}}                                    | ${"aaa\nbbb"}            | ${["aaa", "bbb"]}
+  ${{}}                                    | ${"aaa\r\nbbb"}          | ${["aaa", "bbb"]}
 `("tokenize", ({ constructorArgs, content, expected }) => {
   test(`tokenize(${content}) = ${expected}`, () => {
     expect(

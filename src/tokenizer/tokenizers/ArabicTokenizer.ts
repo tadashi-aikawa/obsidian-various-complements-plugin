@@ -1,8 +1,8 @@
 import type { FactoryArgs } from "../tokenizer";
 import { DefaultTokenizer } from "./DefaultTokenizer";
 
-const INPUT_ARABIC_TRIM_CHAR_PATTERN = /[\n\t\[\]/:?!=()<>"'.,|;*~ `،؛]/g;
-const INDEXING_ARABIC_TRIM_CHAR_PATTERN = /[\n\t\[\]$/:?!=()<>"'.,|;*~ `،؛]/g;
+const INPUT_ARABIC_TRIM_CHAR_PATTERN = /[\r\n\t\[\]/:?!=()<>"'.,|;*~ `،؛]/g;
+const INDEXING_ARABIC_TRIM_CHAR_PATTERN = /[\r\n\t\[\]$/:?!=()<>"'.,|;*~ `،؛]/g;
 
 export class ArabicTokenizer extends DefaultTokenizer {
   constructor(_args?: FactoryArgs) {
