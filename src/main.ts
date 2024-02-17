@@ -68,7 +68,7 @@ export default class VariousComponents extends Plugin {
       await this.appHelper.saveJson(
         normalizePath(
           this.settings.intelligentSuggestionPrioritization.historyFilePath ||
-          DEFAULT_HISTORIES_PATH,
+            DEFAULT_HISTORIES_PATH,
         ),
         this.suggester.selectionHistoryStorage?.data ?? {},
       );
@@ -76,7 +76,6 @@ export default class VariousComponents extends Plugin {
 
     this.suggester = await AutoCompleteSuggest.new(
       this.app,
-      this.manifest,
       this.settings,
       this.statusBar,
       debouncedSaveData,
@@ -194,10 +193,10 @@ export default class VariousComponents extends Plugin {
       await this.suggester.refreshCustomDictionaryTokens();
     }
     if (needUpdateTokens.internalLink) {
-      await this.suggester.refreshInternalLinkTokens();
+      this.suggester.refreshInternalLinkTokens();
     }
     if (needUpdateTokens.frontMatter) {
-      await this.suggester.refreshFrontMatterTokens();
+      this.suggester.refreshFrontMatterTokens();
     }
     if (needUpdateTokens.intelligentSuggestionPrioritization) {
       await this.suggester.refreshIntelligentSuggestionPrioritization();

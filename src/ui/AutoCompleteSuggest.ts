@@ -12,7 +12,6 @@ import {
   type Modifier,
   normalizePath,
   Notice,
-  type PluginManifest,
   Scope,
   TFile,
 } from "obsidian";
@@ -138,7 +137,7 @@ export class AutoCompleteSuggest
   async unsafeLoadHistoryData(): Promise<SelectionHistoryTree> {
     const historyPath = normalizePath(
       this.settings.intelligentSuggestionPrioritization.historyFilePath ||
-        DEFAULT_HISTORIES_PATH
+        DEFAULT_HISTORIES_PATH,
     );
     if (await this.appHelper.exists(historyPath)) {
       this.settings.selectionHistoryTree = {}; // TODO: Remove in the future
@@ -155,32 +154,31 @@ export class AutoCompleteSuggest
 
   static async new(
     app: App,
-    manifest: PluginManifest,
     settings: Settings,
     statusBar: ProviderStatusBar,
-    onPersistSelectionHistory: () => void
+    onPersistSelectionHistory: () => void,
   ): Promise<AutoCompleteSuggest> {
     const ins = new AutoCompleteSuggest(app, statusBar);
 
     ins.currentFileWordProvider = new CurrentFileWordProvider(
       ins.app,
-      ins.appHelper
+      ins.appHelper,
     );
     ins.currentVaultWordProvider = new CurrentVaultWordProvider(
       ins.app,
-      ins.appHelper
+      ins.appHelper,
     );
     ins.customDictionaryWordProvider = new CustomDictionaryWordProvider(
       ins.app,
-      ins.appHelper
+      ins.appHelper,
     );
     ins.internalLinkWordProvider = new InternalLinkWordProvider(
       ins.app,
-      ins.appHelper
+      ins.appHelper,
     );
     ins.frontMatterWordProvider = new FrontMatterWordProvider(
       ins.app,
-      ins.appHelper
+      ins.appHelper,
     );
 
     await ins.updateSettings(settings);
@@ -199,7 +197,7 @@ export class AutoCompleteSuggest
         await ins.refreshCurrentFileTokens();
         ins.refreshInternalLinkTokens();
         ins.updateFrontMatterToken();
-      }
+      },
     );
 
     ins.metadataCacheChangeRef = app.metadataCache.on("changed", async (f) => {
@@ -248,7 +246,7 @@ export class AutoCompleteSuggest
 
     let suggestion = this.tokenizer
       .tokenize(
-        editor.getRange({ line: Math.max(cursor.line - 50, 0), ch: 0 }, cursor)
+        editor.getRange({ line: Math.max(cursor.line - 50, 0), ch: 0 }, cursor),
       )
       .reverse()
       .slice(1)
@@ -259,7 +257,7 @@ export class AutoCompleteSuggest
           editor.getRange(cursor, {
             line: Math.min(cursor.line + 50, editor.lineCount() - 1),
             ch: 0,
-          })
+          }),
         )
         .find((x) => x.startsWith(currentToken));
     }
@@ -270,7 +268,7 @@ export class AutoCompleteSuggest
     editor.replaceRange(
       suggestion,
       { line: cursor.line, ch: cursor.ch - currentToken.length },
-      { line: cursor.line, ch: cursor.ch }
+      { line: cursor.line, ch: cursor.ch },
     );
 
     this.close();
@@ -294,7 +292,7 @@ export class AutoCompleteSuggest
 
   get frontMatterComplementStrategy(): SpecificMatchStrategy {
     return SpecificMatchStrategy.fromName(
-      this.settings.frontMatterComplementMatchStrategy
+      this.settings.frontMatterComplementMatchStrategy,
     );
   }
 
@@ -321,7 +319,7 @@ export class AutoCompleteSuggest
 
   get descriptionOnSuggestion(): DescriptionOnSuggestion {
     return DescriptionOnSuggestion.fromName(
-      this.settings.descriptionOnSuggestion
+      this.settings.descriptionOnSuggestion,
     );
   }
 
@@ -348,14 +346,14 @@ export class AutoCompleteSuggest
 
     this.statusBar.setMatchStrategy(this.matchStrategy);
     this.statusBar.setComplementAutomatically(
-      this.settings.complementAutomatically
+      this.settings.complementAutomatically,
     );
 
     try {
       this.tokenizer = await createTokenizer(
         this.tokenizerStrategy,
         this.app,
-        this.settings
+        this.settings,
       );
     } catch (e: any) {
       new Notice(e.message);
@@ -369,12 +367,12 @@ export class AutoCompleteSuggest
       settings.excludeCurrentVaultPathPrefixPatterns
         .split("\n")
         .filter((x) => x),
-      settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory
+      settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory,
     );
     this.customDictionaryWordProvider.setSettings(
       settings.customDictionaryPaths.split("\n").filter((x) => x),
       ColumnDelimiter.fromName(settings.columnDelimiter),
-      settings.delimiterToDivideSuggestionsForDisplayFromInsertion || null
+      settings.delimiterToDivideSuggestionsForDisplayFromInsertion || null,
     );
 
     this.debounceGetSuggestions = debounce(
@@ -397,7 +395,7 @@ export class AutoCompleteSuggest
               (this.settings.minNumberOfWordsTriggeredPhrase + i - 1 <
                 xs.length &&
                 x.word.length >= this.minNumberTriggered &&
-                !x.word.endsWith(" "))
+                !x.word.endsWith(" ")),
           )
           .map((q) => {
             const handler =
@@ -418,7 +416,7 @@ export class AutoCompleteSuggest
                       minMatchScore: this.settings.minFuzzyMatchScore,
                     }
                   : undefined,
-              }
+              },
             ).map((word) => ({ ...word, offset: q.offset }));
           })
           .flat()
@@ -427,16 +425,16 @@ export class AutoCompleteSuggest
         cb(
           uniqWith(words, suggestionUniqPredicate).slice(
             0,
-            this.settings.maxNumberOfSuggestions
-          )
+            this.settings.maxNumberOfSuggestions,
+          ),
         );
 
         this.showDebugLog(() =>
-          buildLogMessage("Get suggestions", performance.now() - start)
+          buildLogMessage("Get suggestions", performance.now() - start),
         );
       },
       this.settings.delayMilliSeconds,
-      true
+      true,
     );
 
     this.debounceClose = debounce(() => {
@@ -451,17 +449,17 @@ export class AutoCompleteSuggest
       this.scope.register(modifiers, key, () => {
         this.close();
         return true;
-      })
+      }),
     );
   }
 
   private setHotKey(
     name: keyof Settings["hotkeys"],
-    handler: (evt: KeyboardEvent) => CommandReturnType
+    handler: (evt: KeyboardEvent) => CommandReturnType,
   ) {
     this.settings.hotkeys[name].forEach((hk) => {
       this.keymapEventHandler.push(
-        this.scope.register(hk.modifiers, hk.key, handler)
+        this.scope.register(hk.modifiers, hk.key, handler),
       );
     });
   }
@@ -479,7 +477,9 @@ export class AutoCompleteSuggest
     const ipKeys = ["Enter", "Tab", "ArrowUp", "ArrowDown", "Home", "End"];
     this.scope.keys
       .filter((x) =>
-        ipKeys.map((x) => x.toLowerCase()).includes((x.key ?? "").toLowerCase())
+        ipKeys
+          .map((x) => x.toLowerCase())
+          .includes((x.key ?? "").toLowerCase()),
       )
       .forEach((x) => this.scope.unregister(x));
     // propagateESC
@@ -505,7 +505,7 @@ export class AutoCompleteSuggest
       ["select 9th", (evt) => commands.select(this, evt, 8)],
       ["open", (_) => commands.open(this)],
       ["completion", (_) => commands.completion(this)],
-      ["insert as text", (evt) => commands.insertAsText(this, evt)]
+      ["insert as text", (evt) => commands.insertAsText(this, evt)],
     );
 
     // propagate
@@ -522,8 +522,8 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢 Skip: Index current file tokens",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
@@ -537,10 +537,10 @@ export class AutoCompleteSuggest
     });
 
     this.statusBar.setCurrentFileIndexed(
-      this.currentFileWordProvider.wordCount
+      this.currentFileWordProvider.wordCount,
     );
     this.showDebugLog(() =>
-      buildLogMessage("Index current file tokens", performance.now() - start)
+      buildLogMessage("Index current file tokens", performance.now() - start),
     );
   }
 
@@ -554,8 +554,8 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢 Skip: Index current vault tokens",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
@@ -568,10 +568,10 @@ export class AutoCompleteSuggest
     });
 
     this.statusBar.setCurrentVaultIndexed(
-      this.currentVaultWordProvider.wordCount
+      this.currentVaultWordProvider.wordCount,
     );
     this.showDebugLog(() =>
-      buildLogMessage("Index current vault tokens", performance.now() - start)
+      buildLogMessage("Index current vault tokens", performance.now() - start),
     );
   }
 
@@ -585,8 +585,8 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢Skip: Index custom dictionary tokens",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
@@ -605,13 +605,13 @@ export class AutoCompleteSuggest
     });
 
     this.statusBar.setCustomDictionaryIndexed(
-      this.customDictionaryWordProvider.wordCount
+      this.customDictionaryWordProvider.wordCount,
     );
     this.showDebugLog(() =>
       buildLogMessage(
         "Index custom dictionary tokens",
-        performance.now() - start
-      )
+        performance.now() - start,
+      ),
     );
   }
 
@@ -625,8 +625,8 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢Skip: Index internal link tokens",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
@@ -642,10 +642,10 @@ export class AutoCompleteSuggest
     });
 
     this.statusBar.setInternalLinkIndexed(
-      this.internalLinkWordProvider.wordCount
+      this.internalLinkWordProvider.wordCount,
     );
     this.showDebugLog(() =>
-      buildLogMessage("Index internal link tokens", performance.now() - start)
+      buildLogMessage("Index internal link tokens", performance.now() - start),
     );
   }
 
@@ -659,8 +659,8 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢Skip: Index front matter tokens",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
@@ -668,10 +668,10 @@ export class AutoCompleteSuggest
     this.frontMatterWordProvider.refreshWords();
 
     this.statusBar.setFrontMatterIndexed(
-      this.frontMatterWordProvider.wordCount
+      this.frontMatterWordProvider.wordCount,
     );
     this.showDebugLog(() =>
-      buildLogMessage("Index front matter tokens", performance.now() - start)
+      buildLogMessage("Index front matter tokens", performance.now() - start),
     );
   }
 
@@ -681,7 +681,7 @@ export class AutoCompleteSuggest
       this.selectionHistoryStorage = new SelectionHistoryStorage(
         await this.unsafeLoadHistoryData(),
         this.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory,
-        this.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep
+        this.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep,
       );
       this.selectionHistoryStorage.purge();
     } else {
@@ -695,8 +695,8 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢Skip: Update front matter token index",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
@@ -706,8 +706,8 @@ export class AutoCompleteSuggest
     this.showDebugLog(() =>
       buildLogMessage(
         "Update front matter token index",
-        performance.now() - start
-      )
+        performance.now() - start,
+      ),
     );
   }
 
@@ -717,25 +717,25 @@ export class AutoCompleteSuggest
       this.showDebugLog(() =>
         buildLogMessage(
           "👢Skip: Update front matter token",
-          performance.now() - start
-        )
+          performance.now() - start,
+        ),
       );
       return;
     }
 
     this.frontMatterWordProvider.updateWords();
     this.statusBar.setFrontMatterIndexed(
-      this.frontMatterWordProvider.wordCount
+      this.frontMatterWordProvider.wordCount,
     );
 
     this.showDebugLog(() =>
-      buildLogMessage("Update front matter token", performance.now() - start)
+      buildLogMessage("Update front matter token", performance.now() - start),
     );
   }
 
   onTrigger(
     cursor: EditorPosition,
-    editor: Editor
+    editor: Editor,
   ): EditorSuggestTriggerInfo | null {
     const start = performance.now();
 
@@ -787,16 +787,16 @@ export class AutoCompleteSuggest
       this.appHelper.getCurrentLineUntilCursor(editor);
     if (currentLineUntilCursor.startsWith("---")) {
       onReturnNull(
-        "Don't show suggestions because it supposes front matter or horizontal line"
+        "Don't show suggestions because it supposes front matter or horizontal line",
       );
       return null;
     }
     const suppressedPattern = this.settings.patternsToSuppressTrigger.find(
-      (p) => new RegExp(p).test(currentLineUntilCursor)
+      (p) => new RegExp(p).test(currentLineUntilCursor),
     );
     if (suppressedPattern) {
       onReturnNull(
-        `Don't show suggestions because it is the ignored pattern: ${suppressedPattern}`
+        `Don't show suggestions because it is the ignored pattern: ${suppressedPattern}`,
       );
       return null;
     }
@@ -808,7 +808,7 @@ export class AutoCompleteSuggest
     let currentTokens = tokenized.slice(
       tokenized.length > this.settings.maxNumberOfWordsAsPhrase
         ? tokenized.length - this.settings.maxNumberOfWordsAsPhrase
-        : 0
+        : 0,
     );
     showDebugLog(`currentTokens is ${JSON.stringify(currentTokens)}`);
 
@@ -827,18 +827,18 @@ export class AutoCompleteSuggest
       !this.runManually
     ) {
       onReturnNull(
-        `Don't show suggestions because currentTokenSeparatedWhiteSpace doesn't change`
+        `Don't show suggestions because currentTokenSeparatedWhiteSpace doesn't change`,
       );
       return null;
     }
     this.pastCurrentTokenSeparatedWhiteSpace = currentTokenSeparatedWhiteSpace;
     if (
       new RegExp(`^[${this.settings.firstCharactersDisableSuggestions}]`).test(
-        currentTokenSeparatedWhiteSpace
+        currentTokenSeparatedWhiteSpace,
       )
     ) {
       onReturnNull(
-        `Don't show suggestions for avoiding to conflict with the other commands.`
+        `Don't show suggestions for avoiding to conflict with the other commands.`,
       );
       return null;
     }
@@ -848,7 +848,7 @@ export class AutoCompleteSuggest
       Boolean(currentPhrase.match(this.tokenizer.getTrimPattern("input")))
     ) {
       onReturnNull(
-        `Don't show suggestions because currentPhrase is TRIM_PATTERN`
+        `Don't show suggestions because currentPhrase is TRIM_PATTERN`,
       );
       return null;
     }
@@ -859,7 +859,7 @@ export class AutoCompleteSuggest
       currentPhrase.length < this.minNumberTriggered
     ) {
       onReturnNull(
-        "Don't show suggestions because currentPhrase is less than minNumberTriggered option"
+        "Don't show suggestions because currentPhrase is less than minNumberTriggered option",
       );
       return null;
     }
@@ -878,11 +878,11 @@ export class AutoCompleteSuggest
       patterns.length === 0 || currentFrontMatter
         ? currentTokens
         : currentTokens.filter((t) =>
-            patterns.every((p) => !new RegExp(`^${p}$`).test(t.word))
+            patterns.every((p) => !new RegExp(`^${p}$`).test(t.word)),
           );
     if (suppressedTokens.length === 0) {
       onReturnNull(
-        `Don't show suggestions because all tokens are ignored by token pattern: ${String.raw`^[\u3040-\u309F\u30A0-\u30FF]{1,2}$`}`
+        `Don't show suggestions because all tokens are ignored by token pattern: ${String.raw`^[\u3040-\u309F\u30A0-\u30FF]{1,2}$`}`,
       );
       return null;
     }
@@ -977,7 +977,7 @@ export class AutoCompleteSuggest
     // With aliases
     if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
       const { link } = this.appHelper.optimizeMarkdownLinkText(
-        word.aliasMeta.origin
+        word.aliasMeta.origin,
       )!;
       return this.appHelper.useWikiLinks
         ? `[[${link}|${word.value}]]`
@@ -987,7 +987,7 @@ export class AutoCompleteSuggest
     const pattern = this.settings
       .insertAliasTransformedFromDisplayedInternalLink.enabled
       ? new RegExp(
-          this.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp
+          this.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp,
         )
       : null;
     const match = (value: string) =>
@@ -996,12 +996,12 @@ export class AutoCompleteSuggest
       pattern
         ? value.replace(
             pattern,
-            this.settings.insertAliasTransformedFromDisplayedInternalLink.after
+            this.settings.insertAliasTransformedFromDisplayedInternalLink.after,
           )
         : value;
 
     const { displayed, link } = this.appHelper.optimizeMarkdownLinkText(
-      word.phantom ? word.value : word.createdPath
+      word.phantom ? word.value : word.createdPath,
     )!;
     if (
       this.appHelper.newLinkFormat === "shortest" &&
@@ -1070,7 +1070,7 @@ export class AutoCompleteSuggest
         ...this.context.start,
         ch: this.contextStartCh + word.offset!,
       },
-      this.context.end
+      this.context.end,
     );
 
     if (positionToMove !== -1) {
@@ -1078,8 +1078,8 @@ export class AutoCompleteSuggest
         editor.offsetToPos(
           editor.posToOffset(editor.getCursor()) -
             insertedText.length +
-            positionToMove
-        )
+            positionToMove,
+        ),
       );
     }
 
@@ -1087,13 +1087,13 @@ export class AutoCompleteSuggest
     if (
       this.appHelper.equalsAsEditorPosition(
         this.context.start,
-        this.context.end
+        this.context.end,
       )
     ) {
       editor.setCursor(
         editor.offsetToPos(
-          editor.posToOffset(editor.getCursor()) + insertedText.length
-        )
+          editor.posToOffset(editor.getCursor()) + insertedText.length,
+        ),
       );
     }
 
