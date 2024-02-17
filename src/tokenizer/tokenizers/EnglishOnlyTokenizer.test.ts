@@ -25,7 +25,7 @@ describe.each<{
 `("tokenize", ({ constructorArgs, content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(
-      new EnglishOnlyTokenizer(constructorArgs).tokenize(content, raw)
+      new EnglishOnlyTokenizer(constructorArgs).tokenize(content, raw),
     ).toStrictEqual(expected);
   });
 });
@@ -49,7 +49,7 @@ describe.each<{
 `("recursiveTokenize", ({ content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
     expect(new EnglishOnlyTokenizer().recursiveTokenize(content)).toStrictEqual(
-      expected
+      expected,
     );
   });
 });

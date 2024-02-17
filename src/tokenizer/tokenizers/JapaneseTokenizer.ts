@@ -18,7 +18,7 @@ export class JapaneseTokenizer extends AbstractTokenizer {
   tokenize(content: string, raw?: boolean): string[] {
     return pickTokensAsJapanese(
       content,
-      raw ? / /g : this.getTrimPattern("indexing")
+      raw ? / /g : this.getTrimPattern("indexing"),
     );
   }
 
@@ -28,8 +28,8 @@ export class JapaneseTokenizer extends AbstractTokenizer {
         .segment(content)
         // https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/issues/77
         .flatMap((x: string) =>
-          x === " " ? x : x.split(" ").map((t) => (t === "" ? " " : t))
-        )
+          x === " " ? x : x.split(" ").map((t) => (t === "" ? " " : t)),
+        ),
     );
 
     const ret = [];

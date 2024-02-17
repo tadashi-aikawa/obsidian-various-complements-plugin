@@ -57,33 +57,33 @@ export class WordTypeMeta {
   static readonly FRONT_MATTER = new WordTypeMeta(
     "frontMatter",
     100,
-    "frontMatter"
+    "frontMatter",
   );
   static readonly INTERNAL_LINK = new WordTypeMeta(
     "internalLink",
     90,
-    "internalLink"
+    "internalLink",
   );
   static readonly CUSTOM_DICTIONARY = new WordTypeMeta(
     "customDictionary",
     80,
-    "suggestion"
+    "suggestion",
   );
   static readonly CURRENT_FILE = new WordTypeMeta(
     "currentFile",
     70,
-    "suggestion"
+    "suggestion",
   );
   static readonly CURRENT_VAULT = new WordTypeMeta(
     "currentVault",
     60,
-    "suggestion"
+    "suggestion",
   );
 
   private constructor(
     readonly type: WordType,
     readonly priority: number,
-    readonly group: "frontMatter" | "internalLink" | "suggestion"
+    readonly group: "frontMatter" | "internalLink" | "suggestion",
   ) {
     WordTypeMeta._values.push(this);
     WordTypeMeta._dict[type] = this;

@@ -6,7 +6,7 @@ const ENGLISH_PATTERN = /[a-zA-Z0-9_\-\\]/;
 export class EnglishOnlyTokenizer extends DefaultTokenizer {
   tokenize(content: string, raw?: boolean): string[] {
     const tokenized = Array.from(this._tokenize(content, "indexing")).filter(
-      (x) => x.word.match(ENGLISH_PATTERN)
+      (x) => x.word.match(ENGLISH_PATTERN),
     );
     return raw
       ? tokenized.map((x) => x.word)
@@ -29,7 +29,7 @@ export class EnglishOnlyTokenizer extends DefaultTokenizer {
 
   private *_tokenize(
     content: string,
-    target: TrimTarget
+    target: TrimTarget,
   ): Iterable<{ word: string; offset: number }> {
     let startIndex = 0;
     let previousType: PreviousType = "none";

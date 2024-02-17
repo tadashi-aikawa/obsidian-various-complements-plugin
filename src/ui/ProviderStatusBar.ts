@@ -8,14 +8,14 @@ export class ProviderStatusBar {
     public internalLink: HTMLElement | null,
     public frontMatter: HTMLElement | null,
     public matchStrategy: HTMLElement | null,
-    public complementAutomatically: HTMLElement | null
+    public complementAutomatically: HTMLElement | null,
   ) {}
 
   static new(
     statusBar: HTMLElement,
     showMatchStrategy: boolean,
     showIndexingStatus: boolean,
-    showComplementAutomatically: boolean
+    showComplementAutomatically: boolean,
   ): ProviderStatusBar {
     const currentFile = showIndexingStatus
       ? statusBar.createEl("span", {
@@ -69,7 +69,7 @@ export class ProviderStatusBar {
       internalLink,
       frontMatter,
       matchStrategy,
-      complementAutomatically
+      complementAutomatically,
     );
   }
 

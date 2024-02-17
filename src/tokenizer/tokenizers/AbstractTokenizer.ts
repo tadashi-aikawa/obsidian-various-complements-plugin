@@ -40,6 +40,6 @@ export abstract class AbstractTokenizer implements Tokenizer {
   abstract tokenize(content: string, raw?: boolean): string[];
 
   abstract recursiveTokenize(
-    content: string
+    content: string,
   ): { word: string; offset: number }[];
 }

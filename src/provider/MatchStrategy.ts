@@ -15,7 +15,7 @@ type Handler = (
     fuzzy?: {
       minMatchScore: number;
     };
-  }
+  },
 ) => Word[];
 
 export class MatchStrategy {
@@ -24,10 +24,13 @@ export class MatchStrategy {
   static readonly PREFIX = new MatchStrategy("prefix", suggestWords);
   static readonly PARTIAL = new MatchStrategy(
     "partial",
-    suggestWordsByPartialMatch
+    suggestWordsByPartialMatch,
   );
 
-  private constructor(readonly name: Name, readonly handler: Handler) {
+  private constructor(
+    readonly name: Name,
+    readonly handler: Handler,
+  ) {
     MatchStrategy._values.push(this);
   }
 

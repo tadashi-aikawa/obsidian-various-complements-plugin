@@ -85,14 +85,14 @@ describe.each<{
   ${{ value: "abcde", type: "customDictionary" }}                        | ${""}   | ${false}            | ${0}     | ${{ value: "abcde", word: { value: "abcde", hit: "abcde", type: "customDictionary" }, alias: false }}
 `("judge", ({ word, query, queryStartWithUpper, fuzzy, expected }) => {
   test(`judge(${JSON.stringify(
-    word
+    word,
   )}, ${query}, ${queryStartWithUpper}, ${fuzzy}) = ${JSON.stringify(
-    expected
+    expected,
   )}`, () => {
     expect(
       judge(word, query, queryStartWithUpper, {
         fuzzy: fuzzy === false ? undefined : { minMatchScore: fuzzy },
-      })
+      }),
     ).toStrictEqual(expected);
   });
 });
@@ -132,17 +132,17 @@ describe.each<{
   "judgeByPartialMatch",
   ({ word, query, queryStartWithUpper, fuzzy, expected }) => {
     test(`judgeByPartialMatch(${JSON.stringify(
-      word
+      word,
     )}, ${query}, ${queryStartWithUpper}, ${fuzzy}) = ${JSON.stringify(
-      expected
+      expected,
     )}`, () => {
       expect(
         judgeByPartialMatch(word, query, queryStartWithUpper, {
           fuzzy: fuzzy === false ? undefined : { minMatchScore: fuzzy },
-        })
+        }),
       ).toStrictEqual(expected);
     });
-  }
+  },
 );
 
 describe("suggestWords", () => {
@@ -374,7 +374,7 @@ describe("suggestWords", () => {
   test("Query: ua (fuzzy: true)", () => {
     const indexedWords = createIndexedWords();
     expect(
-      suggestWords(indexedWords, "ua", 10, { fuzzy: { minMatchScore: 0 } })
+      suggestWords(indexedWords, "ua", 10, { fuzzy: { minMatchScore: 0 } }),
     ).toStrictEqual([
       {
         value: "uaaaaaaaaaaaaa",
@@ -793,7 +793,7 @@ describe("suggestWords", () => {
 
   test("word type priority order in front matter tags", () => {
     expect(
-      suggestWords(indexedWords2, "a", 10, { frontMatter: "tags" })
+      suggestWords(indexedWords2, "a", 10, { frontMatter: "tags" }),
     ).toStrictEqual([
       {
         key: "tags",
@@ -827,13 +827,13 @@ describe("suggestWords", () => {
 
   test("empty in front matter alias", () => {
     expect(
-      suggestWords(indexedWords2, "a", 10, { frontMatter: "alias" })
+      suggestWords(indexedWords2, "a", 10, { frontMatter: "alias" }),
     ).toStrictEqual([]);
   });
 
   test("empty in front matter aliases", () => {
     expect(
-      suggestWords(indexedWords2, "a", 10, { frontMatter: "aliases" })
+      suggestWords(indexedWords2, "a", 10, { frontMatter: "aliases" }),
     ).toStrictEqual([]);
   });
 
@@ -1122,7 +1122,7 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords, "ueo", 10, {
         fuzzy: { minMatchScore: 0 },
-      })
+      }),
     ).toStrictEqual([
       {
         value: "aiUEO",
@@ -1593,7 +1593,7 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, {
         frontMatter: "tags",
-      })
+      }),
     ).toStrictEqual([
       {
         key: "tags",
@@ -1629,7 +1629,7 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, {
         frontMatter: "alias",
-      })
+      }),
     ).toStrictEqual([]);
   });
 
@@ -1637,7 +1637,7 @@ describe("suggestWordsByPartialMatch", () => {
     expect(
       suggestWordsByPartialMatch(indexedWords2, "a", 10, {
         frontMatter: "alias",
-      })
+      }),
     ).toStrictEqual([]);
   });
 

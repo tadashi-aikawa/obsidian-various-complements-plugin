@@ -11,7 +11,7 @@ export class CustomDictionaryWordAddModal extends Modal {
     dictionaryPaths: string[],
     initialValue: string = "",
     dividerForDisplay: string = "",
-    onSubmit: (dictionaryPath: string, word: CustomDictionaryWord) => void
+    onSubmit: (dictionaryPath: string, word: CustomDictionaryWord) => void,
   ) {
     super(app);
     const appHelper = new AppHelper(app);

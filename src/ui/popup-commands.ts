@@ -7,7 +7,7 @@ export type CommandReturnType = boolean | undefined;
 export function select(
   popup: AutoCompleteSuggest,
   evt: KeyboardEvent,
-  index?: number
+  index?: number,
 ): CommandReturnType {
   if (evt.isComposing) {
     return;
@@ -29,7 +29,7 @@ export function select(
 
 export function insertAsText(
   popup: AutoCompleteSuggest,
-  evt: KeyboardEvent
+  evt: KeyboardEvent,
 ): CommandReturnType {
   if (!popup.context || evt.isComposing) {
     return;
@@ -48,7 +48,7 @@ export function insertAsText(
       ...popup.context.start,
       ch: popup.contextStartCh + item.offset!,
     },
-    popup.context.end
+    popup.context.end,
   );
 
   return false;
@@ -56,7 +56,7 @@ export function insertAsText(
 
 export function selectNext(
   popup: AutoCompleteSuggest,
-  evt: KeyboardEvent
+  evt: KeyboardEvent,
 ): CommandReturnType {
   if (popup.settings.noAutoFocusUntilCycle && popup.selectionLock) {
     popup.setSelectionLock(false);
@@ -68,7 +68,7 @@ export function selectNext(
 
 export function selectPrevious(
   popup: AutoCompleteSuggest,
-  evt: KeyboardEvent
+  evt: KeyboardEvent,
 ): CommandReturnType {
   if (popup.settings.noAutoFocusUntilCycle && popup.selectionLock) {
     popup.setSelectionLock(false);
@@ -109,7 +109,7 @@ export function completion(popup: AutoCompleteSuggest): CommandReturnType {
       ...popup.context.start,
       ch: popup.contextStartCh,
     },
-    popup.context.end
+    popup.context.end,
   );
 
   const tokens = popup.tokenizer.recursiveTokenize(currentPhrase);
@@ -119,7 +119,7 @@ export function completion(popup: AutoCompleteSuggest): CommandReturnType {
       commonPrefix: findCommonPrefix(
         popup.suggestions.values
           .map((x) => excludeEmoji(x.value))
-          .filter((x) => x.toLowerCase().startsWith(t.word.toLowerCase()))
+          .filter((x) => x.toLowerCase().startsWith(t.word.toLowerCase())),
       ),
     }))
     .find((x) => x.commonPrefix != null);
@@ -137,7 +137,7 @@ export function completion(popup: AutoCompleteSuggest): CommandReturnType {
       ...popup.context.start,
       ch: popup.contextStartCh + commonPrefixWithToken.token.offset,
     },
-    popup.context.end
+    popup.context.end,
   );
   return true;
 }

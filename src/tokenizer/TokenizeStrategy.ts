@@ -8,7 +8,7 @@ export class TokenizeStrategy {
     "english-only",
     3,
     5,
-    true
+    true,
   );
   static readonly JAPANESE = new TokenizeStrategy("japanese", 2, 2, false);
   static readonly ARABIC = new TokenizeStrategy("arabic", 3, 3, false);
@@ -18,7 +18,7 @@ export class TokenizeStrategy {
     readonly name: Name,
     readonly triggerThreshold: number,
     readonly indexingThreshold: number,
-    readonly canTreatUnderscoreAsPartOfWord: boolean
+    readonly canTreatUnderscoreAsPartOfWord: boolean,
   ) {
     TokenizeStrategy._values.push(this);
   }

@@ -5,7 +5,7 @@ export const MOD = Platform.isMacOS ? "Cmd" : "Ctrl";
 export const ALT = Platform.isMacOS ? "Option" : "Alt";
 
 export const quickResultSelectionModifier = (
-  userAltInsteadOfModForQuickResultSelection: boolean
+  userAltInsteadOfModForQuickResultSelection: boolean,
 ) => (userAltInsteadOfModForQuickResultSelection ? ALT : MOD);
 
 export type Hotkey = {
@@ -24,7 +24,7 @@ export function hotkey2String(hotkey?: Hotkey): string {
 
 export function string2Hotkey(
   hotKey: string,
-  hideHotkeyGuide: boolean
+  hideHotkeyGuide: boolean,
 ): Hotkey | null {
   const keys = hotKey.split(" ");
   if (keys.length === 1) {
@@ -41,7 +41,7 @@ export function string2Hotkey(
 
 export function equalsAsHotkey(
   hotkey: Hotkey,
-  keyDownEvent: KeyboardEvent
+  keyDownEvent: KeyboardEvent,
 ): boolean {
   const hk: Hotkey = { modifiers: [], key: keyDownEvent.key };
   if (keyDownEvent.shiftKey) {

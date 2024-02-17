@@ -7,7 +7,10 @@ export class ColumnDelimiter {
   static readonly COMMA = new ColumnDelimiter("Comma", ",");
   static readonly PIPE = new ColumnDelimiter("Pipe", "|");
 
-  private constructor(readonly name: string, readonly value: Delimiter) {
+  private constructor(
+    readonly name: string,
+    readonly value: Delimiter,
+  ) {
     ColumnDelimiter._values.push(this);
   }
 

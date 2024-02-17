@@ -15,7 +15,7 @@ type Handler = (
     fuzzy?: {
       minMatchScore: number;
     };
-  }
+  },
 ) => Word[];
 
 const neverUsedHandler = (..._args: any[]) => [];
@@ -25,15 +25,18 @@ export class SpecificMatchStrategy {
 
   static readonly INHERIT = new SpecificMatchStrategy(
     "inherit",
-    neverUsedHandler
+    neverUsedHandler,
   );
   static readonly PREFIX = new SpecificMatchStrategy("prefix", suggestWords);
   static readonly PARTIAL = new SpecificMatchStrategy(
     "partial",
-    suggestWordsByPartialMatch
+    suggestWordsByPartialMatch,
   );
 
-  private constructor(readonly name: Name, readonly handler: Handler) {
+  private constructor(
+    readonly name: Name,
+    readonly handler: Handler,
+  ) {
     SpecificMatchStrategy._values.push(this);
   }
 

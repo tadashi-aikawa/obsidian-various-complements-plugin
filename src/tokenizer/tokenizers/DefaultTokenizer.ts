@@ -9,7 +9,7 @@ export class DefaultTokenizer extends AbstractTokenizer {
   tokenize(content: string, raw?: boolean): string[] {
     const tokens = raw
       ? Array.from(splitRaw(content, this.getTrimPattern("indexing"))).filter(
-          (x) => x !== " "
+          (x) => x !== " ",
         )
       : pickTokens(content, this.getTrimPattern("indexing"));
     return tokens.map((x) => x.replace(/\.+$/g, ""));
@@ -17,7 +17,7 @@ export class DefaultTokenizer extends AbstractTokenizer {
 
   recursiveTokenize(content: string): { word: string; offset: number }[] {
     const trimIndexes = Array.from(
-      content.matchAll(this.getTrimPattern("input"))
+      content.matchAll(this.getTrimPattern("input")),
     )
       .sort((a, b) => a.index! - b.index!)
       .map((x) => x.index!);

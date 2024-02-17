@@ -262,7 +262,7 @@ describe.each<{
 `("synonymAliases", ({ value, emoji, accentsDiacritics, expected }) => {
   test(`${value} (emoji: ${emoji}, accentsDiacritics: ${accentsDiacritics})`, () => {
     expect(synonymAliases(value, { emoji, accentsDiacritics })).toStrictEqual(
-      expected
+      expected,
     );
   });
 });

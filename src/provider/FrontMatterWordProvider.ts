@@ -13,7 +13,7 @@ function synonymAliases(name: string): string[] {
 function frontMatterToWords(
   file: TFile,
   key: string,
-  values: FrontMatterValue
+  values: FrontMatterValue,
 ): FrontMatterWord[] {
   return values.map((x) => ({
     key,
@@ -29,23 +29,23 @@ function pickWords(file: TFile, fm: { [key: string]: FrontMatterValue }) {
     .filter(
       ([_key, value]) =>
         value != null &&
-        (typeof value === "string" || typeof value[0] === "string")
+        (typeof value === "string" || typeof value[0] === "string"),
     )
     .flatMap(([key, value]) => frontMatterToWords(file, key, value));
 }
 
 // noinspection FunctionWithMultipleLoopsJS
 function extractAndUniqWords(
-  wordsByCreatedPath: FrontMatterWordProvider["wordsByCreatedPath"]
+  wordsByCreatedPath: FrontMatterWordProvider["wordsByCreatedPath"],
 ): FrontMatterWord[] {
   return uniqBy(
     Object.values(wordsByCreatedPath).flat(),
-    (w) => w.key + w.value.toLowerCase()
+    (w) => w.key + w.value.toLowerCase(),
   );
 }
 
 function indexingWords(
-  words: FrontMatterWord[]
+  words: FrontMatterWord[],
 ): FrontMatterWordProvider["wordsByFirstLetterByKey"] {
   const wordsByKey = groupBy(words, (x) => x.key);
   return Object.fromEntries(
@@ -53,8 +53,8 @@ function indexingWords(
       ([key, words]: [string, FrontMatterWord[]]) => [
         key,
         groupBy(words, (w) => w.value.charAt(0)),
-      ]
-    )
+      ],
+    ),
   );
 }
 
@@ -63,7 +63,10 @@ export class FrontMatterWordProvider {
   words: FrontMatterWord[];
   wordsByFirstLetterByKey: { [key: string]: WordsByFirstLetter };
 
-  constructor(private app: App, private appHelper: AppHelper) {}
+  constructor(
+    private app: App,
+    private appHelper: AppHelper,
+  ) {}
 
   refreshWords(): void {
     this.clearWords();

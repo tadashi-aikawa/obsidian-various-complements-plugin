@@ -15,7 +15,10 @@ export class CurrentVaultWordProvider {
   private excludePrefixPatterns: string[];
   private onlyUnderCurrentDirectory: boolean;
 
-  constructor(private app: App, private appHelper: AppHelper) {}
+  constructor(
+    private app: App,
+    private appHelper: AppHelper,
+  ) {}
 
   async refreshWords(option: {
     minNumberOfCharacters: number;
@@ -32,7 +35,7 @@ export class CurrentVaultWordProvider {
       .filter((p) => this.includePrefixPatterns.every((x) => p.startsWith(x)))
       .filter((p) => this.excludePrefixPatterns.every((x) => !p.startsWith(x)))
       .filter(
-        (p) => !this.onlyUnderCurrentDirectory || dirname(p) === currentDirname
+        (p) => !this.onlyUnderCurrentDirectory || dirname(p) === currentDirname,
       );
 
     let wordByValue: { [value: string]: Word } = {};
@@ -44,7 +47,7 @@ export class CurrentVaultWordProvider {
         .filter(
           (x) =>
             x.length >= option.minNumberOfCharacters &&
-            !this.tokenizer.shouldIgnoreOnCurrent(x)
+            !this.tokenizer.shouldIgnoreOnCurrent(x),
         )
         .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
       for (const token of tokens) {
@@ -78,7 +81,7 @@ export class CurrentVaultWordProvider {
     tokenizer: Tokenizer,
     includePrefixPatterns: string[],
     excludePrefixPatterns: string[],
-    onlyUnderCurrentDirectory: boolean
+    onlyUnderCurrentDirectory: boolean,
   ) {
     this.tokenizer = tokenizer;
     this.includePrefixPatterns = includePrefixPatterns;

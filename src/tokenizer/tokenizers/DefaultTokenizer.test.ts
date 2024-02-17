@@ -47,7 +47,7 @@ describe.each<{
 `("tokenize", ({ constructorArgs, content, expected }) => {
   test(`tokenize(${content}) = ${expected}`, () => {
     expect(
-      new DefaultTokenizer(constructorArgs).tokenize(content)
+      new DefaultTokenizer(constructorArgs).tokenize(content),
     ).toStrictEqual(expected);
   });
 });
@@ -70,7 +70,7 @@ describe.each<{
 `("recursiveTokenize", ({ constructorArgs, content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
     expect(
-      new DefaultTokenizer(constructorArgs).recursiveTokenize(content)
+      new DefaultTokenizer(constructorArgs).recursiveTokenize(content),
     ).toStrictEqual(expected);
   });
 });

@@ -23,7 +23,7 @@ const WEEK = DAY * 7;
 
 function calcScore(
   history: SelectionHistory | undefined,
-  latestUpdated: number
+  latestUpdated: number,
 ): number {
   if (!history) {
     return 0;
@@ -61,7 +61,7 @@ export class SelectionHistoryStorage {
   constructor(
     data: SelectionHistoryTree = {},
     maxDaysToKeepHistory: number,
-    maxNumberOfHistoryToKeep: number
+    maxNumberOfHistoryToKeep: number,
   ) {
     this.data = data;
 

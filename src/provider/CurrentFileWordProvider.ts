@@ -15,7 +15,10 @@ export class CurrentFileWordProvider {
   private words: Word[] = [];
   private tokenizer: Tokenizer;
 
-  constructor(private app: App, private appHelper: AppHelper) {}
+  constructor(
+    private app: App,
+    private appHelper: AppHelper,
+  ) {}
 
   async refreshWords(option: {
     onlyEnglish: boolean;
@@ -37,7 +40,7 @@ export class CurrentFileWordProvider {
 
     const currentToken = this.tokenizer
       .tokenize(
-        editor.getLine(editor.getCursor().line).slice(0, editor.getCursor().ch)
+        editor.getLine(editor.getCursor().line).slice(0, editor.getCursor().ch),
       )
       .last();
 

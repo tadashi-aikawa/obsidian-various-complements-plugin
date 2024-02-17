@@ -43,7 +43,7 @@ function unescape(value: string): string {
 function jsonToWords(
   json: JsonDictionary,
   path: string,
-  systemCaretSymbol?: string
+  systemCaretSymbol?: string,
 ): CustomDictionaryWord[] {
   return json.words.map((x) => ({
     value: x.displayed || x.value,
@@ -63,7 +63,7 @@ function lineToWord(
   path: string,
   delimiterForDisplay?: string,
   delimiterForHide?: string,
-  systemCaretSymbol?: string
+  systemCaretSymbol?: string,
 ): CustomDictionaryWord {
   const [v, description, ...aliases] = line.split(delimiter.value);
 
@@ -93,7 +93,7 @@ function lineToWord(
 function wordToLine(
   word: CustomDictionaryWord,
   delimiter: ColumnDelimiter,
-  dividerForDisplay: string | null
+  dividerForDisplay: string | null,
 ): string {
   const value =
     word.insertedText && dividerForDisplay
@@ -108,7 +108,7 @@ function wordToLine(
     return [escapedValue, word.description].join(delimiter.value);
   }
   return [escapedValue, word.description, ...word.aliases].join(
-    delimiter.value
+    delimiter.value,
   );
 }
 
@@ -143,7 +143,7 @@ export class CustomDictionaryWordProvider {
 
   private async loadWords(
     path: string,
-    option: Option
+    option: Option,
   ): Promise<CustomDictionaryWord[]> {
     const contents = isURL(path)
       ? await request({ url: path })
@@ -162,12 +162,12 @@ export class CustomDictionaryWordProvider {
               path,
               option.delimiterForDisplay,
               option.delimiterForHide,
-              option.caretSymbol
-            )
+              option.caretSymbol,
+            ),
           );
 
     return words.filter(
-      (x) => !option.regexp || x.value.match(new RegExp(option.regexp))
+      (x) => !option.regexp || x.value.match(new RegExp(option.regexp)),
     );
   }
 
@@ -181,13 +181,13 @@ export class CustomDictionaryWordProvider {
           this.addWord(x, {
             emoji: option.makeSynonymAboutEmoji,
             accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
-          })
+          }),
         );
       } catch (e) {
         // noinspection ObjectAllocationIgnored
         new Notice(
           `⚠ Fail to load ${path} -- Various Complements Plugin -- \n ${e}`,
-          0
+          0,
         );
       }
     }
@@ -199,12 +199,12 @@ export class CustomDictionaryWordProvider {
     synonymOption: {
       emoji: boolean;
       accentsDiacritics: boolean;
-    }
+    },
   ): Promise<void> {
     this.addWord(word, synonymOption);
     await this.fileSystemAdapter.append(
       dictionaryPath,
-      "\n" + wordToLine(word, this.delimiter, this.dividerForDisplay)
+      "\n" + wordToLine(word, this.delimiter, this.dividerForDisplay),
     );
   }
 
@@ -213,7 +213,7 @@ export class CustomDictionaryWordProvider {
     synonymOption: {
       emoji: boolean;
       accentsDiacritics: boolean;
-    }
+    },
   ) {
     this.words.push(word);
 
@@ -230,10 +230,10 @@ export class CustomDictionaryWordProvider {
     pushWord(
       this.wordsByFirstLetter,
       wordWithSynonym.value.charAt(0),
-      wordWithSynonym
+      wordWithSynonym,
     );
     wordWithSynonym.aliases?.forEach((a) =>
-      pushWord(this.wordsByFirstLetter, a.charAt(0), wordWithSynonym)
+      pushWord(this.wordsByFirstLetter, a.charAt(0), wordWithSynonym),
     );
   }
 
@@ -250,7 +250,7 @@ export class CustomDictionaryWordProvider {
   setSettings(
     paths: string[],
     delimiter: ColumnDelimiter,
-    dividerForDisplay: string | null
+    dividerForDisplay: string | null,
   ) {
     this.paths = paths;
     this.delimiter = delimiter;

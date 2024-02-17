@@ -8,7 +8,10 @@ export class InternalLinkWordProvider {
   private words: Word[] = [];
   wordsByFirstLetter: WordsByFirstLetter = {};
 
-  constructor(private app: App, private appHelper: AppHelper) {}
+  constructor(
+    private app: App,
+    private appHelper: AppHelper,
+  ) {}
 
   refreshWords(option: {
     wordAsInternalLinkAlias: boolean;
@@ -34,7 +37,7 @@ export class InternalLinkWordProvider {
 
         return !this.appHelper.getBoolFrontMatter(
           f,
-          option.frontMatterKeyForExclusion
+          option.frontMatterKeyForExclusion,
         );
       })
       .flatMap((x) => {
@@ -82,7 +85,7 @@ export class InternalLinkWordProvider {
                   synonymAliases(al, {
                     emoji: option.makeSynonymAboutEmoji,
                     accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
-                  })
+                  }),
                 ),
               ],
               description: x.path,
@@ -111,7 +114,7 @@ export class InternalLinkWordProvider {
     for (const word of this.words) {
       pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
       word.aliases?.forEach((a) =>
-        pushWord(this.wordsByFirstLetter, a.charAt(0), word)
+        pushWord(this.wordsByFirstLetter, a.charAt(0), word),
       );
     }
   }

@@ -274,7 +274,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             currentFile: true,
             currentVault: true,
           });
-        })
+        }),
     );
     if (this.plugin.settings.strategy === TokenizeStrategy.CHINESE.name) {
       const df = document.createDocumentFragment();
@@ -285,7 +285,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         createEl("a", {
           href: "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
           text: " the site ",
-        })
+        }),
       );
 
       new Setting(containerEl)
@@ -301,7 +301,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
 
       const hasCedict = await app.vault.adapter.exists(
-        this.plugin.settings.cedictPath
+        this.plugin.settings.cedictPath,
       );
       if (!hasCedict) {
         containerEl.createEl("div", {
@@ -319,7 +319,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           this.plugin.settings.matchStrategy = value;
           await this.plugin.saveSettings();
           this.display();
-        })
+        }),
     );
     if (this.plugin.settings.matchStrategy === MatchStrategy.PARTIAL.name) {
       containerEl.createEl("div", {
@@ -338,7 +338,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Min fuzzy match score")
       .setDesc(
-        "It only shows suggestions whose fuzzy matched score is more than the specific value."
+        "It only shows suggestions whose fuzzy matched score is more than the specific value.",
       )
       .addSlider((sc) =>
         sc
@@ -348,7 +348,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.minFuzzyMatchScore = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -356,7 +356,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setDesc("Ex: If enabled, 'aaa' matches with 'áäā'")
       .addToggle((tc) => {
         tc.setValue(
-          this.plugin.settings.treatAccentDiacriticsAsAlphabeticCharacters
+          this.plugin.settings.treatAccentDiacriticsAsAlphabeticCharacters,
         ).onChange(async (value) => {
           this.plugin.settings.treatAccentDiacriticsAsAlphabeticCharacters =
             value;
@@ -376,11 +376,11 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Treat an underscore as a part of a word.")
         .setDesc(
-          "If this setting is enabled, aaa_bbb will be tokenized as a single token aaa_bbb, rather than being split into aaa and bbb."
+          "If this setting is enabled, aaa_bbb will be tokenized as a single token aaa_bbb, rather than being split into aaa and bbb.",
         )
         .addToggle((tc) => {
           tc.setValue(
-            this.plugin.settings.treatUnderscoreAsPartOfWord
+            this.plugin.settings.treatUnderscoreAsPartOfWord,
           ).onChange(async (value) => {
             this.plugin.settings.treatUnderscoreAsPartOfWord = value;
             await this.plugin.saveSettings({
@@ -406,7 +406,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               currentVault: true,
               currentFile: true,
             });
-          }
+          },
         );
       });
 
@@ -420,7 +420,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.maxNumberOfSuggestions = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -434,13 +434,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.maxNumberOfWordsAsPhrase = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
       .setName("Min number of characters for trigger")
       .setDesc(
-        "Setting the value to 0 does not mean the suggestion will be triggered without any inputted character. Instead, a designated value will be used depending on the Strategy you choose."
+        "Setting the value to 0 does not mean the suggestion will be triggered without any inputted character. Instead, a designated value will be used depending on the Strategy you choose.",
       )
       .addSlider((sc) =>
         sc
@@ -450,7 +450,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.minNumberOfCharactersTriggered = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -463,7 +463,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.minNumberOfWordsTriggeredPhrase = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -473,7 +473,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           async (value) => {
             this.plugin.settings.complementAutomatically = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
 
@@ -487,14 +487,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.delayMilliSeconds = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
       .setName("Disable suggestions during IME on")
       .addToggle((tc) => {
         tc.setValue(
-          this.plugin.settings.disableSuggestionsDuringImeOn
+          this.plugin.settings.disableSuggestionsDuringImeOn,
         ).onChange(async (value) => {
           this.plugin.settings.disableSuggestionsDuringImeOn = value;
           await this.plugin.saveSettings();
@@ -508,7 +508,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           async (value) => {
             this.plugin.settings.insertAfterCompletion = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
 
@@ -516,7 +516,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setName("First characters to disable suggestions")
       .addText((cb) => {
         cb.setValue(
-          this.plugin.settings.firstCharactersDisableSuggestions
+          this.plugin.settings.firstCharactersDisableSuggestions,
         ).onChange(async (value) => {
           this.plugin.settings.firstCharactersDisableSuggestions = value;
           await this.plugin.saveSettings();
@@ -526,7 +526,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Line patterns to suppress trigger")
       .setDesc(
-        "Regular expression line patterns (partial match) until the cursor, that suppresses the activation of autocomplete. Multiple patterns can be defined with line breaks."
+        "Regular expression line patterns (partial match) until the cursor, that suppresses the activation of autocomplete. Multiple patterns can be defined with line breaks.",
       )
       .addTextArea((tc) => {
         const el = tc
@@ -544,12 +544,12 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Phrase patterns to suppress trigger")
       .setDesc(
-        "Regular expression patterns (exact match) that suppress the activation of autocomplete. Multiple patterns can be defined with line breaks."
+        "Regular expression patterns (exact match) that suppress the activation of autocomplete. Multiple patterns can be defined with line breaks.",
       )
       .addTextArea((tc) => {
         const el = tc
           .setValue(
-            this.plugin.settings.phrasePatternsToSuppressTrigger.join("\n")
+            this.plugin.settings.phrasePatternsToSuppressTrigger.join("\n"),
           )
           .onChange(async (value) => {
             this.plugin.settings.phrasePatternsToSuppressTrigger =
@@ -569,7 +569,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           async (value) => {
             this.plugin.settings.noAutoFocusUntilCycle = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
   }
@@ -583,42 +583,42 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Show Match strategy")
       .setDesc(
-        "Show Match strategy at the status bar. Changing this option requires a restart to take effect."
+        "Show Match strategy at the status bar. Changing this option requires a restart to take effect.",
       )
       .addToggle((tc) => {
         tc.setValue(this.plugin.settings.showMatchStrategy).onChange(
           async (value) => {
             this.plugin.settings.showMatchStrategy = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
 
     new Setting(containerEl)
       .setName("Show Complement automatically")
       .setDesc(
-        "Show complement automatically at the status bar. Changing this option requires a restart to take effect."
+        "Show complement automatically at the status bar. Changing this option requires a restart to take effect.",
       )
       .addToggle((tc) => {
         tc.setValue(this.plugin.settings.showComplementAutomatically).onChange(
           async (value) => {
             this.plugin.settings.showComplementAutomatically = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
 
     new Setting(containerEl)
       .setName("Show Indexing status")
       .setDesc(
-        "Show indexing status at the status bar. Changing this option requires a restart to take effect."
+        "Show indexing status at the status bar. Changing this option requires a restart to take effect.",
       )
       .addToggle((tc) => {
         tc.setValue(this.plugin.settings.showIndexingStatus).onChange(
           async (value) => {
             this.plugin.settings.showIndexingStatus = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
 
@@ -627,13 +627,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .addDropdown((tc) =>
         tc
           .addOptions(
-            mirrorMap(DescriptionOnSuggestion.values(), (x) => x.name)
+            mirrorMap(DescriptionOnSuggestion.values(), (x) => x.name),
           )
           .setValue(this.plugin.settings.descriptionOnSuggestion)
           .onChange(async (value) => {
             this.plugin.settings.descriptionOnSuggestion = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
   }
 
@@ -655,7 +655,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         text: "keycode.info",
         href: "https://keycode.info/",
       }),
-      ". (Press any key and show 'event.key')"
+      ". (Press any key and show 'event.key')",
     );
 
     const ul = createEl("ul");
@@ -698,14 +698,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Propagate ESC")
       .setDesc(
-        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not."
+        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not.",
       )
       .addToggle((tc) => {
         tc.setValue(this.plugin.settings.propagateEsc).onChange(
           async (value) => {
             this.plugin.settings.propagateEsc = value;
             await this.plugin.saveSettings();
-          }
+          },
         );
       });
   }
@@ -724,7 +724,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.enableCurrentFileComplement = value;
             await this.plugin.saveSettings({ currentFile: true });
             this.display();
-          }
+          },
         );
       });
 
@@ -740,14 +740,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             .onChange(async (value) => {
               this.plugin.settings.currentFileMinNumberOfCharacters = value;
               await this.plugin.saveSettings({ currentFile: true });
-            })
+            }),
         );
 
       new Setting(containerEl)
         .setName("Only complement English on current file complement")
         .addToggle((tc) => {
           tc.setValue(
-            this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement
+            this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement,
           ).onChange(async (value) => {
             this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement =
               value;
@@ -771,7 +771,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.enableCurrentVaultComplement = value;
             this.display();
             await this.plugin.saveSettings({ currentVault: true });
-          }
+          },
         );
       });
 
@@ -787,7 +787,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             .onChange(async (value) => {
               this.plugin.settings.currentVaultMinNumberOfCharacters = value;
               await this.plugin.saveSettings();
-            })
+            }),
         );
 
       new Setting(containerEl)
@@ -796,7 +796,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .addTextArea((tac) => {
           const el = tac
             .setValue(
-              this.plugin.settings.includeCurrentVaultPathPrefixPatterns
+              this.plugin.settings.includeCurrentVaultPathPrefixPatterns,
             )
             .setPlaceholder("Private/")
             .onChange(async (value) => {
@@ -814,7 +814,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .addTextArea((tac) => {
           const el = tac
             .setValue(
-              this.plugin.settings.excludeCurrentVaultPathPrefixPatterns
+              this.plugin.settings.excludeCurrentVaultPathPrefixPatterns,
             )
             .setPlaceholder("Private/")
             .onChange(async (value) => {
@@ -831,7 +831,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings
-              .includeCurrentVaultOnlyFilesUnderCurrentDirectory
+              .includeCurrentVaultOnlyFilesUnderCurrentDirectory,
           ).onChange(async (value) => {
             this.plugin.settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory =
               value;
@@ -851,7 +851,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setName("Enable Custom dictionary complement")
       .addToggle((tc) => {
         tc.setValue(
-          this.plugin.settings.enableCustomDictionaryComplement
+          this.plugin.settings.enableCustomDictionaryComplement,
         ).onChange(async (value) => {
           this.plugin.settings.enableCustomDictionaryComplement = value;
           await this.plugin.saveSettings({ customDictionary: true });
@@ -863,7 +863,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Custom dictionary paths")
         .setDesc(
-          "Specify either a relative path from Vault root or URL for each line."
+          "Specify either a relative path from Vault root or URL for each line.",
         )
         .addTextArea((tac) => {
           const el = tac
@@ -885,7 +885,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.columnDelimiter = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
       new Setting(containerEl)
@@ -893,7 +893,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc("Only load words that match the regular expression pattern.")
         .addText((cb) => {
           cb.setValue(
-            this.plugin.settings.customDictionaryWordRegexPattern
+            this.plugin.settings.customDictionaryWordRegexPattern,
           ).onChange(async (value) => {
             this.plugin.settings.customDictionaryWordRegexPattern = value;
             await this.plugin.saveSettings();
@@ -903,28 +903,28 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Delimiter to hide a suggestion")
         .setDesc(
-          "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but completes to 'abcdefg'."
+          "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but completes to 'abcdefg'.",
         )
         .addText((cb) => {
           cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
             async (value) => {
               this.plugin.settings.delimiterToHideSuggestion = value;
               await this.plugin.saveSettings();
-            }
+            },
           );
         });
 
       new Setting(containerEl)
         .setName(
-          "Delimiter to divide suggestions for display from ones for insertion"
+          "Delimiter to divide suggestions for display from ones for insertion",
         )
         .setDesc(
-          "If set ' >>> ', 'displayed >>> inserted' is shown as 'displayed' on suggestions, but completes to 'inserted'."
+          "If set ' >>> ', 'displayed >>> inserted' is shown as 'displayed' on suggestions, but completes to 'inserted'.",
         )
         .addText((cb) => {
           cb.setValue(
             this.plugin.settings
-              .delimiterToDivideSuggestionsForDisplayFromInsertion
+              .delimiterToDivideSuggestionsForDisplayFromInsertion,
           ).onChange(async (value) => {
             this.plugin.settings.delimiterToDivideSuggestionsForDisplayFromInsertion =
               value;
@@ -935,11 +935,11 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Caret location symbol after complement")
         .setDesc(
-          "If set '<CARET>' and there is '<li><CARET></li>' in custom dictionary, it complements '<li></li>' and move a caret where between '<li>' and `</li>`."
+          "If set '<CARET>' and there is '<li><CARET></li>' in custom dictionary, it complements '<li></li>' and move a caret where between '<li>' and `</li>`.",
         )
         .addText((cb) => {
           cb.setValue(
-            this.plugin.settings.caretLocationSymbolAfterComplement
+            this.plugin.settings.caretLocationSymbolAfterComplement,
           ).onChange(async (value) => {
             this.plugin.settings.caretLocationSymbolAfterComplement = value;
             await this.plugin.saveSettings();
@@ -949,14 +949,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Displayed text suffix")
         .setDesc(
-          "It shows as a suffix of displayed text if there is a difference between displayed and inserted"
+          "It shows as a suffix of displayed text if there is a difference between displayed and inserted",
         )
         .addText((cb) => {
           cb.setValue(this.plugin.settings.displayedTextSuffix).onChange(
             async (value) => {
               this.plugin.settings.displayedTextSuffix = value;
               await this.plugin.saveSettings();
-            }
+            },
           );
         });
     }
@@ -976,7 +976,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.enableInternalLinkComplement = value;
             await this.plugin.saveSettings({ internalLink: true });
             this.display();
-          }
+          },
         );
       });
 
@@ -985,7 +985,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setName("Suggest with an alias")
         .addToggle((tc) => {
           tc.setValue(
-            this.plugin.settings.suggestInternalLinkWithAlias
+            this.plugin.settings.suggestInternalLinkWithAlias,
           ).onChange(async (value) => {
             this.plugin.settings.suggestInternalLinkWithAlias = value;
             await this.plugin.saveSettings({ internalLink: true });
@@ -998,18 +998,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             async (value) => {
               this.plugin.settings.updateInternalLinksOnSave = value;
               await this.plugin.saveSettings({ internalLink: true });
-            }
+            },
           );
         });
 
       new Setting(containerEl)
         .setName(
-          "Insert an alias that is transformed from the displayed internal link"
+          "Insert an alias that is transformed from the displayed internal link",
         )
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
-              .enabled
+              .enabled,
           ).onChange(async (value) => {
             this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.enabled =
               value;
@@ -1029,7 +1029,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .addText((cb) => {
             cb.setValue(
               this.plugin.settings
-                .insertAliasTransformedFromDisplayedInternalLink.beforeRegExp
+                .insertAliasTransformedFromDisplayedInternalLink.beforeRegExp,
             ).onChange(async (value) => {
               this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp =
                 value;
@@ -1043,7 +1043,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .addText((cb) => {
             cb.setValue(
               this.plugin.settings
-                .insertAliasTransformedFromDisplayedInternalLink.after
+                .insertAliasTransformedFromDisplayedInternalLink.after,
             ).onChange(async (value) => {
               this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.after =
                 value;
@@ -1058,7 +1058,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .addTextArea((tac) => {
           const el = tac
             .setValue(
-              this.plugin.settings.excludeInternalLinkPathPrefixPatterns
+              this.plugin.settings.excludeInternalLinkPathPrefixPatterns,
             )
             .setPlaceholder("Private/")
             .onChange(async (value) => {
@@ -1074,14 +1074,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Front matter key for exclusion")
         .setDesc(
-          "Exclude internal links from the suggestions if whose front matters have the key whose name is same as this setting, and the value is 'true'"
+          "Exclude internal links from the suggestions if whose front matters have the key whose name is same as this setting, and the value is 'true'",
         )
         .addText((cb) => {
           TextComponentEvent.onChange(cb, async (value) => {
             this.plugin.settings.frontMatterKeyForExclusionInternalLink = value;
             await this.plugin.saveSettings({ internalLink: true });
           }).setValue(
-            this.plugin.settings.frontMatterKeyForExclusionInternalLink
+            this.plugin.settings.frontMatterKeyForExclusionInternalLink,
           );
         });
     }
@@ -1101,7 +1101,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.enableFrontMatterComplement = value;
             await this.plugin.saveSettings({ frontMatter: true });
             this.display();
-          }
+          },
         );
       });
 
@@ -1111,20 +1111,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .addDropdown((tc) =>
           tc
             .addOptions(
-              mirrorMap(SpecificMatchStrategy.values(), (x) => x.name)
+              mirrorMap(SpecificMatchStrategy.values(), (x) => x.name),
             )
             .setValue(this.plugin.settings.frontMatterComplementMatchStrategy)
             .onChange(async (value) => {
               this.plugin.settings.frontMatterComplementMatchStrategy = value;
               await this.plugin.saveSettings();
-            })
+            }),
         );
 
       new Setting(containerEl)
         .setName("Insert comma after completion")
         .addToggle((tc) => {
           tc.setValue(
-            this.plugin.settings.insertCommaAfterFrontMatterCompletion
+            this.plugin.settings.insertCommaAfterFrontMatterCompletion,
           ).onChange(async (value) => {
             this.plugin.settings.insertCommaAfterFrontMatterCompletion = value;
             await this.plugin.saveSettings();
@@ -1134,7 +1134,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
   }
 
   private addIntelligentSuggestionPrioritizationSettings(
-    containerEl: HTMLElement
+    containerEl: HTMLElement,
   ) {
     containerEl.createEl("h3", {
       text: "Intelligent suggestion prioritization",
@@ -1145,7 +1145,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setName("Enable Intelligent Suggestion Prioritization")
       .addToggle((tc) => {
         tc.setValue(
-          this.plugin.settings.intelligentSuggestionPrioritization.enabled
+          this.plugin.settings.intelligentSuggestionPrioritization.enabled,
         ).onChange(async (value) => {
           this.plugin.settings.intelligentSuggestionPrioritization.enabled =
             value;
@@ -1169,7 +1169,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             });
           }).setValue(
             this.plugin.settings.intelligentSuggestionPrioritization
-              .historyFilePath
+              .historyFilePath,
           );
         });
 
@@ -1181,14 +1181,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             .setLimits(0, 365, 1)
             .setValue(
               this.plugin.settings.intelligentSuggestionPrioritization
-                .maxDaysToKeepHistory
+                .maxDaysToKeepHistory,
             )
             .setDynamicTooltip()
             .onChange(async (value) => {
               this.plugin.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory =
                 value;
               await this.plugin.saveSettings();
-            })
+            }),
         );
 
       new Setting(containerEl)
@@ -1199,14 +1199,14 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             .setLimits(0, 10000, 1)
             .setValue(
               this.plugin.settings.intelligentSuggestionPrioritization
-                .maxNumberOfHistoryToKeep
+                .maxNumberOfHistoryToKeep,
             )
             .setDynamicTooltip()
             .onChange(async (value) => {
               this.plugin.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep =
                 value;
               await this.plugin.saveSettings();
-            })
+            }),
         );
     }
   }
@@ -1222,7 +1222,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         async (value) => {
           this.plugin.settings.disableOnMobile = value;
           await this.plugin.saveSettings();
-        }
+        },
       );
     });
   }
@@ -1237,7 +1237,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       .setName("Show log about performance in a console")
       .addToggle((tc) => {
         tc.setValue(
-          this.plugin.settings.showLogAboutPerformanceInConsole
+          this.plugin.settings.showLogAboutPerformanceInConsole,
         ).onChange(async (value) => {
           this.plugin.settings.showLogAboutPerformanceInConsole = value;
           await this.plugin.saveSettings();
@@ -1268,7 +1268,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
   async ensureCustomDictionaryPath(
     path: string,
-    state: "present" | "absent"
+    state: "present" | "absent",
   ): Promise<boolean> {
     const paths = this.plugin.settings.customDictionaryPaths.split("\n");
     const exists = paths.some((x) => x === path);
@@ -1292,7 +1292,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         settings: this.plugin.settings,
       },
       null,
-      4
+      4,
     );
   }
 }

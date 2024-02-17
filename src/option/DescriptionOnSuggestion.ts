@@ -15,12 +15,12 @@ export class DescriptionOnSuggestion {
   });
   static readonly FULL = new DescriptionOnSuggestion(
     "Full",
-    (word) => word.description ?? null
+    (word) => word.description ?? null,
   );
 
   private constructor(
     readonly name: string,
-    readonly toDisplay: (word: Word) => string | null
+    readonly toDisplay: (word: Word) => string | null,
   ) {
     DescriptionOnSuggestion._values.push(this);
   }

@@ -29,7 +29,7 @@ describe.each<{
 `("tokenize", ({ constructorArgs, content, raw, expected }) => {
   test(`tokenize(${content}, ${raw}) = ${expected}`, () => {
     expect(
-      new JapaneseTokenizer(constructorArgs).tokenize(content, raw)
+      new JapaneseTokenizer(constructorArgs).tokenize(content, raw),
     ).toStrictEqual(expected);
   });
 });
@@ -55,7 +55,7 @@ describe.each<{
 `("recursiveTokenize", ({ constructorArgs, content, expected }) => {
   test(`recursiveTokenize(${content}) = ${expected}`, () => {
     expect(
-      new JapaneseTokenizer(constructorArgs).recursiveTokenize(content)
+      new JapaneseTokenizer(constructorArgs).recursiveTokenize(content),
     ).toStrictEqual(expected);
   });
 });

@@ -57,7 +57,7 @@ export class AppHelper {
   getAliases(file: TFile): string[] {
     return (
       parseFrontMatterAliases(
-        this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter
+        this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter,
       ) ?? []
     );
   }
@@ -79,7 +79,7 @@ export class AppHelper {
         Object.entries(rest).map(([k, _v]) => [
           k,
           parseFrontMatterStringArray(frontMatter, k),
-        ])
+        ]),
       ),
       tags,
       tag: tags,
@@ -90,7 +90,7 @@ export class AppHelper {
 
   getBoolFrontMatter(file: TFile, key: string): boolean {
     return Boolean(
-      this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter?.[key]
+      this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter?.[key],
     );
   }
 
@@ -144,7 +144,7 @@ export class AppHelper {
   }
 
   optimizeMarkdownLinkText(
-    linkText: string
+    linkText: string,
   ): { displayed: string; link: string } | null {
     const activeFile = this.getActiveFile();
     if (!activeFile) {
@@ -163,7 +163,7 @@ export class AppHelper {
 
     const markdownLink = this.unsafeApp.fileManager.generateMarkdownLink(
       file,
-      activeFile.path
+      activeFile.path,
     );
 
     if (markdownLink.startsWith("[[")) {
@@ -187,14 +187,14 @@ export class AppHelper {
     return (
       this.unsafeApp.metadataCache.getFirstLinkpathDest(
         linkText,
-        activeFile.path
+        activeFile.path,
       )?.path ?? null
     );
   }
 
   searchPhantomLinks(): { path: string; link: string }[] {
     return Object.entries(this.unsafeApp.metadataCache.unresolvedLinks).flatMap(
-      ([path, obj]) => Object.keys(obj).map((link) => ({ path, link }))
+      ([path, obj]) => Object.keys(obj).map((link) => ({ path, link })),
     );
   }
 
@@ -256,7 +256,7 @@ export class AppHelper {
     }
 
     const keyLocations = Array.from(
-      editor.getValue().matchAll(/\s*['"]?(?<key>.+?)['"]?:/g)
+      editor.getValue().matchAll(/\s*['"]?(?<key>.+?)['"]?:/g),
     );
     if (keyLocations.length === 0) {
       return null;

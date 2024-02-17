@@ -30,11 +30,11 @@ export function encodeSpace(text: string): string {
 
 export function removeFromPattern(
   pattern: RegExp,
-  removeChars: string
+  removeChars: string,
 ): RegExp {
   return new RegExp(
     pattern.source.replace(new RegExp(`[${removeChars}]`, "g"), ""),
-    pattern.flags
+    pattern.flags,
   );
 }
 
@@ -45,7 +45,7 @@ export function normalizeAccentsDiacritics(text: string): string {
 
 export function synonymAliases(
   value: string,
-  option: { emoji: boolean; accentsDiacritics: boolean }
+  option: { emoji: boolean; accentsDiacritics: boolean },
 ): string[] {
   let synonym = value;
 
@@ -73,7 +73,7 @@ export function lowerStartsWith(a: string, b: string): boolean {
 }
 
 export function wrapFuzzy<ARGS extends unknown[]>(
-  func: (...args: ARGS) => boolean
+  func: (...args: ARGS) => boolean,
 ): (...args: ARGS) => FuzzyResult {
   return (...xs) =>
     func(...xs) ? { type: "concrete_match" } : { type: "none" };
@@ -113,7 +113,7 @@ export function smartLineBreakSplit(text: string): string[] {
 
 export function* splitRaw(
   text: string,
-  regexp: RegExp
+  regexp: RegExp,
 ): IterableIterator<string> {
   let previousIndex = 0;
   for (let r of text.matchAll(regexp)) {

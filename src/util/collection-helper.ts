@@ -1,12 +1,12 @@
 export const groupBy = <T>(
   values: T[],
-  toKey: (t: T) => string
+  toKey: (t: T) => string,
 ): { [key: string]: T[] } =>
   values.reduce(
     (prev, cur, _1, _2, k = toKey(cur)) => (
       (prev[k] || (prev[k] = [])).push(cur), prev
     ),
-    {} as { [key: string]: T[] }
+    {} as { [key: string]: T[] },
   );
 
 export function uniq<T>(values: T[]): T[] {
@@ -26,14 +26,14 @@ export function uniqBy<T>(values: T[], fn: (x: T) => string | number): T[] {
 
 export function uniqWith<T>(arr: T[], fn: (one: T, other: T) => boolean) {
   return arr.filter(
-    (element, index) => arr.findIndex((step) => fn(element, step)) === index
+    (element, index) => arr.findIndex((step) => fn(element, step)) === index,
   );
 }
 
 export function arrayEquals(
   arr1: unknown[],
   arr2: unknown[],
-  length?: number
+  length?: number,
 ): boolean {
   let l = Math.max(arr1.length, arr2.length);
   if (length !== undefined) {
@@ -74,7 +74,7 @@ export function equalsAsSet(ary1: string[], ary2: string[]): boolean {
 
 export function mirrorMap<T>(
   collection: T[],
-  toValue: (t: T) => string
+  toValue: (t: T) => string,
 ): { [key: string]: string } {
   return collection.reduce((p, c) => ({ ...p, [toValue(c)]: toValue(c) }), {});
 }

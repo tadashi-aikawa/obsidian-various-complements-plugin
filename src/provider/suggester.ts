@@ -47,7 +47,7 @@ export function suggestionUniqPredicate(a: Word, b: Word) {
 export function pushWord(
   wordsByFirstLetter: WordsByFirstLetter,
   key: string,
-  word: Word
+  word: Word,
 ) {
   if (wordsByFirstLetter[key] === undefined) {
     wordsByFirstLetter[key] = [word];
@@ -66,7 +66,7 @@ export function judge(
     fuzzy?: {
       minMatchScore: number;
     };
-  }
+  },
 ): Judgement {
   if (query === "") {
     return {
@@ -121,7 +121,7 @@ export function judge(
     .sort((a, b) =>
       a.matched.type === "concrete_match" && b.matched.type !== "concrete_match"
         ? -1
-        : 0
+        : 0,
     )
     .find((x) => x.matched.type !== "none");
   if (
@@ -157,7 +157,7 @@ export function suggestWords(
     fuzzy?: {
       minMatchScore: number;
     };
-  } = {}
+  } = {},
 ): Word[] {
   const { frontMatter, selectionHistoryStorage } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
@@ -187,17 +187,18 @@ export function suggestWords(
           ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
         ]
     : frontMatter
-    ? flattenFrontMatterWords()
-    : [
-        ...(indexedWords.currentFile[query.charAt(0)] ?? []),
-        ...(indexedWords.currentFile[query.charAt(0).toUpperCase()] ?? []),
-        ...(indexedWords.currentVault[query.charAt(0)] ?? []),
-        ...(indexedWords.currentVault[query.charAt(0).toUpperCase()] ?? []),
-        ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
-        ...(indexedWords.customDictionary[query.charAt(0).toUpperCase()] ?? []),
-        ...(indexedWords.internalLink[query.charAt(0)] ?? []),
-        ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
-      ];
+      ? flattenFrontMatterWords()
+      : [
+          ...(indexedWords.currentFile[query.charAt(0)] ?? []),
+          ...(indexedWords.currentFile[query.charAt(0).toUpperCase()] ?? []),
+          ...(indexedWords.currentVault[query.charAt(0)] ?? []),
+          ...(indexedWords.currentVault[query.charAt(0).toUpperCase()] ?? []),
+          ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
+          ...(indexedWords.customDictionary[query.charAt(0).toUpperCase()] ??
+            []),
+          ...(indexedWords.internalLink[query.charAt(0)] ?? []),
+          ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
+        ];
 
   const filteredJudgement = Array.from(words)
     .map((x) => judge(x, query, queryStartWithUpper, option))
@@ -207,9 +208,9 @@ export function suggestWords(
     filteredJudgement.map(
       (x) =>
         selectionHistoryStorage?.getSelectionHistory(x.word as HitWord)
-          ?.lastUpdated ?? 0
+          ?.lastUpdated ?? 0,
     ),
-    0
+    0,
   );
 
   const candidate = filteredJudgement
@@ -230,7 +231,7 @@ export function suggestWords(
         const ret = selectionHistoryStorage.compare(
           aWord,
           bWord,
-          latestUpdated
+          latestUpdated,
         );
         if (ret !== 0) {
           return ret;
@@ -268,7 +269,7 @@ export function judgeByPartialMatch(
     fuzzy?: {
       minMatchScore: number;
     };
-  }
+  },
 ): Judgement {
   if (query === "") {
     return {
@@ -325,7 +326,7 @@ export function judgeByPartialMatch(
     .sort((a, b) =>
       a.matched.type === "concrete_match" && b.matched.type !== "concrete_match"
         ? -1
-        : 0
+        : 0,
     )
     .find((x) => x.matched.type !== "none");
   if (
@@ -368,7 +369,7 @@ export function judgeByPartialMatch(
     .sort((a, b) =>
       a.matched.type === "concrete_match" && b.matched.type !== "concrete_match"
         ? -1
-        : 0
+        : 0,
     )
     .find((x) => x.matched.type !== "none");
   if (
@@ -401,7 +402,7 @@ export function suggestWordsByPartialMatch(
     fuzzy?: {
       minMatchScore: number;
     };
-  } = {}
+  } = {},
 ): Word[] {
   const { frontMatter, selectionHistoryStorage } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
@@ -435,9 +436,9 @@ export function suggestWordsByPartialMatch(
     filteredJudgement.map(
       (x) =>
         selectionHistoryStorage?.getSelectionHistory(x.word as HitWord)
-          ?.lastUpdated ?? 0
+          ?.lastUpdated ?? 0,
     ),
-    0
+    0,
   );
 
   const candidate = filteredJudgement
@@ -458,7 +459,7 @@ export function suggestWordsByPartialMatch(
         const ret = selectionHistoryStorage.compare(
           aWord,
           bWord,
-          latestUpdated
+          latestUpdated,
         );
         if (ret !== 0) {
           return ret;

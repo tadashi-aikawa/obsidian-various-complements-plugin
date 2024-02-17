@@ -12,6 +12,6 @@ declare module "chinese-tokenizer" {
   }
 
   export const load: (
-    content: string
+    content: string,
   ) => (content: string) => TokenizedResult[];
 }
