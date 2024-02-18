@@ -47,6 +47,7 @@ export interface Settings {
   // key customization
   hotkeys: {
     select: Hotkey[];
+    "select with custom alias": Hotkey[];
     up: Hotkey[];
     down: Hotkey[];
     "select 1st": Hotkey[];
@@ -156,6 +157,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // key customization
   hotkeys: {
     select: [{ modifiers: [], key: "Enter" }],
+    "select with custom alias": [],
     up: [{ modifiers: [], key: "ArrowUp" }],
     down: [{ modifiers: [], key: "ArrowDown" }],
     "select 1st": [],

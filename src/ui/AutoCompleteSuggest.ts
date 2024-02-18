@@ -109,6 +109,8 @@ export class AutoCompleteSuggest
   activeLeafChangeRef: EventRef;
   metadataCacheChangeRef: EventRef;
 
+  spareEditorSuggestContext: EditorSuggestContext | null = null;
+
   private constructor(app: App, statusBar: ProviderStatusBar) {
     super(app);
     this.appHelper = new AppHelper(app);
@@ -503,6 +505,20 @@ export class AutoCompleteSuggest
       ["select 7th", (evt) => commands.select(this, evt, 6)],
       ["select 8th", (evt) => commands.select(this, evt, 7)],
       ["select 9th", (evt) => commands.select(this, evt, 8)],
+      [
+        "select with custom alias",
+        (evt) => {
+          // For restore the context of suggestions to insert editor after submitted input
+          this.spareEditorSuggestContext = this.context;
+
+          commands.selectWithCustomAlias(this, evt).then((item) => {
+            if (item) {
+              this.selectSuggestion(item);
+            }
+          });
+          return false;
+        },
+      ],
       ["open", (_) => commands.open(this)],
       ["completion", (_) => commands.completion(this)],
       ["insert as text", (evt) => commands.insertAsText(this, evt)],
@@ -973,9 +989,15 @@ export class AutoCompleteSuggest
     }
   }
 
-  constructInternalLinkText(word: InternalLinkWord): string {
+  constructInternalLinkText(
+    word: InternalLinkWord,
+    forceWithAlias: boolean,
+  ): string {
     // With aliases
-    if (this.settings.suggestInternalLinkWithAlias && word.aliasMeta) {
+    if (
+      (this.settings.suggestInternalLinkWithAlias || forceWithAlias) &&
+      word.aliasMeta
+    ) {
       const { link } = this.appHelper.optimizeMarkdownLinkText(
         word.aliasMeta.origin,
       )!;
@@ -1023,14 +1045,21 @@ export class AutoCompleteSuggest
       : `[${displayed}](${encodeSpace(link)}.md)`;
   }
 
-  selectSuggestion(word: Word, _evt: MouseEvent | KeyboardEvent): void {
-    if (!this.context) {
+  selectSuggestion(word: Word): void {
+    let forceWithAlias = false;
+    let context = this.context;
+    if (!context) {
+      context = this.spareEditorSuggestContext;
+      this.spareEditorSuggestContext = null;
+      forceWithAlias = true;
+    }
+    if (!context) {
       return;
     }
 
     let insertedText = word.value;
     if (word.type === "internalLink") {
-      insertedText = this.constructInternalLinkText(word);
+      insertedText = this.constructInternalLinkText(word, forceWithAlias);
     }
 
     if (word.type === "frontMatter") {
@@ -1063,14 +1092,14 @@ export class AutoCompleteSuggest
       }
     }
 
-    const editor = this.context.editor;
+    const editor = context.editor;
     editor.replaceRange(
       insertedText,
       {
-        ...this.context.start,
+        ...context.start,
         ch: this.contextStartCh + word.offset!,
       },
-      this.context.end,
+      context.end,
     );
 
     if (positionToMove !== -1) {
@@ -1084,12 +1113,7 @@ export class AutoCompleteSuggest
     }
 
     // The workaround of strange behavior for that cursor doesn't move after completion only if it doesn't input any word.
-    if (
-      this.appHelper.equalsAsEditorPosition(
-        this.context.start,
-        this.context.end,
-      )
-    ) {
+    if (this.appHelper.equalsAsEditorPosition(context.start, context.end)) {
       editor.setCursor(
         editor.offsetToPos(
           editor.posToOffset(editor.getCursor()) + insertedText.length,
