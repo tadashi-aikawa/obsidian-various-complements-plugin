@@ -135,6 +135,10 @@ export class AppHelper {
     return editor.posToOffset(editor.getCursor());
   }
 
+  getContentUntilCursor(editor: Editor): string {
+    return editor.getValue().slice(0, this.getCurrentOffset(editor));
+  }
+
   getCurrentLine(editor: Editor): string {
     return editor.getLine(editor.getCursor().line);
   }
@@ -190,6 +194,12 @@ export class AppHelper {
         activeFile.path,
       )?.path ?? null
     );
+  }
+
+  inMathBlock(editor: Editor): boolean {
+    const numberOfDollarPair =
+      this.getContentUntilCursor(editor).match(/\$\$\n/g)?.length ?? 0;
+    return numberOfDollarPair % 2 !== 0;
   }
 
   searchPhantomLinks(): { path: string; link: string }[] {

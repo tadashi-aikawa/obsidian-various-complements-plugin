@@ -31,6 +31,7 @@ export interface Settings {
   complementAutomatically: boolean;
   delayMilliSeconds: number;
   disableSuggestionsDuringImeOn: boolean;
+  disableSuggestionsInMathBlock: boolean;
   // FIXME: Rename at next major version up
   insertAfterCompletion: boolean;
   firstCharactersDisableSuggestions: string;
@@ -142,6 +143,7 @@ export const DEFAULT_SETTINGS: Settings = {
   complementAutomatically: true,
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
+  disableSuggestionsInMathBlock: false,
   insertAfterCompletion: true,
   firstCharactersDisableSuggestions: ":/^",
   patternsToSuppressTrigger: ["^~~~.*", "^```.*"],
@@ -499,6 +501,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           this.plugin.settings.disableSuggestionsDuringImeOn,
         ).onChange(async (value) => {
           this.plugin.settings.disableSuggestionsDuringImeOn = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName("Disable suggestions in the Math block.")
+      .setDesc("It doesn't support the inline Math block.")
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.disableSuggestionsInMathBlock,
+        ).onChange(async (value) => {
+          this.plugin.settings.disableSuggestionsInMathBlock = value;
           await this.plugin.saveSettings();
         });
       });

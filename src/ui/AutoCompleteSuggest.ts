@@ -817,6 +817,16 @@ export class AutoCompleteSuggest
       return null;
     }
 
+    if (
+      this.settings.disableSuggestionsInMathBlock &&
+      this.appHelper.inMathBlock(editor)
+    ) {
+      onReturnNull(
+        `Suggestions are disabled while the cursor is inside a Math block.`,
+      );
+      return null;
+    }
+
     const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
     showDebugLog(`tokens is ${tokens}`);
 
