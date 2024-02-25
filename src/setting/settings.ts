@@ -506,7 +506,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Disable suggestions in the Math block.")
+      .setName("Disable suggestions in the Math block")
       .setDesc("It doesn't support the inline Math block.")
       .addToggle((tc) => {
         tc.setValue(
