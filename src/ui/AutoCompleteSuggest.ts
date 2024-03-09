@@ -908,7 +908,7 @@ export class AutoCompleteSuggest
           );
     if (suppressedTokens.length === 0) {
       onReturnNull(
-        `Don't show suggestions because all tokens are ignored by token pattern: ${String.raw`^[\u3040-\u309F\u30A0-\u30FF]{1,2}$`}`,
+        "Don't show suggestions because all tokens are ignored by token pattern",
       );
       return null;
     }
