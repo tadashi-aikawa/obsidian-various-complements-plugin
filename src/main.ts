@@ -133,6 +133,14 @@ export default class VariousComponents extends Plugin {
     });
 
     this.addCommand({
+      id: "fallback-linkify",
+      name: "Fallback linkify",
+      callback: async () => {
+        this.suggester.triggerComplete({ fallbackLinkify: true });
+      },
+    });
+
+    this.addCommand({
       id: "add-word-custom-dictionary",
       name: "Add a word to a custom dictionary",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: " " }],

@@ -91,6 +91,7 @@ export class AutoCompleteSuggest
   debounceClose: Debouncer<[], void>;
 
   runManually: boolean;
+  fallbackLinkify: boolean;
   selectionLock = false;
   declare isOpen: boolean;
 
@@ -117,15 +118,19 @@ export class AutoCompleteSuggest
     this.statusBar = statusBar;
   }
 
-  triggerComplete() {
+  triggerComplete(opt?: { fallbackLinkify?: boolean }) {
     const editor = this.appHelper.getCurrentEditor();
     const activeFile = this.app.workspace.getActiveFile();
     if (!editor || !activeFile) {
       return;
     }
 
-    // XXX: Unsafe
     this.runManually = true;
+    if (opt?.fallbackLinkify) {
+      this.fallbackLinkify = true;
+    }
+
+    // XXX: Unsafe
     (this as any).trigger(editor, activeFile, true);
   }
 
@@ -384,11 +389,29 @@ export class AutoCompleteSuggest
         this.showDebugLog(() => `[context.query]: ${context.query}`);
         const parsedQuery = JSON.parse(context.query) as {
           currentFrontMatter?: string;
+          fallbackLinkify?: boolean;
           queries: {
             word: string;
             offset: number;
           }[];
         };
+
+        if (parsedQuery.fallbackLinkify) {
+          cb(
+            parsedQuery.queries
+              .slice()
+              .reverse()
+              .filter((q) => q.word.length >= this.minNumberTriggered)
+              .map((q) => ({
+                value: q.word,
+                createdPath: "FIXME: ",
+                type: "internalLink",
+                phantom: true,
+                offset: q.offset,
+              })),
+          );
+          return;
+        }
 
         const words = parsedQuery.queries
           .filter(
@@ -761,6 +784,7 @@ export class AutoCompleteSuggest
     const onReturnNull = (message: string) => {
       showDebugLog(message);
       this.runManually = false;
+      this.fallbackLinkify = false;
       this.close();
     };
 
@@ -922,6 +946,9 @@ export class AutoCompleteSuggest
     // For multi-word completion
     this.contextStartCh = cursor.ch - currentPhrase.length;
 
+    const fallbackLinkify = this.fallbackLinkify;
+    this.fallbackLinkify = false;
+
     return {
       start: {
         ch: cursor.ch - (currentTokens.last()?.word?.length ?? 0), // For multi-word completion
@@ -930,6 +957,7 @@ export class AutoCompleteSuggest
       end: cursor,
       query: JSON.stringify({
         currentFrontMatter,
+        fallbackLinkify,
         queries: suppressedTokens.map((x) => ({
           ...x,
           offset: x.offset - currentTokens[0].offset,
