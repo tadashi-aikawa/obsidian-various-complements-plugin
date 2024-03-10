@@ -151,9 +151,9 @@ export const DEFAULT_SETTINGS: Settings = {
   noAutoFocusUntilCycle: false,
 
   // appearance
-  showMatchStrategy: true,
-  showComplementAutomatically: true,
-  showIndexingStatus: true,
+  showMatchStrategy: false,
+  showComplementAutomatically: false,
+  showIndexingStatus: false,
   descriptionOnSuggestion: "Short",
 
   // key customization
