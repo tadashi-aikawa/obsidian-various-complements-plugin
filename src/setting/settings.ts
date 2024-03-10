@@ -32,8 +32,8 @@ export interface Settings {
   delayMilliSeconds: number;
   disableSuggestionsDuringImeOn: boolean;
   disableSuggestionsInMathBlock: boolean;
-  // FIXME: Rename at next major version up
-  insertAfterCompletion: boolean;
+  // XXX: Want to rename at next major version up
+  insertSpaceAfterCompletion: boolean;
   firstCharactersDisableSuggestions: string;
   patternsToSuppressTrigger: string[];
   phrasePatternsToSuppressTrigger: string[];
@@ -144,7 +144,7 @@ export const DEFAULT_SETTINGS: Settings = {
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
   disableSuggestionsInMathBlock: false,
-  insertAfterCompletion: true,
+  insertSpaceAfterCompletion: false,
   firstCharactersDisableSuggestions: ":/^",
   patternsToSuppressTrigger: ["^~~~.*", "^```.*"],
   phrasePatternsToSuppressTrigger: [],
@@ -520,9 +520,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Insert space after completion")
       .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.insertAfterCompletion).onChange(
+        tc.setValue(this.plugin.settings.insertSpaceAfterCompletion).onChange(
           async (value) => {
-            this.plugin.settings.insertAfterCompletion = value;
+            this.plugin.settings.insertSpaceAfterCompletion = value;
             await this.plugin.saveSettings();
           },
         );

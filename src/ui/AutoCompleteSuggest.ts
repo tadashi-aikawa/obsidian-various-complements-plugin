@@ -1109,7 +1109,7 @@ export class AutoCompleteSuggest
       }
     } else {
       if (
-        this.settings.insertAfterCompletion &&
+        this.settings.insertSpaceAfterCompletion &&
         !(word.type === "customDictionary" && word.ignoreSpaceAfterCompletion)
       ) {
         insertedText = `${insertedText} `;
