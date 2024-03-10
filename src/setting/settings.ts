@@ -212,7 +212,7 @@ export const DEFAULT_SETTINGS: Settings = {
   frontMatterKeyForExclusionInternalLink: "",
 
   // front matter complement
-  enableFrontMatterComplement: true,
+  enableFrontMatterComplement: false,
   frontMatterComplementMatchStrategy: "inherit",
   insertCommaAfterFrontMatterCompletion: false,
 
