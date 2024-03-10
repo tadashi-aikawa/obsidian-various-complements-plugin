@@ -25,6 +25,7 @@ export class CurrentFileWordProvider {
     minNumberOfCharacters: number;
     makeSynonymAboutEmoji: boolean;
     makeSynonymAboutAccentsDiacritics: boolean;
+    excludeWordPatterns: string[];
   }): Promise<void> {
     this.clearWords();
 
@@ -44,6 +45,9 @@ export class CurrentFileWordProvider {
       )
       .last();
 
+    const excludePatterns = option.excludeWordPatterns.map(
+      (x) => new RegExp(`^${x}$`),
+    );
     const content = await this.app.vault.cachedRead(file);
     const tokens = this.tokenizer
       .tokenize(content)
@@ -56,7 +60,8 @@ export class CurrentFileWordProvider {
         }
         return option.onlyEnglish ? allAlphabets(x) : true;
       })
-      .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
+      .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x))
+      .filter((x) => !excludePatterns.some((rp) => x.match(rp)));
     this.words = uniq(tokens)
       .filter((x) => x !== currentToken)
       .map((x) => ({

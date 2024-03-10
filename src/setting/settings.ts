@@ -70,6 +70,7 @@ export interface Settings {
   enableCurrentFileComplement: boolean;
   currentFileMinNumberOfCharacters: number;
   onlyComplementEnglishOnCurrentFileComplement: boolean;
+  excludeCurrentFileWordPatterns: string[];
 
   // current vault complement
   enableCurrentVaultComplement: boolean;
@@ -77,6 +78,7 @@ export interface Settings {
   includeCurrentVaultPathPrefixPatterns: string;
   excludeCurrentVaultPathPrefixPatterns: string;
   includeCurrentVaultOnlyFilesUnderCurrentDirectory: boolean;
+  excludeCurrentVaultWordPatterns: string[];
 
   // custom dictionary complement
   enableCustomDictionaryComplement: boolean;
@@ -177,6 +179,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableCurrentFileComplement: true,
   currentFileMinNumberOfCharacters: 0,
   onlyComplementEnglishOnCurrentFileComplement: false,
+  excludeCurrentFileWordPatterns: [],
 
   // current vault complement
   enableCurrentVaultComplement: false,
@@ -184,6 +187,7 @@ export const DEFAULT_SETTINGS: Settings = {
   includeCurrentVaultPathPrefixPatterns: "",
   excludeCurrentVaultPathPrefixPatterns: "",
   includeCurrentVaultOnlyFilesUnderCurrentDirectory: false,
+  excludeCurrentVaultWordPatterns: [],
 
   // custom dictionary complement
   enableCustomDictionaryComplement: false,
@@ -762,6 +766,26 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings({ currentFile: true });
           });
         });
+
+      new Setting(containerEl)
+        .setName("Exclude word patterns for indexing")
+        .setDesc(
+          "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
+        )
+        .addTextArea((tc) => {
+          const el = tc
+            .setValue(
+              this.plugin.settings.excludeCurrentFileWordPatterns.join("\n"),
+            )
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentFileWordPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path-dense";
+          return el;
+        });
     }
   }
 
@@ -845,6 +869,25 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               value;
             await this.plugin.saveSettings();
           });
+        });
+      new Setting(containerEl)
+        .setName("Exclude word patterns for indexing")
+        .setDesc(
+          "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
+        )
+        .addTextArea((tc) => {
+          const el = tc
+            .setValue(
+              this.plugin.settings.excludeCurrentVaultWordPatterns.join("\n"),
+            )
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentVaultWordPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path-dense";
+          return el;
         });
     }
   }

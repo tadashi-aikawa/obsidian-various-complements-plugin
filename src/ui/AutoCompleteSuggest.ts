@@ -567,6 +567,7 @@ export class AutoCompleteSuggest
       makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
       makeSynonymAboutAccentsDiacritics:
         this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+      excludeWordPatterns: this.settings.excludeCurrentFileWordPatterns,
     });
 
     this.statusBar.setCurrentFileIndexed(
@@ -598,6 +599,7 @@ export class AutoCompleteSuggest
       makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
       makeSynonymAboutAccentsDiacritics:
         this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
+      excludeWordPatterns: this.settings.excludeCurrentVaultWordPatterns,
     });
 
     this.statusBar.setCurrentVaultIndexed(

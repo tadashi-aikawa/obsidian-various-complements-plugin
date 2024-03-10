@@ -24,6 +24,7 @@ export class CurrentVaultWordProvider {
     minNumberOfCharacters: number;
     makeSynonymAboutEmoji: boolean;
     makeSynonymAboutAccentsDiacritics: boolean;
+    excludeWordPatterns: string[];
   }): Promise<void> {
     this.clearWords();
 
@@ -38,6 +39,9 @@ export class CurrentVaultWordProvider {
         (p) => !this.onlyUnderCurrentDirectory || dirname(p) === currentDirname,
       );
 
+    const excludePatterns = option.excludeWordPatterns.map(
+      (x) => new RegExp(`^${x}$`),
+    );
     let wordByValue: { [value: string]: Word } = {};
     for (const path of markdownFilePaths) {
       const content = await this.app.vault.adapter.read(path);
@@ -49,7 +53,8 @@ export class CurrentVaultWordProvider {
             x.length >= option.minNumberOfCharacters &&
             !this.tokenizer.shouldIgnoreOnCurrent(x),
         )
-        .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x));
+        .map((x) => (startsSmallLetterOnlyFirst(x) ? x.toLowerCase() : x))
+        .filter((x) => !excludePatterns.some((rp) => x.match(rp)));
       for (const token of tokens) {
         wordByValue[token] = {
           value: token,
