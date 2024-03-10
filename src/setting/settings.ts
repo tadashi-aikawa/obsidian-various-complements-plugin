@@ -119,10 +119,6 @@ export interface Settings {
 
   // debug
   showLogAboutPerformanceInConsole: boolean;
-
-  // others
-  // TODO: Want to remove in the future version
-  selectionHistoryTree: SelectionHistoryTree;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -228,10 +224,6 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // debug
   showLogAboutPerformanceInConsole: false,
-
-  // others
-  // TODO: Want to remove in the future version
-  selectionHistoryTree: {},
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {

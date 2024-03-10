@@ -147,13 +147,7 @@ export class AutoCompleteSuggest
         DEFAULT_HISTORIES_PATH,
     );
     if (await this.appHelper.exists(historyPath)) {
-      this.settings.selectionHistoryTree = {}; // TODO: Remove in the future
       return this.appHelper.loadJson<SelectionHistoryTree>(historyPath);
-    }
-
-    // TODO: Remove in the future
-    if (Object.keys(this.settings.selectionHistoryTree).length > 0) {
-      return this.settings.selectionHistoryTree;
     }
 
     return {};
