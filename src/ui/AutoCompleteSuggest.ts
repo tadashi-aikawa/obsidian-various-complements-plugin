@@ -91,7 +91,7 @@ export class AutoCompleteSuggest
   debounceClose: Debouncer<[], void>;
 
   runManually: boolean;
-  fallbackLinkify: boolean;
+  completionMode: "prefix" | "partial" | "new";
   selectionLock = false;
   declare isOpen: boolean;
 
@@ -126,8 +126,10 @@ export class AutoCompleteSuggest
     }
 
     this.runManually = true;
+
     if (opt?.fallbackLinkify) {
-      this.fallbackLinkify = true;
+      this.completionMode =
+        this.completionMode === "prefix" ? "partial" : "new";
     }
 
     // XXX: Unsafe
@@ -227,6 +229,8 @@ export class AutoCompleteSuggest
 
       ins.app.metadataCache.offref(cacheResolvedRef);
     });
+
+    ins.completionMode = ins.matchStrategy.name;
 
     return ins;
   }
@@ -383,14 +387,14 @@ export class AutoCompleteSuggest
         this.showDebugLog(() => `[context.query]: ${context.query}`);
         const parsedQuery = JSON.parse(context.query) as {
           currentFrontMatter?: string;
-          fallbackLinkify?: boolean;
+          completionMode: AutoCompleteSuggest["completionMode"];
           queries: {
             word: string;
             offset: number;
           }[];
         };
 
-        if (parsedQuery.fallbackLinkify) {
+        if (parsedQuery.completionMode === "new") {
           cb(
             parsedQuery.queries
               .slice()
@@ -407,6 +411,10 @@ export class AutoCompleteSuggest
           return;
         }
 
+        const matchStrategy = MatchStrategy.fromName(
+          parsedQuery.completionMode,
+        );
+
         const words = parsedQuery.queries
           .filter(
             (x, i, xs) =>
@@ -422,7 +430,7 @@ export class AutoCompleteSuggest
               this.frontMatterComplementStrategy !==
                 SpecificMatchStrategy.INHERIT
                 ? this.frontMatterComplementStrategy.handler
-                : this.matchStrategy.handler;
+                : matchStrategy.handler;
             return handler(
               this.indexedWords,
               q.word,
@@ -780,7 +788,7 @@ export class AutoCompleteSuggest
     const onReturnNull = (message: string) => {
       showDebugLog(message);
       this.runManually = false;
-      this.fallbackLinkify = false;
+      this.completionMode = this.matchStrategy.name;
       this.close();
     };
 
@@ -942,9 +950,6 @@ export class AutoCompleteSuggest
     // For multi-word completion
     this.contextStartCh = cursor.ch - currentPhrase.length;
 
-    const fallbackLinkify = this.fallbackLinkify;
-    this.fallbackLinkify = false;
-
     return {
       start: {
         ch: cursor.ch - (currentTokens.last()?.word?.length ?? 0), // For multi-word completion
@@ -953,7 +958,7 @@ export class AutoCompleteSuggest
       end: cursor,
       query: JSON.stringify({
         currentFrontMatter,
-        fallbackLinkify,
+        completionMode: this.completionMode,
         queries: suppressedTokens.map((x) => ({
           ...x,
           offset: x.offset - currentTokens[0].offset,
@@ -1080,6 +1085,8 @@ export class AutoCompleteSuggest
   }
 
   selectSuggestion(word: Word): void {
+    this.completionMode = this.matchStrategy.name;
+
     let forceWithAlias = false;
     let context = this.context;
     if (!context) {
