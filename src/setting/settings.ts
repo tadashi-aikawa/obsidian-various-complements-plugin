@@ -6,7 +6,6 @@ import { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { mirrorMap } from "../util/collection-helper";
 import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
-import type { SelectionHistoryTree } from "../storage/SelectionHistoryStorage";
 import { smartLineBreakSplit } from "../util/strings";
 import { TextComponentEvent } from "./settings-helper";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
