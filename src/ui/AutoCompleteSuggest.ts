@@ -394,20 +394,21 @@ export class AutoCompleteSuggest
           }[];
         };
 
+        const createNewLinkSuggestions = (): Word[] =>
+          parsedQuery.queries
+            .slice()
+            .reverse()
+            .filter((q) => q.word.length >= this.minNumberTriggered)
+            .map((q) => ({
+              value: q.word,
+              createdPath: "FIXME: ",
+              type: "internalLink",
+              phantom: true,
+              offset: q.offset,
+            }));
+
         if (parsedQuery.completionMode === "new") {
-          cb(
-            parsedQuery.queries
-              .slice()
-              .reverse()
-              .filter((q) => q.word.length >= this.minNumberTriggered)
-              .map((q) => ({
-                value: q.word,
-                createdPath: "FIXME: ",
-                type: "internalLink",
-                phantom: true,
-                offset: q.offset,
-              })),
-          );
+          cb(createNewLinkSuggestions());
           return;
         }
 
@@ -415,7 +416,7 @@ export class AutoCompleteSuggest
           parsedQuery.completionMode,
         );
 
-        const words = parsedQuery.queries
+        let words = parsedQuery.queries
           .filter(
             (x, i, xs) =>
               parsedQuery.currentFrontMatter ||
@@ -448,6 +449,18 @@ export class AutoCompleteSuggest
           })
           .flat()
           .sort((a, b) => Number(a.fuzzy) - Number(b.fuzzy));
+
+        // Fallback linkify and partial completion mode
+        if (
+          this.completionMode != this.matchStrategy.name &&
+          this.completionMode === "partial"
+        ) {
+          words = words.filter((x) => x.type === "internalLink");
+          if (words.length === 0) {
+            cb(createNewLinkSuggestions());
+            return;
+          }
+        }
 
         cb(
           uniqWith(words, suggestionUniqPredicate).slice(
