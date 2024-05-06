@@ -8,7 +8,7 @@ This plugin for [Obsidian] enables you complete words like the auto-completion o
 
 ![](https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/resources/various-complements.gif)
 
-## 📚Documentation
+## 📚 Documentation
 
 https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/
 
