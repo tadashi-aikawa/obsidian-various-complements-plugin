@@ -32,25 +32,48 @@ Before creating a pull request, please make an [issue] or a [discussion]😉
 ## 🖥️ For developers
 
 - Requirements
-    - [Task]
+    - Node.js v22
 
 ### Development
 
-```console
-task init
-task dev
+#### 依存ライブラリインストール
+
+```bash
+corepack enable
+pnpm install
 ```
 
-### Release
+#### 開発用ビルド
 
+```bash
+# 開発ビルド
+pnpm dev
 ```
+
+#### テスト
+
+```bash
+pnpm test
+# ファイル変更時に再実行
+pnpm test --watch
+```
+
+#### CI
+
+```bash
+# CIコマンド実行
+pnpm run ci
+```
+
+#### Release
+
+```bash
 # Stable
-task release VERSION=1.2.3
+VERSION=1.2.3 pnpm release
 
 # Beta
-task release VERSION=1.2.3-beta1
+VERSION=1.2.3-beta1 pnpm release
 ```
 
 [Obsidian]: https://obsidian.md/
-[Task]: https://github.com/go-task/task
 

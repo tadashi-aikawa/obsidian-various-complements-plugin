@@ -2,11 +2,11 @@
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "strict": true,
-    "types": ["svelte", "node", "jest"],
+    "types": ["svelte", "jest"],
     "baseUrl": ".",
     "inlineSources": true,
     "module": "ESNext",
-    "target": "es6",
+    "target": "es2018",
     "allowJs": true,
     "strictPropertyInitialization": false,
     "moduleResolution": "node",
@@ -15,5 +15,5 @@
     "lib": ["dom", "es5", "es6", "es7"],
     "allowSyntheticDefaultImports": true
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "**/*.mts"]
 }

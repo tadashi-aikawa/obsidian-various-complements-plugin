@@ -8,6 +8,9 @@
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
     "version": "node version-bump.mjs && git add manifest-beta.json manifest.json versions.json",
     "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "ci": "corepack enable && pnpm i && pnpm build && pnpm test",
+    "release": "pnpm run ci && pnpm version ${VERSION} && git push --tags && git push",
     "prepare": "husky install",
     "pre:push": "tsc -noEmit -skipLibCheck && pnpm test"
   },
@@ -15,9 +18,11 @@
   "author": "tadashi-aikawa",
   "license": "MIT",
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@tsconfig/svelte": "^5.0.2",
     "builtin-modules": "^3.3.0",
-    "esbuild": "^0.20.0",
+    "chokidar": "^3.6.0",
+    "esbuild": "^0.23.0",
     "esbuild-jest": "^0.5.0",
     "esbuild-svelte": "^0.8.0",
     "husky": "^9.0.11",

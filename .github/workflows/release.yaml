@@ -14,8 +14,7 @@ jobs:
         with:
           node-version: "22"
 
-      - run: pnpm install
-      - run: pnpm build
+      - run: pnpm ci
 
       - name: Create Release
         id: create_release

@@ -16,14 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      - run: task ci
+      - run: pnpm run ci
 
       - name: "Discord notification (not success)"
         uses: rjstone/discord-webhook-notify@v1
