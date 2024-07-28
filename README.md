@@ -36,32 +36,30 @@ Before creating a pull request, please make an [issue] or a [discussion]😉
 
 ### Development
 
-#### 依存ライブラリインストール
+#### Install dependencies
 
 ```bash
 corepack enable
 pnpm install
 ```
 
-#### 開発用ビルド
+#### Build for development
 
 ```bash
-# 開発ビルド
 pnpm dev
 ```
 
-#### テスト
+#### Test
 
 ```bash
 pnpm test
-# ファイル変更時に再実行
+# or
 pnpm test --watch
 ```
 
 #### CI
 
 ```bash
-# CIコマンド実行
 pnpm run ci
 ```
 
