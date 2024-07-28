@@ -14,6 +14,7 @@ jobs:
         with:
           node-version: "22"
 
+      - run: corepack enable
       - run: pnpm ci
 
       - name: Create Release

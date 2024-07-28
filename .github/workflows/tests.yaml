@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: "22"
 
+      - run: corepack enable
       - run: pnpm run ci
 
       - name: "Discord notification (not success)"
