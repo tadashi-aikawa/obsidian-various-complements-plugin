@@ -54,6 +54,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      prettier-plugin-organize-imports:
+        specifier: ^4.0.0
+        version: 4.0.0(prettier@3.3.3)(typescript@5.5.4)
       prettier-plugin-svelte:
         specifier: ^3.2.6
         version: 3.2.6(prettier@3.3.3)(svelte@4.2.18)
@@ -1820,6 +1823,19 @@ packages:
   posix-character-classes@0.1.1:
     resolution: {integrity: sha512-xTgYBc3fuo7Yt7JbiuFxSYGToMoz8fLoE6TC9Wx1P/u+LfeThMOAqmuyECnlBaaJb+u1m9hHiXUEtwW4OzfUJg==}
     engines: {node: '>=0.10.0'}
+
+  prettier-plugin-organize-imports@4.0.0:
+    resolution: {integrity: sha512-vnKSdgv9aOlqKeEFGhf9SCBsTyzDSyScy1k7E0R1Uo4L0cTcOV7c1XQaT7jfXIOc/p08WLBfN2QUQA9zDSZMxA==}
+    peerDependencies:
+      '@vue/language-plugin-pug': ^2.0.24
+      prettier: '>=2.0'
+      typescript: '>=2.9'
+      vue-tsc: ^2.0.24
+    peerDependenciesMeta:
+      '@vue/language-plugin-pug':
+        optional: true
+      vue-tsc:
+        optional: true
 
   prettier-plugin-svelte@3.2.6:
     resolution: {integrity: sha512-Y1XWLw7vXUQQZmgv1JAEiLcErqUniAF2wO7QJsw8BVMvpLET2dI5WpEIEJx1r11iHVdSMzQxivyfrH9On9t2IQ==}
@@ -4458,6 +4474,11 @@ snapshots:
       find-up: 4.1.0
 
   posix-character-classes@0.1.1: {}
+
+  prettier-plugin-organize-imports@4.0.0(prettier@3.3.3)(typescript@5.5.4):
+    dependencies:
+      prettier: 3.3.3
+      typescript: 5.5.4
 
   prettier-plugin-svelte@3.2.6(prettier@3.3.3)(svelte@4.2.18):
     dependencies:

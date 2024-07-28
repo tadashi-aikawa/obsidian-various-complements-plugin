@@ -9,18 +9,17 @@ import {
   excludeSpace,
   findCommonPrefix,
   type FuzzyResult,
+  isInternalLink,
   joinNumberWithSymbol,
   lowerIncludes,
   lowerIncludesWithoutSpace,
   lowerStartsWithoutSpace,
   microFuzzy,
+  removeFromPattern,
   splitRaw,
   startsSmallLetterOnlyFirst,
   synonymAliases,
-  isInternalLink,
-  removeFromPattern,
 } from "./strings";
-import type { Regex } from "svelte-lucide-icons";
 
 describe.each<{ one: string; another: string; expected: boolean }>`
   one            | another          | expected
