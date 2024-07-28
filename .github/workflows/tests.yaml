@@ -21,7 +21,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - run: task ci
 
@@ -30,7 +30,7 @@ jobs:
         if: "! success()"
         with:
           description: "⚠ Various Complements Tests failed!"
-          footer: "Node.js v20"
+          footer: "Node.js v22"
           severity: error
           avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
@@ -45,7 +45,7 @@ jobs:
         if: always()
         with:
           description: "✅ Various Complements Tests passed!"
-          footer: "Node.js v20"
+          footer: "Node.js v22"
           severity: info
           avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
