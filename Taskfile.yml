@@ -10,14 +10,15 @@ tasks:
     cmds:
       - task -l
 
-  build:dev: npm run dev
-  build: npm run build
+  build:dev: pnpm dev
+  build: pnpm build
   watch: watchexec --no-vcs-ignore --exts "js,json,css" cp main.js styles.css manifest.json /mnt/c/Users/syoum/work/minerva/.obsidian/plugins/various-complements/
 
   init:
     desc: Install dependencies
     cmds:
-      - npm install
+      - corepack enable
+      - pnpm install
 
   dev:
     desc: Build and copy files when they are updated.
@@ -28,12 +29,12 @@ tasks:
   test:
     desc: Unit tests
     cmds:
-      - npm test
+      - pnpm test
 
   test:watch:
     desc: Unit tests --watch
     cmds:
-      - npm test -- --watch
+      - pnpm test -- --watch
 
   ci:
     desc: For CI
@@ -50,7 +51,7 @@ tasks:
     deps:
       - ci
     cmds:
-      - npm version {{.VERSION}}
+      - pnpm version {{.VERSION}}
       - task: ci
       - git push --tags
       - git push
