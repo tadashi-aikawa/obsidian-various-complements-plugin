@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "ci": "corepack enable && pnpm i && pnpm build && pnpm test",
     "release": "pnpm run ci && pnpm version ${VERSION} && git push --tags && git push",
-    "prepare": "husky install",
+    "prepare": "husky",
     "pre:push": "tsc -noEmit -skipLibCheck && pnpm test"
   },
   "keywords": [],
