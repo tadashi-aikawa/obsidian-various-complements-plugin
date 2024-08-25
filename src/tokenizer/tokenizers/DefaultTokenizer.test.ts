@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
-import { DefaultTokenizer } from "./DefaultTokenizer";
 import type { FactoryArgs } from "../tokenizer";
+import { DefaultTokenizer } from "./DefaultTokenizer";
 
 describe.each<{
   constructorArgs: FactoryArgs;
@@ -21,8 +21,11 @@ describe.each<{
   ${{}}                                    | ${"**bold** *italic*"}   | ${["bold", "italic"]}
   ${{}}                                    | ${"__a _b __c__ d_ e__"} | ${["a", "b", "c", "d", "e"]}
   ${{ treatUnderscoreAsPartOfWord: true }} | ${"__a _b __c__ d_ e__"} | ${["__a", "_b", "__c__", "d_", "e__"]}
+  ${{}}                                    | ${"--a -b --c-- d- e--"} | ${["--a", "-b", "--c--", "d-", "e--"]}
+  ${{ treatUnderscoreAsPartOfWord: true }} | ${"--a _b -_c_- d- e__"} | ${["--a", "_b", "-_c_-", "d-", "e__"]}
   ${{}}                                    | ${"let hoge_huga = 1"}   | ${["let", "hoge", "huga", "1"]}
   ${{ treatUnderscoreAsPartOfWord: true }} | ${"let hoge_huga = 1"}   | ${["let", "hoge_huga", "1"]}
+  ${{}}                                    | ${"let hoge-huga = 1"}   | ${["let", "hoge-huga", "1"]}
   ${{}}                                    | ${'"aaa" "bbb"'}         | ${["aaa", "bbb"]}
   ${{}}                                    | ${"'aaa' 'bbb'"}         | ${["aaa", "bbb"]}
   ${{}}                                    | ${"„aaa“ „bbb“"}         | ${["aaa", "bbb"]}
