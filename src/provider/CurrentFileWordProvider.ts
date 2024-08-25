@@ -1,14 +1,14 @@
 import type { App } from "obsidian";
-import { groupBy, uniq } from "../util/collection-helper";
-import type { WordsByFirstLetter } from "./suggester";
-import type { Tokenizer } from "../tokenizer/tokenizer";
 import type { AppHelper } from "../app-helper";
+import type { Word } from "../model/Word";
+import type { Tokenizer } from "../tokenizer/tokenizer";
+import { uniq } from "../util/collection-helper";
 import {
   allAlphabets,
   startsSmallLetterOnlyFirst,
   synonymAliases,
 } from "../util/strings";
-import type { Word } from "../model/Word";
+import { pushWord, type WordsByFirstLetter } from "./suggester";
 
 export class CurrentFileWordProvider {
   wordsByFirstLetter: WordsByFirstLetter = {};
@@ -73,7 +73,13 @@ export class CurrentFileWordProvider {
           accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
         }),
       }));
-    this.wordsByFirstLetter = groupBy(this.words, (x) => x.value.charAt(0));
+
+    for (const word of this.words) {
+      pushWord(this.wordsByFirstLetter, word.value.charAt(0), word);
+      word.aliases?.forEach((a) =>
+        pushWord(this.wordsByFirstLetter, a.charAt(0), word),
+      );
+    }
   }
 
   clearWords(): void {
