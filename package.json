@@ -12,7 +12,6 @@
     "pre:push": "pnpm typecheck && pnpm test",
     "ci": "pnpm i && pnpm build && pnpm test",
     "version": "node version-bump.mjs && git add manifest-beta.json manifest.json versions.json",
-    "release": "pnpm run ci && pnpm version ${VERSION} && git push --tags && git push",
     "prepare": "husky"
   },
   "keywords": [],

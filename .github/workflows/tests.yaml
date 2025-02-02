@@ -8,8 +8,6 @@ on:
       - "src/**/*"
       - "*.js"
       - "*.json"
-  schedule:
-    - cron: "0 0 * * *"
 
 jobs:
   test:
@@ -24,28 +22,3 @@ jobs:
 
       - run: corepack enable
       - run: pnpm run ci
-
-      - name: "Discord notification (not success)"
-        uses: rjstone/discord-webhook-notify@v1
-        if: "! success()"
-        with:
-          description: "⚠ Various Complements Tests failed!"
-          footer: "Node.js v22"
-          severity: error
-          avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-
-  notify:
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: "Discord notification (success)"
-        uses: rjstone/discord-webhook-notify@v1
-        if: always()
-        with:
-          description: "✅ Various Complements Tests passed!"
-          footer: "Node.js v22"
-          severity: info
-          avatarUrl: https://www.suruga-ya.jp/database/pics_light/game/871005085.jpg
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
