@@ -36,6 +36,12 @@ Before creating a pull request, please make an [issue] or a [discussion]😉
 
 ### Development
 
+#### Set up
+
+```bash
+git config core.hooksPath hooks
+```
+
 #### Install dependencies
 
 ```bash

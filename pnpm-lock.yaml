@@ -42,9 +42,6 @@ importers:
       esbuild-svelte:
         specifier: ^0.8.1
         version: 0.8.1(esbuild@0.23.0)(svelte@4.2.18)
-      husky:
-        specifier: ^9.1.3
-        version: 9.1.3
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.5.1)
@@ -65,7 +62,7 @@ importers:
         version: 4.2.18
       svelte-preprocess:
         specifier: ^5.1.3
-        version: 5.1.3(@babel/core@7.22.10)(svelte@4.2.18)(typescript@5.5.4)
+        version: 5.1.3(@babel/core@7.24.9)(svelte@4.2.18)(typescript@5.5.4)
       tslib:
         specifier: ^2.6.3
         version: 2.6.3
@@ -1271,11 +1268,6 @@ packages:
   human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
-
-  husky@9.1.3:
-    resolution: {integrity: sha512-ET3TQmQgdIu0pt+jKkpo5oGyg/4MQZpG6xcam5J5JyNJV+CBT23OBpCF15bKHKycRyMH9k6ONy8g2HdGIsSkMQ==}
-    engines: {node: '>=18'}
-    hasBin: true
 
   import-local@3.1.0:
     resolution: {integrity: sha512-ASB07uLtnDs1o6EHjKpX34BKYDSqnFerfTOJL2HvMqF70LnxpjkzDB8J44oT9pu4AMPkQwf8jl6szgvNd2tRIg==}
@@ -3744,8 +3736,6 @@ snapshots:
 
   human-signals@2.1.0: {}
 
-  husky@9.1.3: {}
-
   import-local@3.1.0:
     dependencies:
       pkg-dir: 4.2.0
@@ -4719,7 +4709,7 @@ snapshots:
 
   svelte-lucide-icons@0.6.0: {}
 
-  svelte-preprocess@5.1.3(@babel/core@7.22.10)(svelte@4.2.18)(typescript@5.5.4):
+  svelte-preprocess@5.1.3(@babel/core@7.24.9)(svelte@4.2.18)(typescript@5.5.4):
     dependencies:
       '@types/pug': 2.0.6
       detect-indent: 6.1.0
@@ -4728,7 +4718,7 @@ snapshots:
       strip-indent: 3.0.0
       svelte: 4.2.18
     optionalDependencies:
-      '@babel/core': 7.22.10
+      '@babel/core': 7.24.9
       typescript: 5.5.4
 
   svelte@4.2.18:
