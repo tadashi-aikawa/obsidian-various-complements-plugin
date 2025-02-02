@@ -1,0 +1,47 @@
+#!/bin/bash
+
+commit_message_first_line="$(cat "$1")"
+
+if [[ "${commit_message_first_line}" == "fixup! "* ]]; then
+  exit 0
+fi
+
+commit_message_regex='^([^(:!]+)\(?([^():!]*)\)?!?:\ (.+)$'
+if [[ $commit_message_first_line =~ $commit_message_regex ]]; then
+  type="${BASH_REMATCH[1]}"
+  scope="${BASH_REMATCH[2]}"
+  description="${BASH_REMATCH[3]}"
+fi
+
+if [[ -z ${type} && -z ${scope} && -z ${description} ]]; then
+  echo "Invalid commit message format -> ${commit_message_first_line}"
+  exit 1
+fi
+
+# $1: type
+function validateType() {
+  case $1 in
+  feat | fix | style | docs | refactor | test | ci | build | dev | chore) ;;
+  *)
+    echo "Invalid type: $1"
+    echo ">> feat | fix | style | docs | refactor | test | ci | build | dev | chore"
+    exit 1
+    ;;
+  esac
+}
+
+# $1: scope
+function validateScope() {
+  case $1 in
+  'current file' | 'current vault' | 'custom dictionary' | 'internal link' | 'front matter' | "") ;;
+  *)
+    echo "Invalid scope: $1"
+    echo ">> current file | current vault | custom dictionary | internal link | front matter"
+    exit 1
+    ;;
+  esac
+}
+
+validateType "${type}"
+
+tr "/" \\n <<<"${scope}" | while read -r f; do validateScope "$f"; done
