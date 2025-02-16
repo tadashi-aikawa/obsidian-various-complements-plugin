@@ -15,33 +15,33 @@ import {
   Scope,
   TFile,
 } from "obsidian";
-import { createTokenizer, type Tokenizer } from "../tokenizer/tokenizer";
-import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
-import type { Settings } from "../setting/settings";
 import { AppHelper } from "../app-helper";
-import type { WordsByFirstLetter } from "../provider/suggester";
-import { suggestionUniqPredicate } from "../provider/suggester";
-import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
+import type { InternalLinkWord, Word } from "../model/Word";
+import { ColumnDelimiter } from "../option/ColumnDelimiter";
+import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
 import { CurrentFileWordProvider } from "../provider/CurrentFileWordProvider";
+import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
+import { CustomDictionaryWordProvider } from "../provider/CustomDictionaryWordProvider";
+import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
 import { InternalLinkWordProvider } from "../provider/InternalLinkWordProvider";
 import { MatchStrategy } from "../provider/MatchStrategy";
-import { ColumnDelimiter } from "../option/ColumnDelimiter";
-import { setEquals, uniqWith } from "../util/collection-helper";
-import { CurrentVaultWordProvider } from "../provider/CurrentVaultWordProvider";
-import type { ProviderStatusBar } from "./ProviderStatusBar";
-import type { InternalLinkWord, Word } from "../model/Word";
-import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
-import { FrontMatterWordProvider } from "../provider/FrontMatterWordProvider";
 import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
+import type { WordsByFirstLetter } from "../provider/suggester";
+import { suggestionUniqPredicate } from "../provider/suggester";
+import type { Settings } from "../setting/settings";
 import {
   type HitWord,
   SelectionHistoryStorage,
   type SelectionHistoryTree,
 } from "../storage/SelectionHistoryStorage";
-import { encodeSpace, equalsAsLiterals, isInternalLink } from "../util/strings";
+import { createTokenizer, type Tokenizer } from "../tokenizer/tokenizer";
+import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
+import { setEquals, uniqWith } from "../util/collection-helper";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
-import * as commands from "./popup-commands";
+import { encodeSpace, equalsAsLiterals, isInternalLink } from "../util/strings";
 import type { CommandReturnType } from "./popup-commands";
+import * as commands from "./popup-commands";
+import type { ProviderStatusBar } from "./ProviderStatusBar";
 
 function buildLogMessage(message: string, msec: number) {
   return `${message}: ${Math.round(msec)}[ms]`;
@@ -486,7 +486,11 @@ export class AutoCompleteSuggest
 
   private registerKeyAsIgnored(modifiers: Modifier[], key: string | null) {
     this.keymapEventHandler.push(
-      this.scope.register(modifiers, key, () => {
+      this.scope.register(modifiers, key, (evt) => {
+        if (evt.isComposing) {
+          return;
+        }
+
         this.close();
         return true;
       }),
