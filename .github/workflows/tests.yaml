@@ -20,5 +20,5 @@ jobs:
         with:
           node-version: "22"
 
-      - run: corepack enable
+      - run: npm install -g corepack@latest && corepack enable
       - run: pnpm run ci
