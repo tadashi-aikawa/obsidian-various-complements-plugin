@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "pre:push": "pnpm typecheck && pnpm test",
     "ci": "pnpm i && pnpm build && pnpm test",
-    "version": "node version-bump.mjs && git add manifest-beta.json manifest.json versions.json"
+    "version": "node version-bump.mjs"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
