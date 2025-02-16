@@ -10,8 +10,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "pre:push": "pnpm typecheck && pnpm test",
-    "ci": "pnpm i && pnpm build && pnpm test",
-    "version": "node version-bump.mjs"
+    "ci": "pnpm i && pnpm build && pnpm test"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
