@@ -71,13 +71,7 @@ pnpm run ci
 
 #### Release
 
-```bash
-# Stable
-VERSION=1.2.3 pnpm release
-
-# Beta
-VERSION=1.2.3-beta1 pnpm release
-```
+[Release Action](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/actions/workflows/release.yaml) を実行。
 
 [Obsidian]: https://obsidian.md/
 
