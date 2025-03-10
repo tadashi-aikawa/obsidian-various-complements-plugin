@@ -14,12 +14,15 @@ export type Hotkey = {
   hideHotkeyGuide?: boolean;
 };
 
-export function hotkey2String(hotkey?: Hotkey): string {
-  if (!hotkey) {
+export function hotkey2String(hk?: Hotkey): string {
+  if (!hk) {
     return "";
   }
-  const mods = hotkey.modifiers.join(" ");
-  return mods ? `${mods} ${hotkey.key}` : hotkey.key;
+
+  const hotkey = hk.key === " " ? "Space" : hk.key;
+  const mods = hk.modifiers.join(" ");
+
+  return mods ? `${mods} ${hotkey}` : hotkey;
 }
 
 export function string2Hotkey(
@@ -27,14 +30,20 @@ export function string2Hotkey(
   hideHotkeyGuide: boolean,
 ): Hotkey | null {
   const keys = hotKey.split(" ");
+
+  if (keys.length === 0 || keys[0] === "") {
+    return null;
+  }
   if (keys.length === 1) {
-    return keys[0] === ""
-      ? null
-      : { modifiers: [], key: keys[0], hideHotkeyGuide };
+    return {
+      modifiers: [],
+      key: keys[0].replace("Space", " "),
+      hideHotkeyGuide,
+    };
   }
   return {
     modifiers: keys.slice(0, -1) as Modifier[],
-    key: keys.at(-1) as Modifier,
+    key: keys.at(-1)!.replace("Space", " "),
     hideHotkeyGuide,
   };
 }

@@ -1,17 +1,17 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
-import type VariousComponents from "../main";
-import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
-import { MatchStrategy } from "../provider/MatchStrategy";
-import { ColumnDelimiter } from "../option/ColumnDelimiter";
-import { mirrorMap } from "../util/collection-helper";
-import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
-import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
-import { smartLineBreakSplit } from "../util/strings";
-import { TextComponentEvent } from "./settings-helper";
-import { DEFAULT_HISTORIES_PATH } from "../util/path";
 import type { Hotkey } from "../keys";
 import { hotkey2String, string2Hotkey } from "../keys";
+import type VariousComponents from "../main";
+import { ColumnDelimiter } from "../option/ColumnDelimiter";
+import { DescriptionOnSuggestion } from "../option/DescriptionOnSuggestion";
+import { MatchStrategy } from "../provider/MatchStrategy";
+import { SpecificMatchStrategy } from "../provider/SpecificMatchStrategy";
+import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { isPresent } from "../types";
+import { mirrorMap } from "../util/collection-helper";
+import { DEFAULT_HISTORIES_PATH } from "../util/path";
+import { smartLineBreakSplit } from "../util/strings";
+import { TextComponentEvent } from "./settings-helper";
 
 export interface Settings {
   // general
@@ -661,12 +661,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     const li = createEl("li");
     li.append(
-      "You can know the keycode at ",
+      "You can find the keycode at ",
       createEl("a", {
         text: "keycode.info",
         href: "https://keycode.info/",
       }),
-      ". (Press any key and show 'event.key')",
+      ". Press any key to see the '",
+      createEl("code", {
+        text: "event.key",
+      }),
+      "' value, ",
+      createEl("b", {
+        text: "except for the space key",
+      }),
+      ". Set the space key as '",
+      createEl("code", {
+        text: "Space",
+      }),
+      "'.",
     );
 
     const ul = createEl("ul");
