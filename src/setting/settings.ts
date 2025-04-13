@@ -93,6 +93,8 @@ export interface Settings {
   enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
+  excludeSelfInternalLink: boolean;
+
   updateInternalLinksOnSave: boolean;
   insertAliasTransformedFromDisplayedInternalLink: {
     enabled: boolean;
@@ -202,6 +204,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
+  excludeSelfInternalLink: false,
   updateInternalLinksOnSave: true,
   insertAliasTransformedFromDisplayedInternalLink: {
     enabled: false,
@@ -1060,6 +1063,15 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             async (value) => {
               this.plugin.settings.updateInternalLinksOnSave = value;
               await this.plugin.saveSettings({ internalLink: true });
+            },
+          );
+        });
+      new Setting(containerEl)
+        .setName("Exclude self internal link")
+        .addToggle((tc) => {
+          tc.setValue(this.plugin.settings.excludeSelfInternalLink).onChange(
+            async (value) => {
+              this.plugin.settings.excludeSelfInternalLink = value;
             },
           );
         });

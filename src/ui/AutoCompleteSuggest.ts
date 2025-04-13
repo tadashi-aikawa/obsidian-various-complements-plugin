@@ -462,6 +462,14 @@ export class AutoCompleteSuggest
           }
         }
 
+        if (this.settings.excludeSelfInternalLink) {
+          words = words.filter(
+            (x) =>
+              x.type !== "internalLink" ||
+              x.createdPath !== this.appHelper.getActiveFile()?.path,
+          );
+        }
+
         cb(
           uniqWith(words, suggestionUniqPredicate).slice(
             0,
