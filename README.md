@@ -10,7 +10,8 @@ This plugin for [Obsidian] enables you complete words like the auto-completion o
 
 ## 📚 Documentation
 
-https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/
+- [Official](https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/)
+- [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/tadashi-aikawa/obsidian-various-complements-plugin)
 
 ## 👥 For users
 
