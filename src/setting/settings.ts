@@ -94,6 +94,7 @@ export interface Settings {
   suggestInternalLinkWithAlias: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
   excludeSelfInternalLink: boolean;
+  excludeExistingInActiveFileInternalLinks: boolean;
 
   updateInternalLinksOnSave: boolean;
   insertAliasTransformedFromDisplayedInternalLink: {
@@ -206,6 +207,7 @@ export const DEFAULT_SETTINGS: Settings = {
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
   excludeSelfInternalLink: false,
+  excludeExistingInActiveFileInternalLinks: false,
   updateInternalLinksOnSave: true,
   insertAliasTransformedFromDisplayedInternalLink: {
     enabled: false,
@@ -1077,6 +1079,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               await this.plugin.saveSettings({ internalLink: true });
             },
           );
+        });
+      new Setting(containerEl)
+        .setName("Exclude existing in active file internal links")
+        .setDesc(
+          "Exclude internal links present in the current file from the suggestions. Note that the number of excluded suggestions will reduce the total suggestions by the value set in the 'Max number of suggestions' option.",
+        )
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.excludeExistingInActiveFileInternalLinks,
+          ).onChange(async (value) => {
+            this.plugin.settings.excludeExistingInActiveFileInternalLinks =
+              value;
+            await this.plugin.saveSettings({ internalLink: true });
+          });
         });
 
       new Setting(containerEl)

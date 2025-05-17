@@ -219,6 +219,14 @@ export class AppHelper {
     );
   }
 
+  getResolvedLinks(file: TFile): string[] {
+    return (
+      Object.keys(
+        this.unsafeApp.metadataCache.resolvedLinks[file.path] ?? {},
+      ) ?? []
+    );
+  }
+
   getUnresolvedLinks(file: TFile): Set<string> {
     const countsByLink =
       this.unsafeApp.metadataCache.unresolvedLinks[file.path] ?? {};

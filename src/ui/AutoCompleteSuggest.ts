@@ -470,6 +470,15 @@ export class AutoCompleteSuggest
           );
         }
 
+        if (this.settings.excludeExistingInActiveFileInternalLinks) {
+          const activeFile = this.appHelper.getActiveFile()!;
+          const linkPaths = this.appHelper.getResolvedLinks(activeFile);
+          words = words.filter(
+            (x) =>
+              x.type !== "internalLink" || !linkPaths.includes(x.createdPath),
+          );
+        }
+
         cb(
           uniqWith(words, suggestionUniqPredicate).slice(
             0,
