@@ -1,13 +1,13 @@
-import fs from "fs";
-import path from "path";
 import builtins from "builtin-modules";
 import chokidar from "chokidar";
 import esbuild from "esbuild";
-import process from "process";
 import esbuildSvelte from "esbuild-svelte";
+import fs from "fs";
+import path from "path";
+import process from "process";
 import sveltePreprocess from "svelte-preprocess";
 
-const VAULT_DIR = "/mnt/c/Users/syoum/work/minerva";
+const VAULT_DIR = "/Users/tadashi-aikawa/work/minerva";
 const FILES = ["main.js", "manifest.json", "styles.css"];
 
 // ---
