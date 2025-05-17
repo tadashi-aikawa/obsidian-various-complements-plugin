@@ -71,7 +71,7 @@ pnpm run ci
 
 #### Release
 
-[Release Action](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/actions/workflows/release.yaml) を実行。
+Run [Release Action](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/actions/workflows/release.yaml).
 
 [Obsidian]: https://obsidian.md/
 
