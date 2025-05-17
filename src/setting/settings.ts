@@ -1074,6 +1074,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           tc.setValue(this.plugin.settings.excludeSelfInternalLink).onChange(
             async (value) => {
               this.plugin.settings.excludeSelfInternalLink = value;
+              await this.plugin.saveSettings({ internalLink: true });
             },
           );
         });
