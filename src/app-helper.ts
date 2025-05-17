@@ -88,6 +88,17 @@ export class AppHelper {
     };
   }
 
+  getTagsProperty(file: TFile): string[] {
+    const frontMatter =
+      this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter;
+    if (!frontMatter) {
+      return [];
+    }
+
+    // remove #
+    return parseFrontMatterTags(frontMatter)?.map((x) => x.slice(1)) ?? [];
+  }
+
   getBoolFrontMatter(file: TFile, key: string): boolean {
     return Boolean(
       this.unsafeApp.metadataCache.getFileCache(file)?.frontmatter?.[key],

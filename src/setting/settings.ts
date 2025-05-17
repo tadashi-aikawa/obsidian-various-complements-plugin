@@ -102,6 +102,7 @@ export interface Settings {
     after: string;
   };
   frontMatterKeyForExclusionInternalLink: string;
+  tagsForExclusionInternalLink: string[];
 
   // front matter complement
   enableFrontMatterComplement: boolean;
@@ -212,6 +213,7 @@ export const DEFAULT_SETTINGS: Settings = {
     after: "",
   },
   frontMatterKeyForExclusionInternalLink: "",
+  tagsForExclusionInternalLink: [],
 
   // front matter complement
   enableFrontMatterComplement: false,
@@ -1157,6 +1159,25 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }).setValue(
             this.plugin.settings.frontMatterKeyForExclusionInternalLink,
           );
+        });
+      new Setting(containerEl)
+        .setName("Tags for exclusion")
+        .setDesc(
+          "Tags to exclude suggestions for internal links. If specifying multiple tags, separate them with line breaks.",
+        )
+        .addTextArea((tc) => {
+          const el = tc
+            .setValue(
+              this.plugin.settings.tagsForExclusionInternalLink.join("\n"),
+            )
+            .onChange(async (value) => {
+              this.plugin.settings.tagsForExclusionInternalLink =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path-mini";
+          return el;
         });
     }
   }

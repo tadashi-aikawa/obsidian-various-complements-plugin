@@ -30,6 +30,10 @@ export function uniqWith<T>(arr: T[], fn: (one: T, other: T) => boolean) {
   );
 }
 
+export function hasSameElement(arr1: unknown[], arr2: unknown[]): boolean {
+  return arr1.some((x) => arr2.includes(x));
+}
+
 export function arrayEquals(
   arr1: unknown[],
   arr2: unknown[],

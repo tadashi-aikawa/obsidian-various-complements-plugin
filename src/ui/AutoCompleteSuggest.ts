@@ -707,6 +707,7 @@ export class AutoCompleteSuggest
         this.settings.treatAccentDiacriticsAsAlphabeticCharacters,
       frontMatterKeyForExclusion:
         this.settings.frontMatterKeyForExclusionInternalLink,
+      tagsForExclusion: this.settings.tagsForExclusionInternalLink,
     });
 
     this.statusBar.setInternalLinkIndexed(

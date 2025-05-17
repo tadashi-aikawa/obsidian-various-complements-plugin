@@ -57,6 +57,27 @@ describe.each<{ arr: any[]; fn: (a: any, b: any) => any; expected: any[] }>`
 describe.each<{
   arr1: unknown[];
   arr2: unknown[];
+  expected: boolean;
+}>`
+  arr1             | arr2             | expected
+  ${["aa", "iii"]} | ${["u"]}         | ${false}
+  ${["aa", "iii"]} | ${["aa"]}        | ${true}
+  ${["aa", "iii"]} | ${["aa", "u"]}   | ${true}
+  ${["aa", "iii"]} | ${["u", "iii"]}  | ${true}
+  ${["aa", "iii"]} | ${["aa", "iii"]} | ${true}
+  ${["aa", "iii"]} | ${["uu", "ee"]}  | ${false}
+  ${["aa"]}        | ${[]}            | ${false}
+  ${[]}            | ${["aa"]}        | ${false}
+  ${[]}            | ${[]}            | ${false}
+`("hasSameElement", ({ arr1, arr2, expected }) => {
+  test(`hasSameElement(${arr1}, ${arr2}) = ${expected}`, () => {
+    expect(arr1.some((x) => arr2.includes(x))).toStrictEqual(expected);
+  });
+});
+
+describe.each<{
+  arr1: unknown[];
+  arr2: unknown[];
   length?: number;
   expected: boolean;
 }>`

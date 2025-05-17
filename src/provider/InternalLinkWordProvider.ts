@@ -1,8 +1,9 @@
 import type { App } from "obsidian";
-import { pushWord, type WordsByFirstLetter } from "./suggester";
+import { hasSameElement } from "src/util/collection-helper";
 import type { AppHelper } from "../app-helper";
-import { synonymAliases } from "../util/strings";
 import type { InternalLinkWord, Word } from "../model/Word";
+import { synonymAliases } from "../util/strings";
+import { pushWord, type WordsByFirstLetter } from "./suggester";
 
 export class InternalLinkWordProvider {
   private words: Word[] = [];
@@ -19,6 +20,7 @@ export class InternalLinkWordProvider {
     makeSynonymAboutEmoji: boolean;
     makeSynonymAboutAccentsDiacritics: boolean;
     frontMatterKeyForExclusion: string;
+    tagsForExclusion: string[];
   }): void {
     this.clearWords();
 
@@ -31,14 +33,19 @@ export class InternalLinkWordProvider {
           return false;
         }
 
-        if (!option.frontMatterKeyForExclusion) {
-          return true;
+        const fmkfc = option.frontMatterKeyForExclusion;
+        if (fmkfc && this.appHelper.getBoolFrontMatter(f, fmkfc)) {
+          return false;
         }
 
-        return !this.appHelper.getBoolFrontMatter(
-          f,
-          option.frontMatterKeyForExclusion,
-        );
+        if (option.tagsForExclusion.length > 0) {
+          const tags = this.appHelper.getTagsProperty(f);
+          if (hasSameElement(option.tagsForExclusion, tags)) {
+            return false;
+          }
+        }
+
+        return true;
       })
       .flatMap((x) => {
         const aliases = this.appHelper.getAliases(x);
