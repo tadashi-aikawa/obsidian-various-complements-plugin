@@ -1,3 +1,10 @@
+import { type Word, WordTypeMeta } from "../model/Word";
+import type {
+  HitWord,
+  SelectionHistoryStorage,
+} from "../storage/SelectionHistoryStorage";
+import type { IndexedWords } from "../ui/AutoCompleteSuggest";
+import { max, uniqWith } from "../util/collection-helper";
 import {
   capitalizeFirstLetter,
   lowerFuzzy,
@@ -6,13 +13,6 @@ import {
   lowerStartsWith,
   wrapFuzzy,
 } from "../util/strings";
-import type { IndexedWords } from "../ui/AutoCompleteSuggest";
-import { max, uniqWith } from "../util/collection-helper";
-import { type Word, WordTypeMeta } from "../model/Word";
-import type {
-  HitWord,
-  SelectionHistoryStorage,
-} from "../storage/SelectionHistoryStorage";
 
 export type WordsByFirstLetter = { [firstLetter: string]: Word[] };
 
@@ -99,6 +99,7 @@ export function judge(
           value: c,
           hit: c,
           fuzzy: matched.type === "fuzzy_match",
+          query,
         },
         value: c,
         alias: false,
@@ -109,6 +110,7 @@ export function judge(
           ...word,
           hit: word.value,
           fuzzy: matched.type === "fuzzy_match",
+          query,
         },
         value: word.value,
         alias: false,
@@ -135,6 +137,7 @@ export function judge(
         ...word,
         hit: matchedAlias.aliases,
         fuzzy: matchedAlias.matched.type === "fuzzy_match",
+        query,
       },
       value: matchedAlias.aliases,
       alias: true,
@@ -304,6 +307,7 @@ export function judgeByPartialMatch(
           value: c,
           hit: c,
           fuzzy: startsWithMatched.type === "fuzzy_match",
+          query,
         },
         value: c,
         alias: false,
@@ -314,6 +318,7 @@ export function judgeByPartialMatch(
           ...word,
           hit: word.value,
           fuzzy: startsWithMatched.type === "fuzzy_match",
+          query,
         },
         value: word.value,
         alias: false,
@@ -340,6 +345,7 @@ export function judgeByPartialMatch(
         ...word,
         hit: startsWithAliasMatched.aliases,
         fuzzy: startsWithAliasMatched.matched.type === "fuzzy_match",
+        query,
       },
       value: startsWithAliasMatched.aliases,
       alias: true,
@@ -358,6 +364,7 @@ export function judgeByPartialMatch(
         ...word,
         hit: word.value,
         fuzzy: includesMatched.type === "fuzzy_match",
+        query,
       },
       value: word.value,
       alias: false,
@@ -383,6 +390,7 @@ export function judgeByPartialMatch(
         ...word,
         hit: matchedAliasIncluded.aliases,
         fuzzy: matchedAliasIncluded.matched.type === "fuzzy_match",
+        query,
       },
       value: matchedAliasIncluded.aliases,
       alias: true,

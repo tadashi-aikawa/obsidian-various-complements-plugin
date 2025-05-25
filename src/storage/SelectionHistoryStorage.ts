@@ -134,20 +134,31 @@ export class SelectionHistoryStorage {
   }
 
   increment(word: HitWord): void {
+    console.log(word);
     if (!this.data[word.hit]) {
       this.data[word.hit] = {};
     }
-    if (!this.data[word.hit][word.value]) {
-      this.data[word.hit][word.value] = {};
+
+    let valueRef;
+    if (word.valueForHistory) {
+      if (!this.data[word.hit][word.valueForHistory]) {
+        this.data[word.hit][word.valueForHistory] = {};
+      }
+      valueRef = this.data[word.hit][word.valueForHistory];
+    } else {
+      if (!this.data[word.hit][word.value]) {
+        this.data[word.hit][word.value] = {};
+      }
+      valueRef = this.data[word.hit][word.value];
     }
 
-    if (this.data[word.hit][word.value][word.type]) {
-      this.data[word.hit][word.value][word.type] = {
-        count: this.data[word.hit][word.value][word.type].count + 1,
+    if (valueRef[word.type]) {
+      valueRef[word.type] = {
+        count: valueRef[word.type].count + 1,
         lastUpdated: Date.now(),
       };
     } else {
-      this.data[word.hit][word.value][word.type] = {
+      valueRef[word.type] = {
         count: 1,
         lastUpdated: Date.now(),
       };

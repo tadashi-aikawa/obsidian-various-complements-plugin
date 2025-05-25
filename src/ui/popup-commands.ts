@@ -1,8 +1,8 @@
-import type { AutoCompleteSuggest } from "./AutoCompleteSuggest";
 import { Notice } from "obsidian";
+import type { InternalLinkWord, Word } from "src/model/Word";
 import { excludeEmoji, findCommonPrefix } from "../util/strings";
+import type { AutoCompleteSuggest } from "./AutoCompleteSuggest";
 import { InputDialog } from "./component/InputDialog";
-import type { InternalLinkWord } from "src/model/Word";
 
 export type CommandReturnType = boolean | undefined;
 
@@ -63,6 +63,34 @@ export async function selectWithCustomAlias(
     origin: item.aliasMeta?.origin ?? item.value,
   };
   item.value = input;
+  return item;
+}
+
+export function selectWithQueryAlias(
+  popup: AutoCompleteSuggest,
+  evt: KeyboardEvent,
+): Word | null {
+  if (!popup.context || evt.isComposing) {
+    return null;
+  }
+
+  if (popup.selectionLock) {
+    popup.close();
+    return null;
+  }
+
+  const item = popup.suggestions.values[popup.suggestions.selectedItem];
+  if (item.type !== "internalLink") {
+    select(popup, evt);
+    return null;
+  }
+
+  item.aliasMeta = {
+    origin: item.aliasMeta?.origin ?? item.value,
+  };
+  item.valueForHistory = item.value;
+  item.value = item.query!;
+
   return item;
 }
 

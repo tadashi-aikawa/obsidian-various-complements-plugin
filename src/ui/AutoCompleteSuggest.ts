@@ -578,6 +578,16 @@ export class AutoCompleteSuggest
           return false;
         },
       ],
+      [
+        "select with query alias",
+        (evt) => {
+          const item = commands.selectWithQueryAlias(this, evt);
+          if (item) {
+            this.selectSuggestion(item);
+          }
+          return false;
+        },
+      ],
       ["open", (_) => commands.open(this)],
       ["completion", (_) => commands.completion(this)],
       ["insert as text", (evt) => commands.insertAsText(this, evt)],

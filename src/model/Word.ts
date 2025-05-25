@@ -15,6 +15,8 @@ export interface DefaultWord {
   offset?: number;
   hit?: string;
   fuzzy?: boolean;
+  query?: string;
+  valueForHistory?: string; // prioritize this value for history
 }
 export interface CurrentFileWord extends DefaultWord {
   type: "currentFile";
