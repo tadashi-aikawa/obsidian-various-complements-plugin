@@ -1,5 +1,5 @@
 import type { App } from "obsidian";
-import { hasSameElement } from "src/util/collection-helper";
+import { hasSameElement } from "../../src/util/collection-helper";
 import type { AppHelper } from "../app-helper";
 import type { InternalLinkWord, Word } from "../model/Word";
 import { synonymAliases } from "../util/strings";

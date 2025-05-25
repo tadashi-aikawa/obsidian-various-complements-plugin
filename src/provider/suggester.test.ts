@@ -1,3 +1,7 @@
+import { describe, expect, test } from "@jest/globals";
+import type { Word } from "../../src/model/Word";
+import type { IndexedWords } from "../ui/AutoCompleteSuggest";
+import type { Judgement } from "./suggester";
 import {
   judge,
   judgeByPartialMatch,
@@ -6,10 +10,6 @@ import {
   suggestWordsByPartialMatch,
   type WordsByFirstLetter,
 } from "./suggester";
-import { describe, expect, test } from "@jest/globals";
-import type { IndexedWords } from "../ui/AutoCompleteSuggest";
-import type { Word } from "src/model/Word";
-import type { Judgement } from "./suggester";
 
 describe("pushWord", () => {
   const createWordsByFirstLetter = (): WordsByFirstLetter => ({

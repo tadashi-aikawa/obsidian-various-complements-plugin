@@ -182,13 +182,13 @@ export class AppHelper {
     );
 
     if (markdownLink.startsWith("[[")) {
-      const text = markdownLink.matchAll(/^\[\[(?<text>.+)]]$/g).next().value
+      const text = markdownLink.matchAll(/^\[\[(?<text>.+)]]$/g).next().value!
         .groups?.text!; // dirty error handling
       return { displayed: text, link: text };
     } else {
       const { displayed, link } = markdownLink
         .matchAll(/^\[(?<displayed>.+)]\((?<link>.+)\.md\)$/g)
-        .next().value.groups!; // dirty error handling
+        .next().value!.groups!; // dirty error handling
       return { displayed, link };
     }
   }

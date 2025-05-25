@@ -1,5 +1,5 @@
 import { Notice } from "obsidian";
-import type { InternalLinkWord, Word } from "src/model/Word";
+import type { InternalLinkWord, Word } from "../../src/model/Word";
 import { excludeEmoji, findCommonPrefix } from "../util/strings";
 import type { AutoCompleteSuggest } from "./AutoCompleteSuggest";
 import { InputDialog } from "./component/InputDialog";
