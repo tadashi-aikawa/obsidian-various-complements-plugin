@@ -134,7 +134,6 @@ export class SelectionHistoryStorage {
   }
 
   increment(word: HitWord): void {
-    console.log(word);
     if (!this.data[word.hit]) {
       this.data[word.hit] = {};
     }
