@@ -3,8 +3,8 @@ import type { FactoryArgs, TrimTarget } from "../tokenizer";
 import { DefaultTokenizer } from "./DefaultTokenizer";
 
 type PreviousType = "none" | "trim" | "korean" | "others";
-const INPUT_TRIM_CHAR_PATTERN = /[\r\n\t\[\]$/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”。、『』「」《》〈〉]/g;
-const INDEXING_TRIM_CHAR_PATTERN = /[\r\n\t\[\]$/:?!=()<>"',|;*~ `_“„«»‹›‚‘’”。、『』「」《》〈〉]/g;
+const INPUT_TRIM_CHAR_PATTERN = /[\r\n\t\[\]$/:?!=<>"',|;*~ `_“„«»‹›‚‘’”。、『』「」《》〈〉]/g;
+const INDEXING_TRIM_CHAR_PATTERN = /[\r\n\t\[\]$/:?!=<>"',|;*~ `_“„«»‹›‚‘’”。、『』「」《》〈〉]/g;
 const KOREAN_PATTERN = /[\u1100-\u11FF\u3131-\u318E\uAC00-\uD7AF\uA960–\uA97F\uD7B0–\uD7FFA-Za-z0-9_\-\\]/;
 export class KoreanTokenizer extends DefaultTokenizer {
   constructor(args?: FactoryArgs) {
@@ -46,16 +46,40 @@ export class KoreanTokenizer extends DefaultTokenizer {
   ): Iterable<{ word: string; offset: number }> {
     let startIndex = 0;
     let previousType: PreviousType = "none";
+    const trimPattern = super.getTrimPattern(target);
 
     for (let i = 0; i < content.length; i++) {
-      if (content[i].match(super.getTrimPattern(target))) {
+      const char = content[i];
+
+      if (char === "(" || char === ")") {
+        const isPrevSpace = i > 0 && content[i - 1] === " ";
+        const isNextSpace = i < content.length - 1 && content[i + 1] === " ";
+
+        if (isPrevSpace || isNextSpace) {
+          yield { word: content.slice(startIndex, i), offset: startIndex };
+          previousType = "trim";
+          startIndex = i + 1;
+          continue;
+        } else {
+          if (previousType === "korean" || previousType === "none") {
+            previousType = "korean";
+            continue;
+          }
+          yield { word: content.slice(startIndex, i), offset: startIndex };
+          previousType = "korean";
+          startIndex = i;
+          continue;
+        }
+      }
+
+      if (char.match(trimPattern)) {
         yield { word: content.slice(startIndex, i), offset: startIndex };
         previousType = "trim";
         startIndex = i;
         continue;
       }
 
-      if (content[i].match(KOREAN_PATTERN)) {
+      if (char.match(KOREAN_PATTERN)) {
         if (previousType === "korean" || previousType === "none") {
           previousType = "korean";
           continue;
