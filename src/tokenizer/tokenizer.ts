@@ -6,6 +6,7 @@ import { JapaneseTokenizer } from "./tokenizers/JapaneseTokenizer";
 import type { TokenizeStrategy } from "./TokenizeStrategy";
 import { EnglishOnlyTokenizer } from "./tokenizers/EnglishOnlyTokenizer";
 import { ChineseTokenizer } from "./tokenizers/ChineseTokenizer";
+import { KoreanTokenizer } from "./tokenizers/KoreanTokenizer";
 import type { Settings } from "../setting/settings";
 
 export type TrimTarget = "input" | "indexing";
@@ -48,5 +49,7 @@ export async function createTokenizer(
       }
       const dict = await app.vault.adapter.read(settings.cedictPath);
       return ChineseTokenizer.create(dict);
+    case "korean":
+      return new KoreanTokenizer();
   }
 }
