@@ -241,34 +241,160 @@ export const DEFAULT_SETTINGS: Settings = {
 export class VariousComplementsSettingTab extends PluginSettingTab {
   plugin: VariousComponents;
 
+  // --- A hack is used to make a fake close button that appears when the header becomes sticky.
+  // Obsidian's settings pane doesn't exatly work well with UI that spans more than the padding of the container element. ---
+
+  // --- New UI for better UX with Category Split, Navigations and 1HACK ---
+  private scrollObserver: IntersectionObserver | null = null;
+  private selectedCategory: string = "All";
+  private static readonly CATEGORY_LIST = [
+    "All",
+    "General",
+    "Matching & Filtering",
+    "Triggering & Suppression",
+    "Suggestion Sources",
+    "Appearance & UI",
+    "Key Customization",
+    "Advanced",
+  ];
+
   constructor(app: App, plugin: VariousComponents) {
     super(app, plugin);
     this.plugin = plugin;
   }
 
   async display(): Promise<void> {
-    let { containerEl } = this;
+    const { containerEl } = this;
 
     containerEl.empty();
 
+    if (this.scrollObserver) {
+      this.scrollObserver.disconnect();
+    }
+
     containerEl.createEl("h2", { text: "Various Complements - Settings" });
-    await this.addMainSettings(containerEl);
-    this.addAppearanceSettings(containerEl);
+
+    // --- Header like Functionality ---
+    const buttonBar = containerEl.createDiv({
+      cls: "various-complements__settings__category-bar",
+    });
+
+    const computedStyles = window.getComputedStyle(containerEl);
+    const paddingTop = computedStyles.paddingTop;
+    const paddingLeft = computedStyles.paddingLeft;
+    const paddingRight = computedStyles.paddingRight;
+
+    Object.assign(buttonBar.style, {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      position: "sticky",
+      width: "auto",
+      zIndex: "1",
+      background: "var(--background-primary)",
+      boxShadow: "0 2px 3px -2px var(--background-modifier-border)",
+      pointerEvents: "none", // That hack mentinioned in the comment starts here
+      top: `-${paddingTop}`,
+      margin: `0 -${paddingRight} 0 -${paddingLeft}`,
+      padding: `${paddingTop} ${paddingRight} 8px ${paddingLeft}`,
+    });
+
+    const buttonGrid = buttonBar.createDiv();
+    Object.assign(buttonGrid.style, {
+      display: "grid",
+      gridTemplateColumns: "repeat(4, 1fr)",
+      gap: "4px",
+      pointerEvents: "auto", // HACK: Re-enables clicks only for the grid and the buttons inside it
+    });
+
+    const fakeCloseButton = buttonBar.createDiv();
+    Object.assign(fakeCloseButton.style, {
+      position: "absolute",
+      top: `calc(${paddingTop} / 2 - 12px)`,
+      right: `calc(${paddingRight} / 2 - 20px)`,
+      width: "24px",
+      height: "24px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "var(--radius-s)",
+      cursor: "pointer",
+      visibility: "hidden",
+      transition: "background-color 0.1s ease",
+      fontSize: "28px",
+      lineHeight: "24px",
+    });
+    fakeCloseButton.textContent = "\u00D7"; // The '×' character taken from obsidian
+
+    // ---A sentinel element to detect when the header becomes sticky. ---
+    const sentinel = containerEl.createDiv();
+    sentinel.style.height = "1px"; // It must have a size to be observed
+    containerEl.insertBefore(sentinel, buttonBar);
+
+    // On or Not to On ---
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      if (!entries[0].isIntersecting) {
+        fakeCloseButton.style.visibility = "visible";
+      } else {
+        fakeCloseButton.style.visibility = "hidden";
+      }
+    };
+
+    this.scrollObserver = new IntersectionObserver(observerCallback, {
+      root: containerEl,
+      threshold: 0.9,
+    });
+    this.scrollObserver.observe(sentinel);
+
+    VariousComplementsSettingTab.CATEGORY_LIST.forEach((cat) => {
+      // --- Conditional Styling for active category ---
+      const buttonClasses = ["various-complements__settings__category-btn"];
+      if (this.selectedCategory === cat) {
+        buttonClasses.push("is-active");
+      }
+
+      const button = buttonGrid.createEl("button", {
+        text: cat,
+        cls: buttonClasses.join(" "),
+      });
+      button.style.fontSize = "var(--font-ui-small)";
+
+      button.addEventListener("click", () => {
+        this.selectedCategory = cat;
+        this.display();
+      });
+    });
+
+    // --- Conditional settings displayed based on selected category ---
+    const showAll = this.selectedCategory === "All";
+    if (showAll || this.selectedCategory === "General") {
+      await this.addGeneralCoreSettings(containerEl);
+    }
+    if (showAll || this.selectedCategory === "Matching & Filtering") {
+      await this.addMatchingFilteringSettings(containerEl);
+    }
+    if (showAll || this.selectedCategory === "Triggering & Suppression") {
+      await this.addTriggeringSuppressionSettings(containerEl);
+    }
+    if (showAll || this.selectedCategory === "Suggestion Sources") {
+      this.addSuggestionSourcesSettings(containerEl);
+    }
+    if (showAll || this.selectedCategory === "Appearance & UI") {
+      this.addAppearanceUiSettings(containerEl);
+    }
+    if (showAll || this.selectedCategory === "Key Customization") {
     this.addKeyCustomizationSettings(containerEl);
-    this.addCurrentFileComplementSettings(containerEl);
-    this.addCurrentVaultComplementSettings(containerEl);
-    this.addCustomDictionaryComplementSettings(containerEl);
-    this.addInternalLinkComplementSettings(containerEl);
-    this.addFrontMatterComplementSettings(containerEl);
-    this.addIntelligentSuggestionPrioritizationSettings(containerEl);
-    this.addMobileSettings(containerEl);
-    this.addDebugSettings(containerEl);
+    }
+    if (showAll || this.selectedCategory === "Advanced") {
+      this.addAdvancedSettings(containerEl);
+    }
   }
 
-  private async addMainSettings(containerEl: HTMLElement) {
+  // --- Category splits General ---
+  private async addGeneralCoreSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
-      text: "Main",
-      cls: "various-complements__settings__header various-complements__settings__header__main",
+      text: "General",
+      cls: "various-complements__settings__header",
     });
 
     new Setting(containerEl).setName("Strategy").addDropdown((tc) =>
@@ -319,6 +445,78 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       }
     }
 
+    new Setting(containerEl)
+      .setName("Complement automatically")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.complementAutomatically).onChange(
+          async (value) => {
+            this.plugin.settings.complementAutomatically = value;
+            await this.plugin.saveSettings();
+          },
+        );
+      });
+
+    new Setting(containerEl)
+      .setName("Insert space after completion")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.insertSpaceAfterCompletion).onChange(
+          async (value) => {
+            this.plugin.settings.insertSpaceAfterCompletion = value;
+            await this.plugin.saveSettings();
+          },
+        );
+      });
+
+    new Setting(containerEl)
+      .setName("Max number of suggestions")
+      .addSlider((sc) =>
+        sc
+          .setLimits(1, 255, 1)
+          .setValue(this.plugin.settings.maxNumberOfSuggestions)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.maxNumberOfSuggestions = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Delay milli-seconds for trigger")
+      .addSlider((sc) =>
+        sc
+          .setLimits(0, 1000, 10)
+          .setValue(this.plugin.settings.delayMilliSeconds)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.delayMilliSeconds = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Propagate ESC")
+      .setDesc(
+        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not.",
+      )
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.propagateEsc).onChange(
+          async (value) => {
+            this.plugin.settings.propagateEsc = value;
+            await this.plugin.saveSettings();
+          },
+        );
+      });
+  }
+
+  // --- Category Splits Matching & Filtering ---
+  private async addMatchingFilteringSettings(containerEl: HTMLElement) {
+    containerEl.createEl("h3", {
+      text: "Matching & Filtering",
+      cls: "various-complements__settings__header",
+    });
+
+    containerEl.createEl("h4", { text: "Matching Strategy" });
+
     new Setting(containerEl).setName("Match strategy").addDropdown((tc) =>
       tc
         .addOptions(mirrorMap(MatchStrategy.values(), (x) => x.name))
@@ -358,6 +556,22 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+
+      new Setting(containerEl)
+      .setName("Max number of words as a phrase")
+      .setDesc(`[⚠Warning] It makes slower more than N times (N is set value)`)
+      .addSlider((sc) =>
+        sc
+          .setLimits(1, 10, 1)
+          .setValue(this.plugin.settings.maxNumberOfWordsAsPhrase)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.maxNumberOfWordsAsPhrase = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    containerEl.createEl("h4", { text: "Character & Word Handling" });
 
     new Setting(containerEl)
       .setName("Treat accent diacritics as alphabetic characters.")
@@ -417,33 +631,16 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           },
         );
       });
+  }
 
-    new Setting(containerEl)
-      .setName("Max number of suggestions")
-      .addSlider((sc) =>
-        sc
-          .setLimits(1, 255, 1)
-          .setValue(this.plugin.settings.maxNumberOfSuggestions)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.maxNumberOfSuggestions = value;
-            await this.plugin.saveSettings();
-          }),
-      );
+  // --- Category Splits "Triggering & Suppression" ---
+  private async addTriggeringSuppressionSettings(containerEl: HTMLElement) {
+    containerEl.createEl("h3", {
+      text: "Triggering & Suppression",
+      cls: "various-complements__settings__header",
+    });
 
-    new Setting(containerEl)
-      .setName("Max number of words as a phrase")
-      .setDesc(`[⚠Warning] It makes slower more than N times (N is set value)`)
-      .addSlider((sc) =>
-        sc
-          .setLimits(1, 10, 1)
-          .setValue(this.plugin.settings.maxNumberOfWordsAsPhrase)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.maxNumberOfWordsAsPhrase = value;
-            await this.plugin.saveSettings();
-          }),
-      );
+    containerEl.createEl("h4", { text: "Activation Rules" });
 
     new Setting(containerEl)
       .setName("Min number of characters for trigger")
@@ -474,29 +671,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
-      .setName("Complement automatically")
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.complementAutomatically).onChange(
-          async (value) => {
-            this.plugin.settings.complementAutomatically = value;
-            await this.plugin.saveSettings();
-          },
-        );
-      });
-
-    new Setting(containerEl)
-      .setName("Delay milli-seconds for trigger")
-      .addSlider((sc) =>
-        sc
-          .setLimits(0, 1000, 10)
-          .setValue(this.plugin.settings.delayMilliSeconds)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.delayMilliSeconds = value;
-            await this.plugin.saveSettings();
-          }),
-      );
+    containerEl.createEl("h4", { text: "Exclusion Rules (Suppression)" });
 
     new Setting(containerEl)
       .setName("Disable suggestions during IME on")
@@ -519,17 +694,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           this.plugin.settings.disableSuggestionsInMathBlock = value;
           await this.plugin.saveSettings();
         });
-      });
-
-    new Setting(containerEl)
-      .setName("Insert space after completion")
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.insertSpaceAfterCompletion).onChange(
-          async (value) => {
-            this.plugin.settings.insertSpaceAfterCompletion = value;
-            await this.plugin.saveSettings();
-          },
-        );
       });
 
     new Setting(containerEl)
@@ -580,24 +744,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           "various-complements__settings__text-area-path-dense";
         return el;
       });
-
-    new Setting(containerEl)
-      .setName("No auto-focus until the cycle")
-      .setDesc("No focus on the suggestions until the cycle key is pressed.")
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.noAutoFocusUntilCycle).onChange(
-          async (value) => {
-            this.plugin.settings.noAutoFocusUntilCycle = value;
-            await this.plugin.saveSettings();
-          },
-        );
-      });
   }
 
-  private addAppearanceSettings(containerEl: HTMLElement) {
+  // --- Category SPlits Appearance & UI ---
+  private addAppearanceUiSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
-      text: "Appearance",
-      cls: "various-complements__settings__header various-complements__settings__header__appearance",
+      text: "Appearance & UI",
+      cls: "various-complements__settings__header",
     });
 
     new Setting(containerEl)
@@ -655,12 +808,25 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+
+    new Setting(containerEl)
+      .setName("No auto-focus until the cycle")
+      .setDesc("No focus on the suggestions until the cycle key is pressed.")
+      .addToggle((tc) => {
+        tc.setValue(this.plugin.settings.noAutoFocusUntilCycle).onChange(
+          async (value) => {
+            this.plugin.settings.noAutoFocusUntilCycle = value;
+            await this.plugin.saveSettings();
+          },
+        );
+      });
   }
 
+  // --- Category Splits Key Customization ---
   private addKeyCustomizationSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
-      text: "Key customization",
-      cls: "various-complements__settings__header various-complements__settings__header__key-customization",
+      text: "Key Customization",
+      cls: "various-complements__settings__header",
     });
 
     const div = createDiv({
@@ -705,14 +871,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     const df = document.createDocumentFragment();
     df.append(ul);
 
-    new Setting(div).setHeading().setName("Hotkeys").setDesc(df);
+    new Setting(div).setHeading().setName("Hotkeys Description").setDesc(df);
 
     const hotkeys = this.plugin.settings.hotkeys;
     Object.keys(hotkeys).forEach((k: string) => {
       const key = k as keyof Settings["hotkeys"];
+      const name =
+        key.startsWith("select") && key.endsWith("th")
+          ? key.replace("select", "select ")
+          : key;
 
       new Setting(div)
-        .setName(key)
+        .setName(name)
         .setClass("various-complements__settings__popup-hotkey-item")
         .addText((cb) => {
           return cb
@@ -726,28 +896,50 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             });
         });
     });
-
-    new Setting(containerEl)
-      .setName("Propagate ESC")
-      .setDesc(
-        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not.",
-      )
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.propagateEsc).onChange(
-          async (value) => {
-            this.plugin.settings.propagateEsc = value;
-            await this.plugin.saveSettings();
-          },
-        );
-      });
   }
 
-  private addCurrentFileComplementSettings(containerEl: HTMLElement) {
+  // --- Category Splits Suggestion Sources ---
+  private addSuggestionSourcesSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
-      text: "Current file complement",
-      cls: "various-complements__settings__header various-complements__settings__header__current-file",
+      text: "Suggestion Sources",
+      cls: "various-complements__settings__header",
     });
 
+    containerEl.createEl("h4", { text: "Current File Complement" });
+    this.renderCurrentFileComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Current Vault Complement" });
+    this.renderCurrentVaultComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Internal Link Complement" });
+    this.renderInternalLinkComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Front Matter Complement" });
+    this.renderFrontMatterComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Custom Dictionary Complement" });
+    this.renderCustomDictionaryComplementSettings(containerEl);
+  }
+
+  // --- Category Splits Advanced ---
+  private addAdvancedSettings(containerEl: HTMLElement) {
+    containerEl.createEl("h3", {
+      text: "Advanced",
+      cls: "various-complements__settings__header",
+    });
+
+    containerEl.createEl("h4", { text: "Intelligent Suggestion Prioritization" });
+    this.renderIntelligentSuggestionPrioritizationSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Mobile" });
+    this.renderMobileSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Debug" });
+    this.renderDebugSettings(containerEl);
+  }
+
+  // ---The following methods render settings for sub-categories without creating a main header :XD ---
+  private renderCurrentFileComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Current file complement")
       .addToggle((tc) => {
@@ -764,6 +956,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Min number of characters for indexing")
         .setDesc("It uses a default value of Strategy if set 0.")
+        .setClass("various-complements__settings__nested")
         .addSlider((sc) =>
           sc
             .setLimits(0, 15, 1)
@@ -777,6 +970,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
         .setName("Only complement English on current file complement")
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement,
@@ -792,6 +986,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
         )
+        .setClass("various-complements__settings__nested")
         .addTextArea((tc) => {
           const el = tc
             .setValue(
@@ -809,12 +1004,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addCurrentVaultComplementSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Current vault complement",
-      cls: "various-complements__settings__header various-complements__settings__header__current-vault",
-    });
-
+  private renderCurrentVaultComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Current vault complement")
       .addToggle((tc) => {
@@ -831,6 +1021,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Min number of characters for indexing")
         .setDesc("It uses a default value of Strategy if set 0.")
+        .setClass("various-complements__settings__nested")
         .addSlider((sc) =>
           sc
             .setLimits(0, 15, 1)
@@ -845,6 +1036,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Include prefix path patterns")
         .setDesc("Prefix match path patterns to include files.")
+        .setClass("various-complements__settings__nested")
         .addTextArea((tac) => {
           const el = tac
             .setValue(
@@ -863,6 +1055,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Exclude prefix path patterns")
         .setDesc("Prefix match path patterns to exclude files.")
+        .setClass("various-complements__settings__nested")
         .addTextArea((tac) => {
           const el = tac
             .setValue(
@@ -880,6 +1073,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
       new Setting(containerEl)
         .setName("Include only files under current directory")
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings
@@ -895,6 +1089,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
         )
+        .setClass("various-complements__settings__nested")
         .addTextArea((tc) => {
           const el = tc
             .setValue(
@@ -912,12 +1107,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addCustomDictionaryComplementSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Custom dictionary complement",
-      cls: "various-complements__settings__header various-complements__settings__header__custom-dictionary",
-    });
-
+  private renderCustomDictionaryComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Custom dictionary complement")
       .addToggle((tc) => {
@@ -936,6 +1126,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "Specify either a relative path from Vault root or URL for each line.",
         )
+        .setClass("various-complements__settings__nested")
         .addTextArea((tac) => {
           const el = tac
             .setValue(this.plugin.settings.customDictionaryPaths)
@@ -949,19 +1140,24 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           return el;
         });
 
-      new Setting(containerEl).setName("Column delimiter").addDropdown((tc) =>
-        tc
-          .addOptions(mirrorMap(ColumnDelimiter.values(), (x) => x.name))
-          .setValue(this.plugin.settings.columnDelimiter)
-          .onChange(async (value) => {
-            this.plugin.settings.columnDelimiter = value;
-            await this.plugin.saveSettings();
-          }),
-      );
+      // --- START: ADDED CODE ---
+      new Setting(containerEl)
+        .setName("Column delimiter")
+        .setClass("various-complements__settings__nested")
+        .addDropdown((tc) =>
+          tc
+            .addOptions(mirrorMap(ColumnDelimiter.values(), (x) => x.name))
+            .setValue(this.plugin.settings.columnDelimiter)
+            .onChange(async (value) => {
+              this.plugin.settings.columnDelimiter = value;
+              await this.plugin.saveSettings();
+            }),
+        );
 
       new Setting(containerEl)
         .setName("Word regex pattern")
         .setDesc("Only load words that match the regular expression pattern.")
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           cb.setValue(
             this.plugin.settings.customDictionaryWordRegexPattern,
@@ -976,6 +1172,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but completes to 'abcdefg'.",
         )
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
             async (value) => {
@@ -992,6 +1189,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "If set ' >>> ', 'displayed >>> inserted' is shown as 'displayed' on suggestions, but completes to 'inserted'.",
         )
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           cb.setValue(
             this.plugin.settings
@@ -1008,6 +1206,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "If set '<CARET>' and there is '<li><CARET></li>' in custom dictionary, it complements '<li></li>' and move a caret where between '<li>' and `</li>`.",
         )
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           cb.setValue(
             this.plugin.settings.caretLocationSymbolAfterComplement,
@@ -1022,6 +1221,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "It shows as a suffix of displayed text if there is a difference between displayed and inserted",
         )
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           cb.setValue(this.plugin.settings.displayedTextSuffix).onChange(
             async (value) => {
@@ -1033,12 +1233,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addInternalLinkComplementSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Internal link complement",
-      cls: "various-complements__settings__header various-complements__settings__header__internal-link",
-    });
-
+  private renderInternalLinkComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Internal link complement")
       .addToggle((tc) => {
@@ -1054,6 +1249,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     if (this.plugin.settings.enableInternalLinkComplement) {
       new Setting(containerEl)
         .setName("Suggest with an alias")
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.suggestInternalLinkWithAlias,
@@ -1064,6 +1260,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
       new Setting(containerEl)
         .setName("Update internal links on save")
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(this.plugin.settings.updateInternalLinksOnSave).onChange(
             async (value) => {
@@ -1074,6 +1271,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
       new Setting(containerEl)
         .setName("Exclude self internal link")
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(this.plugin.settings.excludeSelfInternalLink).onChange(
             async (value) => {
@@ -1087,6 +1285,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "Exclude internal links present in the current file from the suggestions. Note that the number of excluded suggestions will reduce the total suggestions by the value set in the 'Max number of suggestions' option.",
         )
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.excludeExistingInActiveFileInternalLinks,
@@ -1101,6 +1300,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setName(
           "Insert an alias that is transformed from the displayed internal link",
         )
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
@@ -1150,6 +1350,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Exclude prefix path patterns")
         .setDesc("Prefix match path patterns to exclude files.")
+        .setClass("various-complements__settings__nested")
         .addTextArea((tac) => {
           const el = tac
             .setValue(
@@ -1171,6 +1372,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "Exclude internal links from the suggestions if whose front matters have the key whose name is same as this setting, and the value is 'true'",
         )
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           TextComponentEvent.onChange(cb, async (value) => {
             this.plugin.settings.frontMatterKeyForExclusionInternalLink = value;
@@ -1184,6 +1386,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         .setDesc(
           "Tags to exclude suggestions for internal links. If specifying multiple tags, separate them with line breaks.",
         )
+        .setClass("various-complements__settings__nested")
         .addTextArea((tc) => {
           const el = tc
             .setValue(
@@ -1201,12 +1404,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addFrontMatterComplementSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Front matter complement",
-      cls: "various-complements__settings__header various-complements__settings__header__front-matter",
-    });
-
+  private renderFrontMatterComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Front matter complement")
       .addToggle((tc) => {
@@ -1222,6 +1420,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     if (this.plugin.settings.enableFrontMatterComplement) {
       new Setting(containerEl)
         .setName("Match strategy in the front matter")
+        .setClass("various-complements__settings__nested")
         .addDropdown((tc) =>
           tc
             .addOptions(
@@ -1236,6 +1435,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
         .setName("Insert comma after completion")
+        .setClass("various-complements__settings__nested")
         .addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.insertCommaAfterFrontMatterCompletion,
@@ -1247,14 +1447,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addIntelligentSuggestionPrioritizationSettings(
+  private renderIntelligentSuggestionPrioritizationSettings(
     containerEl: HTMLElement,
   ) {
-    containerEl.createEl("h3", {
-      text: "Intelligent suggestion prioritization",
-      cls: "various-complements__settings__header various-complements__settings__header__intelligent-suggestion-prioritization",
-    });
-
     new Setting(containerEl)
       .setName("Enable Intelligent Suggestion Prioritization")
       .addToggle((tc) => {
@@ -1272,8 +1467,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     if (this.plugin.settings.intelligentSuggestionPrioritization.enabled) {
       new Setting(containerEl)
-        .setName("history file path")
+        .setName("History file path")
         .setDesc(`Default: ${DEFAULT_HISTORIES_PATH}`)
+        .setClass("various-complements__settings__nested")
         .addText((cb) => {
           TextComponentEvent.onChange(cb, async (value) => {
             this.plugin.settings.intelligentSuggestionPrioritization.historyFilePath =
@@ -1290,6 +1486,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Max days to keep history")
         .setDesc("If set 0, it will never remove")
+        .setClass("various-complements__settings__nested")
         .addSlider((sc) =>
           sc
             .setLimits(0, 365, 1)
@@ -1308,6 +1505,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Max number of history to keep")
         .setDesc("If set 0, it will never remove")
+        .setClass("various-complements__settings__nested")
         .addSlider((sc) =>
           sc
             .setLimits(0, 10000, 1)
@@ -1325,12 +1523,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addMobileSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Mobile",
-      cls: "various-complements__settings__header various-complements__settings__header__mobile",
-    });
-
+  private renderMobileSettings(containerEl: HTMLElement) {
     new Setting(containerEl).setName("Disable on mobile").addToggle((tc) => {
       tc.setValue(this.plugin.settings.disableOnMobile).onChange(
         async (value) => {
@@ -1341,12 +1534,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
   }
 
-  private addDebugSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Debug",
-      cls: "various-complements__settings__header various-complements__settings__header__debug",
-    });
-
+  private renderDebugSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Show log about performance in a console")
       .addToggle((tc) => {

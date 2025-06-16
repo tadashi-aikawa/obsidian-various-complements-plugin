@@ -1,3 +1,36 @@
+/* --- Category Button Bar Modern Style --- */
+.various-complements__settings__category-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 0.5rem;
+}
+.various-complements__settings__category-btn {
+  background: none;
+  border: none;
+  color: var(--text-normal);
+  font-size: 1rem;
+  font-family: inherit;
+  padding: 0.25rem 1.1rem 0.25rem 1.1rem;
+  margin: 0;
+  border-radius: 0;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-bottom 0.15s;
+  outline: none;
+}
+.various-complements__settings__category-btn.is-active {
+  color: var(--interactive-accent);
+  border-bottom: 2px solid var(--interactive-accent);
+  font-weight: 600;
+}
+.various-complements__settings__category-btn:focus {
+  color: var(--interactive-accent);
+}
+
+/* Category Button Bar Modern Style ENDS */
+
 .various-complements__settings__text-area-path {
   height: 120px;
   width: 500px;
