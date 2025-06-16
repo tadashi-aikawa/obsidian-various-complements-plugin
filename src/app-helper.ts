@@ -187,7 +187,7 @@ export class AppHelper {
       return { displayed: text, link: text };
     } else {
       const { displayed, link } = markdownLink
-        .matchAll(/^\[(?<displayed>.+)]\((?<link>.+)\.md\)$/g)
+        .matchAll(/^\[(?<displayed>.+)]\(\<?(?<link>.+)\.md\>?\)$/g)
         .next().value!.groups!; // dirty error handling
       return { displayed, link };
     }
