@@ -1,4 +1,4 @@
-type Name = "default" | "english-only" | "japanese" | "arabic" | "chinese";
+type Name = "default" | "english-only" | "japanese" | "arabic" | "chinese" | "korean";
 
 export class TokenizeStrategy {
   private static readonly _values: TokenizeStrategy[] = [];
@@ -13,6 +13,7 @@ export class TokenizeStrategy {
   static readonly JAPANESE = new TokenizeStrategy("japanese", 2, 2, false);
   static readonly ARABIC = new TokenizeStrategy("arabic", 3, 3, false);
   static readonly CHINESE = new TokenizeStrategy("chinese", 1, 2, false);
+  static readonly KOREAN = new TokenizeStrategy("korean", 1, 2, true);
 
   private constructor(
     readonly name: Name,
