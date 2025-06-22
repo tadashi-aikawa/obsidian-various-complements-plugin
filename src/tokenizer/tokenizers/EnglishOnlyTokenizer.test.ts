@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
-import { EnglishOnlyTokenizer } from "./EnglishOnlyTokenizer";
 import type { FactoryArgs } from "../tokenizer";
+import { EnglishOnlyTokenizer } from "./EnglishOnlyTokenizer";
 
 describe.each<{
   constructorArgs: FactoryArgs;

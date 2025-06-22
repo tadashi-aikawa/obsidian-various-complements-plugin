@@ -1,10 +1,10 @@
 import { App, FileSystemAdapter, Notice, request } from "obsidian";
-import { pushWord, type WordsByFirstLetter } from "./suggester";
+import type { AppHelper } from "../app-helper";
+import type { CustomDictionaryWord } from "../model/Word";
 import type { ColumnDelimiter } from "../option/ColumnDelimiter";
 import { isURL } from "../util/path";
-import type { CustomDictionaryWord } from "../model/Word";
 import { synonymAliases } from "../util/strings";
-import type { AppHelper } from "../app-helper";
+import { pushWord, type WordsByFirstLetter } from "./suggester";
 
 type JsonDictionary = {
   /** If set, take precedence over ["Caret location symbol after complement"](https://tadashi-aikawa.github.io/docs-obsidian-various-complements-plugin/4.%20Options/4.6.%20Custom%20dictionary%20complement/%E2%9A%99%EF%B8%8FCaret%20location%20symbol%20after%20complement/) */

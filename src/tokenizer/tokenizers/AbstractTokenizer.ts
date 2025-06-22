@@ -1,5 +1,5 @@
-import { removeFromPattern } from "../../util/strings";
 import { ExhaustiveError } from "../../errors";
+import { removeFromPattern } from "../../util/strings";
 import {
   type FactoryArgs,
   type Tokenizer,

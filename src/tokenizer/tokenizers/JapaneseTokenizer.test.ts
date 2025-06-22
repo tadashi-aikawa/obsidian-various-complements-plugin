@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
-import { JapaneseTokenizer } from "./JapaneseTokenizer";
 import type { FactoryArgs } from "../tokenizer";
+import { JapaneseTokenizer } from "./JapaneseTokenizer";
 
 // treatUnderscoreAsPartOfWord: true はサポート外のため呼び出す想定にないのでテストしない
 describe.each<{

@@ -801,14 +801,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
         .setName("Min number of characters for trigger")
-        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .setDesc(
+          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+        )
         .addSlider((sc) =>
           sc
             .setLimits(0, 10, 1)
-            .setValue(this.plugin.settings.currentFileMinNumberOfCharactersForTrigger)
+            .setValue(
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger,
+            )
             .setDynamicTooltip()
             .onChange(async (value) => {
-              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger = value;
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger =
+                value;
               await this.plugin.saveSettings();
             }),
         );
@@ -918,14 +923,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
       new Setting(containerEl)
         .setName("Min number of characters for trigger")
-        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .setDesc(
+          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+        )
         .addSlider((sc) =>
           sc
             .setLimits(0, 10, 1)
-            .setValue(this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger)
+            .setValue(
+              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger,
+            )
             .setDynamicTooltip()
             .onChange(async (value) => {
-              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger = value;
+              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger =
+                value;
               await this.plugin.saveSettings();
             }),
         );
@@ -1073,14 +1083,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
         .setName("Min number of characters for trigger")
-        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .setDesc(
+          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+        )
         .addSlider((sc) =>
           sc
             .setLimits(0, 10, 1)
-            .setValue(this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger)
+            .setValue(
+              this.plugin.settings
+                .customDictionaryMinNumberOfCharactersForTrigger,
+            )
             .setDynamicTooltip()
             .onChange(async (value) => {
-              this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger = value;
+              this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger =
+                value;
               await this.plugin.saveSettings();
             }),
         );
@@ -1255,14 +1271,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
         .setName("Min number of characters for trigger")
-        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .setDesc(
+          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+        )
         .addSlider((sc) =>
           sc
             .setLimits(0, 10, 1)
-            .setValue(this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger)
+            .setValue(
+              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger,
+            )
             .setDynamicTooltip()
             .onChange(async (value) => {
-              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger = value;
+              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger =
+                value;
               await this.plugin.saveSettings();
             }),
         );
@@ -1312,7 +1333,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
-
     }
   }
 

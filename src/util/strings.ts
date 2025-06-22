@@ -1,6 +1,6 @@
+import emojiRegex from "emoji-regex";
 import { uniq } from "./collection-helper";
 import diacriticsMap from "./diacritics-map";
-import emojiRegex from "emoji-regex";
 
 const regEmoji = new RegExp(` *(${emojiRegex().source}) *`, "g");
 

@@ -1,4 +1,10 @@
-type Name = "default" | "english-only" | "japanese" | "arabic" | "chinese" | "korean";
+type Name =
+  | "default"
+  | "english-only"
+  | "japanese"
+  | "arabic"
+  | "chinese"
+  | "korean";
 
 export class TokenizeStrategy {
   private static readonly _values: TokenizeStrategy[] = [];

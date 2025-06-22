@@ -1,9 +1,9 @@
 import type { App, TFile } from "obsidian";
-import type { WordsByFirstLetter } from "./suggester";
 import type { AppHelper, FrontMatterValue } from "../app-helper";
 import type { FrontMatterWord } from "../model/Word";
-import { excludeEmoji } from "../util/strings";
 import { groupBy, uniqBy } from "../util/collection-helper";
+import { excludeEmoji } from "../util/strings";
+import type { WordsByFirstLetter } from "./suggester";
 
 function synonymAliases(name: string): string[] {
   const lessEmojiValue = excludeEmoji(name);

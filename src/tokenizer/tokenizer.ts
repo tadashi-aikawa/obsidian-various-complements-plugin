@@ -1,13 +1,13 @@
 import type { App } from "obsidian";
 
-import { DefaultTokenizer } from "./tokenizers/DefaultTokenizer";
-import { ArabicTokenizer } from "./tokenizers/ArabicTokenizer";
-import { JapaneseTokenizer } from "./tokenizers/JapaneseTokenizer";
-import type { TokenizeStrategy } from "./TokenizeStrategy";
-import { EnglishOnlyTokenizer } from "./tokenizers/EnglishOnlyTokenizer";
-import { ChineseTokenizer } from "./tokenizers/ChineseTokenizer";
-import { KoreanTokenizer } from "./tokenizers/KoreanTokenizer";
 import type { Settings } from "../setting/settings";
+import { ArabicTokenizer } from "./tokenizers/ArabicTokenizer";
+import { ChineseTokenizer } from "./tokenizers/ChineseTokenizer";
+import { DefaultTokenizer } from "./tokenizers/DefaultTokenizer";
+import { EnglishOnlyTokenizer } from "./tokenizers/EnglishOnlyTokenizer";
+import { JapaneseTokenizer } from "./tokenizers/JapaneseTokenizer";
+import { KoreanTokenizer } from "./tokenizers/KoreanTokenizer";
+import type { TokenizeStrategy } from "./TokenizeStrategy";
 
 export type TrimTarget = "input" | "indexing";
 

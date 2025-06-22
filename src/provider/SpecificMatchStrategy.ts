@@ -1,7 +1,7 @@
-import type { IndexedWords } from "../ui/AutoCompleteSuggest";
-import { suggestWords, suggestWordsByPartialMatch } from "./suggester";
 import type { Word } from "../model/Word";
 import type { SelectionHistoryStorage } from "../storage/SelectionHistoryStorage";
+import type { IndexedWords } from "../ui/AutoCompleteSuggest";
+import { suggestWords, suggestWordsByPartialMatch } from "./suggester";
 
 type Name = "inherit" | "prefix" | "partial";
 

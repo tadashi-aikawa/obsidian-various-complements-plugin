@@ -1,14 +1,14 @@
 import { debounce, normalizePath, Notice, Plugin } from "obsidian";
-import { AutoCompleteSuggest } from "./ui/AutoCompleteSuggest";
+import { merge } from "ts-deepmerge";
+import { AppHelper } from "./app-helper";
 import {
   DEFAULT_SETTINGS,
   type Settings,
   VariousComplementsSettingTab,
 } from "./setting/settings";
-import { AppHelper } from "./app-helper";
-import { ProviderStatusBar } from "./ui/ProviderStatusBar";
+import { AutoCompleteSuggest } from "./ui/AutoCompleteSuggest";
 import { CustomDictionaryWordAddModal } from "./ui/CustomDictionaryWordAddModal";
-import { merge } from "ts-deepmerge";
+import { ProviderStatusBar } from "./ui/ProviderStatusBar";
 import { DEFAULT_HISTORIES_PATH } from "./util/path";
 
 export default class VariousComponents extends Plugin {
