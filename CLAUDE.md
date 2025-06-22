@@ -129,6 +129,28 @@ feat(current file/current vault): Add per-provider minimum character settings
 docs: Update README with new configuration options
 ```
 
+## Provider-Specific Settings
+
+The plugin supports **provider-specific trigger settings** for fine-grained control:
+
+### Trigger Character Settings
+Each provider can have independent minimum character requirements:
+- `currentFileMinNumberOfCharactersForTrigger` - Current file provider
+- `currentVaultMinNumberOfCharactersForTrigger` - Current vault provider  
+- `customDictionaryMinNumberOfCharactersForTrigger` - Custom dictionary provider
+- `internalLinkMinNumberOfCharactersForTrigger` - Internal link provider
+
+**Behavior:**
+- Set to `0` to use global `minNumberOfCharactersTriggered` setting
+- Set to `1-10` to override with provider-specific minimum
+- The system respects the lowest minimum among all enabled providers for trigger activation
+- Individual providers are filtered based on their specific settings
+
+### Implementation Details
+- **Global trigger logic**: `AutoCompleteSuggest.minNumberTriggered` getter considers all provider minimums
+- **Provider filtering**: `suggester.ts` functions respect individual provider thresholds
+- **Settings UI**: Each provider section includes trigger configuration sliders
+
 ## Important Implementation Notes
 
 - The plugin uses a custom fork of `chinese-tokenizer` for Chinese text processing
