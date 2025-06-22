@@ -43,7 +43,7 @@ export function string2Hotkey(
   }
   return {
     modifiers: keys.slice(0, -1) as Modifier[],
-    key: keys.at(-1)!.replace("Space", " "),
+    key: keys.last()!.replace("Space", " "),
     hideHotkeyGuide,
   };
 }

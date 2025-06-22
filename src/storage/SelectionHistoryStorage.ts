@@ -107,7 +107,7 @@ export class SelectionHistoryStorage {
         times
           .sort((a, b) => (a > b ? -1 : 1))
           .slice(0, this.maxNumberOfHistoryToKeep)
-          .at(-1) ?? 0;
+          .last() ?? 0;
 
       for (const hit of Object.keys(this.data)) {
         for (const value of Object.keys(this.data[hit])) {
