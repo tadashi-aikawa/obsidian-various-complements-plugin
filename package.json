@@ -7,9 +7,10 @@
     "dev": "node esbuild.config.mjs",
     "typecheck": "tsgo -noEmit -skipLibCheck",
     "build": "pnpm typecheck && node esbuild.config.mjs production",
+    "format": "prettier -l \"**/*.ts\"",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "pre:push": "pnpm typecheck && pnpm test",
+    "pre:push": "pnpm typecheck && pnpm format && pnpm test",
     "ci": "pnpm i && pnpm build && pnpm test"
   },
   "keywords": [],

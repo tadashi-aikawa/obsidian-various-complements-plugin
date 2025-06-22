@@ -18,6 +18,9 @@ pnpm typecheck
 # Build for production
 pnpm build
 
+# Check code formatting
+pnpm format
+
 # Run tests
 pnpm test
 
