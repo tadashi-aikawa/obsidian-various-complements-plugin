@@ -15,6 +15,13 @@ type Handler = (
     fuzzy?: {
       minMatchScore: number;
     };
+    providerMinChars?: {
+      currentFile: number;
+      currentVault: number;
+      customDictionary: number;
+      internalLink: number;
+    };
+    globalMinChar?: number;
   },
 ) => Word[];
 

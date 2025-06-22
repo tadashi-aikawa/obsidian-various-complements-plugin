@@ -927,6 +927,291 @@ describe("suggestWords", () => {
       },
     ]);
   });
+
+  test("provider-specific min chars: exclude currentFile when query is too short", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWords(indexedWords, "a", 10, {
+        providerMinChars: {
+          currentFile: 2,
+          currentVault: 0,
+          customDictionary: 0,
+          internalLink: 0,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "AI",
+        type: "internalLink",
+        hit: "AI",
+        query: "a",
+        createdPath: "a/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "AI",
+        type: "internalLink",
+        hit: "AI",
+        query: "a",
+        createdPath: "b/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "AWS",
+        type: "internalLink",
+        hit: "AWS",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "AWS",
+        type: "customDictionary",
+        hit: "AWS",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "uwaa",
+        aliases: ["aaa"],
+        hit: "aaa",
+        query: "a",
+        type: "customDictionary",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        type: "internalLink",
+        hit: "aiUEO",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        aliases: ["aiueo"],
+        hit: "aiueo",
+        query: "a",
+        type: "internalLink",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: include currentFile when query meets requirement", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWords(indexedWords, "ai", 10, {
+        providerMinChars: {
+          currentFile: 2,
+          currentVault: 0,
+          customDictionary: 0,
+          internalLink: 0,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "AI",
+        hit: "AI",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "a/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "b/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "ai",
+        hit: "ai",
+        query: "ai",
+        type: "currentFile",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        aliases: ["aiueo"],
+        hit: "aiueo",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "ai",
+        type: "customDictionary",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: exclude internalLink with 3 chars requirement", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWords(indexedWords, "ai", 10, {
+        providerMinChars: {
+          currentFile: 0,
+          currentVault: 0,
+          customDictionary: 0,
+          internalLink: 3,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "ai",
+        hit: "ai",
+        query: "ai",
+        type: "currentFile",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "ai",
+        type: "customDictionary",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: allow provider setting smaller than global setting", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWords(indexedWords, "ai", 10, {
+        providerMinChars: {
+          currentFile: 2,
+          currentVault: 5,
+          customDictionary: 5,
+          internalLink: 2,
+        },
+        globalMinChar: 3,
+      }),
+    ).toStrictEqual([
+      {
+        value: "AI",
+        hit: "AI",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "a/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "AI",
+        hit: "AI",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "b/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "ai",
+        hit: "ai",
+        query: "ai",
+        type: "currentFile",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "ai",
+        type: "internalLink",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        hit: "aiueo",
+        query: "ai",
+        type: "internalLink",
+        aliases: ["aiueo"],
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "ai",
+        type: "currentFile",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: include internalLink when query meets 3 chars requirement", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWords(indexedWords, "aiu", 10, {
+        providerMinChars: {
+          currentFile: 0,
+          currentVault: 0,
+          customDictionary: 0,
+          internalLink: 3,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "aiu",
+        type: "internalLink",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        aliases: ["aiueo"],
+        hit: "aiueo",
+        query: "aiu",
+        type: "internalLink",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        hit: "aiUEO",
+        query: "aiu",
+        type: "customDictionary",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
 });
 
 describe("suggestWordsByPartialMatch", () => {
@@ -1794,6 +2079,169 @@ describe("suggestWordsByPartialMatch", () => {
         type: "currentFile",
         hit: "a",
         query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: exclude customDictionary when query is too short", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "a", 10, {
+        providerMinChars: {
+          currentFile: 0,
+          currentVault: 0,
+          customDictionary: 5,
+          internalLink: 0,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "AI",
+        type: "internalLink",
+        hit: "AI",
+        query: "a",
+        createdPath: "a/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "AI",
+        type: "internalLink",
+        hit: "AI",
+        query: "a",
+        createdPath: "b/AI.md",
+        fuzzy: false,
+      },
+      {
+        value: "ai",
+        type: "currentFile",
+        hit: "ai",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "AWS",
+        type: "internalLink",
+        hit: "AWS",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "Arc",
+        type: "currentFile",
+        hit: "Arc",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        type: "internalLink",
+        hit: "aiUEO",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        type: "internalLink",
+        hit: "aiueo",
+        query: "a",
+        aliases: ["aiueo"],
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        type: "currentFile",
+        hit: "aiUEO",
+        query: "a",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: exclude customDictionary with 4 chars query", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "aiue", 10, {
+        providerMinChars: {
+          currentFile: 0,
+          currentVault: 0,
+          customDictionary: 5,
+          internalLink: 0,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "aiUEO",
+        type: "internalLink",
+        hit: "aiUEO",
+        query: "aiue",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        type: "internalLink",
+        hit: "aiueo",
+        query: "aiue",
+        aliases: ["aiueo"],
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        type: "currentFile",
+        hit: "aiUEO",
+        query: "aiue",
+        createdPath: "",
+        fuzzy: false,
+      },
+    ]);
+  });
+
+  test("provider-specific min chars: include customDictionary with 5 chars query", () => {
+    const indexedWords = createIndexedWords();
+    expect(
+      suggestWordsByPartialMatch(indexedWords, "aiueo", 10, {
+        providerMinChars: {
+          currentFile: 0,
+          currentVault: 0,
+          customDictionary: 5,
+          internalLink: 0,
+        },
+        globalMinChar: 0,
+      }),
+    ).toStrictEqual([
+      {
+        value: "aiUEO",
+        type: "internalLink",
+        hit: "aiUEO",
+        query: "aiueo",
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "あいうえお",
+        type: "internalLink",
+        hit: "aiueo",
+        query: "aiueo",
+        aliases: ["aiueo"],
+        createdPath: "",
+        fuzzy: false,
+      },
+      {
+        value: "aiUEO",
+        type: "customDictionary",
+        hit: "aiUEO",
+        query: "aiueo",
         createdPath: "",
         fuzzy: false,
       },

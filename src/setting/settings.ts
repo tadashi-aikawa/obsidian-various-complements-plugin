@@ -111,6 +111,12 @@ export interface Settings {
   frontMatterComplementMatchStrategy: string;
   insertCommaAfterFrontMatterCompletion: boolean;
 
+  // provider-specific trigger settings
+  currentFileMinNumberOfCharactersForTrigger: number;
+  currentVaultMinNumberOfCharactersForTrigger: number;
+  customDictionaryMinNumberOfCharactersForTrigger: number;
+  internalLinkMinNumberOfCharactersForTrigger: number;
+
   intelligentSuggestionPrioritization: {
     enabled: boolean;
     historyFilePath: string;
@@ -223,6 +229,12 @@ export const DEFAULT_SETTINGS: Settings = {
   enableFrontMatterComplement: false,
   frontMatterComplementMatchStrategy: "inherit",
   insertCommaAfterFrontMatterCompletion: false,
+
+  // provider-specific trigger settings
+  currentFileMinNumberOfCharactersForTrigger: 0,
+  currentVaultMinNumberOfCharactersForTrigger: 0,
+  customDictionaryMinNumberOfCharactersForTrigger: 0,
+  internalLinkMinNumberOfCharactersForTrigger: 0,
 
   intelligentSuggestionPrioritization: {
     enabled: true,
@@ -788,6 +800,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
         });
 
       new Setting(containerEl)
+        .setName("Min number of characters for trigger")
+        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(this.plugin.settings.currentFileMinNumberOfCharactersForTrigger)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger = value;
+              await this.plugin.saveSettings();
+            }),
+        );
+
+      new Setting(containerEl)
         .setName("Exclude word patterns for indexing")
         .setDesc(
           "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
@@ -890,6 +916,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
+      new Setting(containerEl)
+        .setName("Min number of characters for trigger")
+        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger = value;
+              await this.plugin.saveSettings();
+            }),
+        );
+
       new Setting(containerEl)
         .setName("Exclude word patterns for indexing")
         .setDesc(
@@ -1030,6 +1070,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             },
           );
         });
+
+      new Setting(containerEl)
+        .setName("Min number of characters for trigger")
+        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger = value;
+              await this.plugin.saveSettings();
+            }),
+        );
     }
   }
 
@@ -1198,6 +1252,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             "various-complements__settings__text-area-path-mini";
           return el;
         });
+
+      new Setting(containerEl)
+        .setName("Min number of characters for trigger")
+        .setDesc("Override the main trigger setting for this provider. Set 0 to use the main setting value.")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger = value;
+              await this.plugin.saveSettings();
+            }),
+        );
     }
   }
 
@@ -1244,6 +1312,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
+
     }
   }
 

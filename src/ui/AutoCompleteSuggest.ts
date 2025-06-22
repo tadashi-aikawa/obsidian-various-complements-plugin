@@ -302,10 +302,20 @@ export class AutoCompleteSuggest
   }
 
   get minNumberTriggered(): number {
-    return (
-      this.settings.minNumberOfCharactersTriggered ||
-      this.tokenizerStrategy.triggerThreshold
-    );
+    const globalMinChars = this.settings.minNumberOfCharactersTriggered || this.tokenizerStrategy.triggerThreshold;
+    
+    const providerMinChars = [
+      this.settings.currentFileMinNumberOfCharactersForTrigger,
+      this.settings.currentVaultMinNumberOfCharactersForTrigger, 
+      this.settings.customDictionaryMinNumberOfCharactersForTrigger,
+      this.settings.internalLinkMinNumberOfCharactersForTrigger
+    ].filter(x => x > 0); // Only consider non-zero values
+    
+    if (providerMinChars.length === 0) {
+      return globalMinChars;
+    }
+    
+    return Math.min(globalMinChars, ...providerMinChars);
   }
 
   get currentFileMinNumberOfCharacters(): number {
@@ -444,6 +454,13 @@ export class AutoCompleteSuggest
                       minMatchScore: this.settings.minFuzzyMatchScore,
                     }
                   : undefined,
+                providerMinChars: {
+                  currentFile: this.settings.currentFileMinNumberOfCharactersForTrigger,
+                  currentVault: this.settings.currentVaultMinNumberOfCharactersForTrigger,
+                  customDictionary: this.settings.customDictionaryMinNumberOfCharactersForTrigger,
+                  internalLink: this.settings.internalLinkMinNumberOfCharactersForTrigger,
+                },
+                globalMinChar: this.settings.minNumberOfCharactersTriggered || this.tokenizerStrategy.triggerThreshold,
               },
             ).map((word) => ({ ...word, offset: q.offset }));
           })

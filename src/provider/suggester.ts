@@ -160,10 +160,26 @@ export function suggestWords(
     fuzzy?: {
       minMatchScore: number;
     };
+    providerMinChars?: {
+      currentFile: number;
+      currentVault: number;
+      customDictionary: number;
+      internalLink: number;
+    };
+    globalMinChar?: number;
   } = {},
 ): Word[] {
-  const { frontMatter, selectionHistoryStorage } = option;
+  const { frontMatter, selectionHistoryStorage, providerMinChars, globalMinChar } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
+
+  // プロバイダー別の最小文字数チェック関数
+  const shouldIncludeProvider = (providerType: keyof NonNullable<typeof providerMinChars>): boolean => {
+    if (!providerMinChars) {
+      return true;
+    }
+    const minChars = providerMinChars[providerType] || globalMinChar || 0;
+    return query.length >= minChars;
+  };
 
   const flattenFrontMatterWords = () => {
     if (frontMatter === "alias" || frontMatter === "aliases") {
@@ -179,28 +195,26 @@ export function suggestWords(
     ? frontMatter
       ? flattenFrontMatterWords()
       : [
-          ...(indexedWords.currentFile[query.charAt(0)] ?? []),
-          ...(indexedWords.currentFile[query.charAt(0).toLowerCase()] ?? []),
-          ...(indexedWords.currentVault[query.charAt(0)] ?? []),
-          ...(indexedWords.currentVault[query.charAt(0).toLowerCase()] ?? []),
-          ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
-          ...(indexedWords.customDictionary[query.charAt(0).toLowerCase()] ??
-            []),
-          ...(indexedWords.internalLink[query.charAt(0)] ?? []),
-          ...(indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []),
+          ...(shouldIncludeProvider('currentFile') ? (indexedWords.currentFile[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('currentFile') ? (indexedWords.currentFile[query.charAt(0).toLowerCase()] ?? []) : []),
+          ...(shouldIncludeProvider('currentVault') ? (indexedWords.currentVault[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('currentVault') ? (indexedWords.currentVault[query.charAt(0).toLowerCase()] ?? []) : []),
+          ...(shouldIncludeProvider('customDictionary') ? (indexedWords.customDictionary[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('customDictionary') ? (indexedWords.customDictionary[query.charAt(0).toLowerCase()] ?? []) : []),
+          ...(shouldIncludeProvider('internalLink') ? (indexedWords.internalLink[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('internalLink') ? (indexedWords.internalLink[query.charAt(0).toLowerCase()] ?? []) : []),
         ]
     : frontMatter
       ? flattenFrontMatterWords()
       : [
-          ...(indexedWords.currentFile[query.charAt(0)] ?? []),
-          ...(indexedWords.currentFile[query.charAt(0).toUpperCase()] ?? []),
-          ...(indexedWords.currentVault[query.charAt(0)] ?? []),
-          ...(indexedWords.currentVault[query.charAt(0).toUpperCase()] ?? []),
-          ...(indexedWords.customDictionary[query.charAt(0)] ?? []),
-          ...(indexedWords.customDictionary[query.charAt(0).toUpperCase()] ??
-            []),
-          ...(indexedWords.internalLink[query.charAt(0)] ?? []),
-          ...(indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []),
+          ...(shouldIncludeProvider('currentFile') ? (indexedWords.currentFile[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('currentFile') ? (indexedWords.currentFile[query.charAt(0).toUpperCase()] ?? []) : []),
+          ...(shouldIncludeProvider('currentVault') ? (indexedWords.currentVault[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('currentVault') ? (indexedWords.currentVault[query.charAt(0).toUpperCase()] ?? []) : []),
+          ...(shouldIncludeProvider('customDictionary') ? (indexedWords.customDictionary[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('customDictionary') ? (indexedWords.customDictionary[query.charAt(0).toUpperCase()] ?? []) : []),
+          ...(shouldIncludeProvider('internalLink') ? (indexedWords.internalLink[query.charAt(0)] ?? []) : []),
+          ...(shouldIncludeProvider('internalLink') ? (indexedWords.internalLink[query.charAt(0).toUpperCase()] ?? []) : []),
         ];
 
   const filteredJudgement = Array.from(words)
@@ -410,10 +424,26 @@ export function suggestWordsByPartialMatch(
     fuzzy?: {
       minMatchScore: number;
     };
+    providerMinChars?: {
+      currentFile: number;
+      currentVault: number;
+      customDictionary: number;
+      internalLink: number;
+    };
+    globalMinChar?: number;
   } = {},
 ): Word[] {
-  const { frontMatter, selectionHistoryStorage } = option;
+  const { frontMatter, selectionHistoryStorage, providerMinChars, globalMinChar } = option;
   const queryStartWithUpper = capitalizeFirstLetter(query) === query;
+
+  // プロバイダー別の最小文字数チェック関数
+  const shouldIncludeProvider = (providerType: keyof NonNullable<typeof providerMinChars>): boolean => {
+    if (!providerMinChars) {
+      return true;
+    }
+    const minChars = providerMinChars[providerType] || globalMinChar || 0;
+    return query.length >= minChars;
+  };
 
   const flatObjectValues = (object: { [firstLetter: string]: Word[] }) =>
     Object.values(object).flat();
@@ -431,10 +461,10 @@ export function suggestWordsByPartialMatch(
   const words = frontMatter
     ? flattenFrontMatterWords()
     : [
-        ...flatObjectValues(indexedWords.currentFile),
-        ...flatObjectValues(indexedWords.currentVault),
-        ...flatObjectValues(indexedWords.customDictionary),
-        ...flatObjectValues(indexedWords.internalLink),
+        ...(shouldIncludeProvider('currentFile') ? flatObjectValues(indexedWords.currentFile) : []),
+        ...(shouldIncludeProvider('currentVault') ? flatObjectValues(indexedWords.currentVault) : []),
+        ...(shouldIncludeProvider('customDictionary') ? flatObjectValues(indexedWords.customDictionary) : []),
+        ...(shouldIncludeProvider('internalLink') ? flatObjectValues(indexedWords.internalLink) : []),
       ];
   const filteredJudgement = Array.from(words)
     .map((x) => judgeByPartialMatch(x, query, queryStartWithUpper, option))
