@@ -738,23 +738,33 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             });
         });
     });
-
-    new Setting(containerEl)
-      .setName("Propagate ESC")
-      .setDesc(
-        "It is handy if you use Vim mode because you can switch to Normal mode by one ESC, whether it shows suggestions or not.",
-      )
-      .addToggle((tc) => {
-        tc.setValue(this.plugin.settings.propagateEsc).onChange(
-          async (value) => {
-            this.plugin.settings.propagateEsc = value;
-            await this.plugin.saveSettings();
-          },
-        );
-      });
   }
 
-  private addCurrentFileComplementSettings(containerEl: HTMLElement) {
+  // --- Category Splits Suggestion Sources ---
+  private addSuggestionSourcesSettings(containerEl: HTMLElement) {
+    containerEl.createEl("h3", {
+      text: "Suggestion Sources",
+      cls: "various-complements__settings__header",
+    });
+
+    containerEl.createEl("h4", { text: "Current File Complement" });
+    this.renderCurrentFileComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Current Vault Complement" });
+    this.renderCurrentVaultComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Internal Link Complement" });
+    this.renderInternalLinkComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Front Matter Complement" });
+    this.renderFrontMatterComplementSettings(containerEl);
+
+    containerEl.createEl("h4", { text: "Custom Dictionary Complement" });
+    this.renderCustomDictionaryComplementSettings(containerEl);
+  }
+
+  // --- Category Splits Advanced ---
+  private async addAdvancedSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Current file complement",
       cls: "various-complements__settings__header various-complements__settings__header__current-file",
@@ -798,6 +808,26 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings({ currentFile: true });
           });
         });
+      
+      new Setting(containerEl)
+        .setName("Min number of characters for trigger")
+        .setDesc(
+          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+        )
+        .setClass("various-complements__settings__nested")
+        .addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger =
+                value;
+              await this.plugin.saveSettings();
+            }),
+        );
 
       new Setting(containerEl)
         .setName("Min number of characters for trigger")
@@ -922,25 +952,6 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           });
         });
       new Setting(containerEl)
-        .setName("Min number of characters for trigger")
-        .setDesc(
-          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        )
-        .addSlider((sc) =>
-          sc
-            .setLimits(0, 10, 1)
-            .setValue(
-              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger,
-            )
-            .setDynamicTooltip()
-            .onChange(async (value) => {
-              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger =
-                value;
-              await this.plugin.saveSettings();
-            }),
-        );
-
-      new Setting(containerEl)
         .setName("Exclude word patterns for indexing")
         .setDesc(
           "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
@@ -999,15 +1010,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           return el;
         });
 
-      new Setting(containerEl).setName("Column delimiter").addDropdown((tc) =>
-        tc
-          .addOptions(mirrorMap(ColumnDelimiter.values(), (x) => x.name))
-          .setValue(this.plugin.settings.columnDelimiter)
-          .onChange(async (value) => {
-            this.plugin.settings.columnDelimiter = value;
-            await this.plugin.saveSettings();
-          }),
-      );
+      // --- START: ADDED CODE ---
+      new Setting(containerEl)
+        .setName("Column delimiter")
+        .setClass("various-complements__settings__nested")
+        .addDropdown((tc) =>
+          tc
+            .addOptions(mirrorMap(ColumnDelimiter.values(), (x) => x.name))
+            .setValue(this.plugin.settings.columnDelimiter)
+            .onChange(async (value) => {
+              this.plugin.settings.columnDelimiter = value;
+              await this.plugin.saveSettings();
+            }),
+        );
 
       new Setting(containerEl)
         .setName("Word regex pattern")
@@ -1080,35 +1095,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             },
           );
         });
-
-      new Setting(containerEl)
-        .setName("Min number of characters for trigger")
-        .setDesc(
-          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        )
-        .addSlider((sc) =>
-          sc
-            .setLimits(0, 10, 1)
-            .setValue(
-              this.plugin.settings
-                .customDictionaryMinNumberOfCharactersForTrigger,
-            )
-            .setDynamicTooltip()
-            .onChange(async (value) => {
-              this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger =
-                value;
-              await this.plugin.saveSettings();
-            }),
-        );
     }
   }
 
-  private addInternalLinkComplementSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Internal link complement",
-      cls: "various-complements__settings__header various-complements__settings__header__internal-link",
-    });
-
+  private renderInternalLinkComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Internal link complement")
       .addToggle((tc) => {
@@ -1268,34 +1258,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             "various-complements__settings__text-area-path-mini";
           return el;
         });
-
-      new Setting(containerEl)
-        .setName("Min number of characters for trigger")
-        .setDesc(
-          "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        )
-        .addSlider((sc) =>
-          sc
-            .setLimits(0, 10, 1)
-            .setValue(
-              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger,
-            )
-            .setDynamicTooltip()
-            .onChange(async (value) => {
-              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger =
-                value;
-              await this.plugin.saveSettings();
-            }),
-        );
     }
   }
 
-  private addFrontMatterComplementSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Front matter complement",
-      cls: "various-complements__settings__header various-complements__settings__header__front-matter",
-    });
-
+  private renderFrontMatterComplementSettings(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName("Enable Front matter complement")
       .addToggle((tc) => {
@@ -1414,12 +1380,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     }
   }
 
-  private addMobileSettings(containerEl: HTMLElement) {
-    containerEl.createEl("h3", {
-      text: "Mobile",
-      cls: "various-complements__settings__header various-complements__settings__header__mobile",
-    });
-
+  private renderMobileSettings(containerEl: HTMLElement) {
     new Setting(containerEl).setName("Disable on mobile").addToggle((tc) => {
       tc.setValue(this.plugin.settings.disableOnMobile).onChange(
         async (value) => {
