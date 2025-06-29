@@ -384,6 +384,7 @@ export class AutoCompleteSuggest
       settings.excludeCurrentVaultPathPrefixPatterns
         .split("\n")
         .filter((x) => x),
+      settings.excludeCurrentVaultPathGlobPatterns,
       settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory,
     );
     this.customDictionaryWordProvider.setSettings(
@@ -747,6 +748,8 @@ export class AutoCompleteSuggest
     this.internalLinkWordProvider.refreshWords({
       wordAsInternalLinkAlias: this.settings.suggestInternalLinkWithAlias,
       excludePathPrefixPatterns: this.excludeInternalLinkPrefixPathPatterns,
+      excludePathGlobPatterns:
+        this.settings.excludeInternalLinkPathGlobPatterns,
       makeSynonymAboutEmoji: this.settings.matchingWithoutEmoji,
       makeSynonymAboutAccentsDiacritics:
         this.settings.treatAccentDiacriticsAsAlphabeticCharacters,

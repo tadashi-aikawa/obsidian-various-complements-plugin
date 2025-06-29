@@ -43,6 +43,7 @@ pnpm ci
 - **Testing**: Jest with esbuild-jest transformer
 - **Obsidian API**: v0.16.0
 - **Node.js**: v22
+- **Glob Matching**: micromatch v4.0.7 for high-performance path pattern matching
 
 ## Architecture Overview
 
@@ -67,7 +68,7 @@ pnpm ci
 - `src/tokenizer/` - Text tokenization with language-specific implementations
 - `src/ui/` - Obsidian UI components and Svelte components
 - `src/setting/` - Plugin settings management
-- `src/util/` - Utility functions and helpers
+- `src/util/` - Utility functions and helpers (including glob pattern matching)
 - `src/model/` - TypeScript type definitions
 
 ### Entry Points
@@ -154,6 +155,36 @@ Each provider can have independent minimum character requirements:
 - **Provider filtering**: `suggester.ts` functions respect individual provider thresholds
 - **Settings UI**: Each provider section includes trigger configuration sliders
 
+## Path Exclusion System
+
+The plugin provides flexible path exclusion capabilities for Current Vault and Internal Link providers:
+
+### Exclusion Methods
+**Prefix Path Patterns** (Higher Performance):
+- Simple string prefix matching (e.g., `Private/`, `attachments/`)
+- Recommended for basic exclusion needs
+- Minimal processing overhead
+
+**Glob Path Patterns** (More Flexible):
+- Advanced wildcard pattern matching using micromatch
+- Supports complex patterns like `**/attachments`, `**/*.{png,jpg}`, `Private/**`
+- Higher processing overhead - use only when prefix patterns are insufficient
+
+### Performance Considerations
+- **Performance Impact**: Each glob pattern adds processing overhead during file indexing
+- **Best Practice**: Use prefix patterns when possible, glob patterns only for complex cases
+- **Dynamic Warnings**: UI shows performance warnings when glob patterns are configured
+- **Pattern Examples**:
+  - `**/attachments` - Excludes any folder named "attachments" at any level
+  - `**/*.{png,jpg,gif}` - Excludes image files with specific extensions
+  - `Private/**` - Excludes all files under Private directory
+
+### Implementation Details
+- **Dual filtering**: Both prefix and glob exclusions are applied (OR logic)
+- **Error handling**: Invalid glob patterns are safely ignored with console warnings
+- **Real-time updates**: Settings UI immediately reflects changes with dynamic warning display
+- **Type safety**: Path glob patterns are stored as `string[]` for consistency
+
 ## Important Implementation Notes
 
 - The plugin uses a custom fork of `chinese-tokenizer` for Chinese text processing
@@ -161,3 +192,5 @@ Each provider can have independent minimum character requirements:
 - Settings are managed through `src/setting/settings.ts` with helper functions
 - Word indexing is real-time with status indicators in the status bar
 - Performance is critical - efficient tokenization and caching are essential
+- lintやformatのチェックをするときは `pnpm pre:push` を実行してください。まとめて確認できるので便利です。そして、pnpmのformatによって意図した改行が失われてしまう場合は、pnpmのformatを無視するコメントを入れてください。
+

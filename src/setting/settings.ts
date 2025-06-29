@@ -77,6 +77,7 @@ export interface Settings {
   currentVaultMinNumberOfCharacters: number;
   includeCurrentVaultPathPrefixPatterns: string;
   excludeCurrentVaultPathPrefixPatterns: string;
+  excludeCurrentVaultPathGlobPatterns: string[];
   includeCurrentVaultOnlyFilesUnderCurrentDirectory: boolean;
   excludeCurrentVaultWordPatterns: string[];
 
@@ -94,6 +95,7 @@ export interface Settings {
   enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
+  excludeInternalLinkPathGlobPatterns: string[];
   excludeSelfInternalLink: boolean;
   excludeExistingInActiveFileInternalLinks: boolean;
 
@@ -197,6 +199,7 @@ export const DEFAULT_SETTINGS: Settings = {
   currentVaultMinNumberOfCharacters: 0,
   includeCurrentVaultPathPrefixPatterns: "",
   excludeCurrentVaultPathPrefixPatterns: "",
+  excludeCurrentVaultPathGlobPatterns: [],
   includeCurrentVaultOnlyFilesUnderCurrentDirectory: false,
   excludeCurrentVaultWordPatterns: [],
 
@@ -214,6 +217,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
   excludeInternalLinkPathPrefixPatterns: "",
+  excludeInternalLinkPathGlobPatterns: [],
   excludeSelfInternalLink: false,
   excludeExistingInActiveFileInternalLinks: false,
   updateInternalLinksOnSave: true,
@@ -909,6 +913,35 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             "various-complements__settings__text-area-path";
           return el;
         });
+
+      new Setting(containerEl)
+        .setName("Exclude path glob patterns")
+        .setDesc(
+          "Glob patterns to exclude files. Supports wildcards like **/attachments, **/*.png, etc.",
+        )
+        .addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeCurrentVaultPathGlobPatterns.join(
+                "\n",
+              ),
+            )
+            .setPlaceholder("**/attachments\n**/*.png")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentVaultPathGlobPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+              this.display();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      containerEl.createEl("div", {
+        text: "⚠ Glob patterns add processing overhead. Use prefix path patterns above for better performance when possible.",
+        cls: "various-complements__settings__warning",
+      });
+
       new Setting(containerEl)
         .setName("Include only files under current directory")
         .addToggle((tc) => {
@@ -1235,6 +1268,33 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             "various-complements__settings__text-area-path";
           return el;
         });
+
+      new Setting(containerEl)
+        .setName("Exclude path glob patterns")
+        .setDesc(
+          "Glob patterns to exclude files. Supports wildcards like **/attachments, **/*.png, etc.",
+        )
+        .addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeInternalLinkPathGlobPatterns.join(
+                "\n",
+              ),
+            )
+            .setPlaceholder("**/attachments\n**/*.png")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeInternalLinkPathGlobPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      containerEl.createEl("div", {
+        text: "⚠ Glob patterns add processing overhead. Use prefix path patterns above for better performance when possible.",
+        cls: "various-complements__settings__warning",
+      });
 
       new Setting(containerEl)
         .setName("Front matter key for exclusion")

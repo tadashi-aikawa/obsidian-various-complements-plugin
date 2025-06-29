@@ -2,6 +2,7 @@ import type { App } from "obsidian";
 import type { AppHelper } from "../app-helper";
 import type { Word } from "../model/Word";
 import type { Tokenizer } from "../tokenizer/tokenizer";
+import { isMatchedGlobPatterns } from "../util/glob";
 import { dirname } from "../util/path";
 import { startsSmallLetterOnlyFirst, synonymAliases } from "../util/strings";
 import { pushWord, type WordsByFirstLetter } from "./suggester";
@@ -12,6 +13,7 @@ export class CurrentVaultWordProvider {
   private tokenizer: Tokenizer;
   private includePrefixPatterns: string[];
   private excludePrefixPatterns: string[];
+  private excludePathGlobPatterns: string[];
   private onlyUnderCurrentDirectory: boolean;
 
   constructor(
@@ -34,6 +36,7 @@ export class CurrentVaultWordProvider {
       .map((x) => x.path)
       .filter((p) => this.includePrefixPatterns.every((x) => p.startsWith(x)))
       .filter((p) => this.excludePrefixPatterns.every((x) => !p.startsWith(x)))
+      .filter((p) => !isMatchedGlobPatterns(p, this.excludePathGlobPatterns))
       .filter(
         (p) => !this.onlyUnderCurrentDirectory || dirname(p) === currentDirname,
       );
@@ -90,11 +93,13 @@ export class CurrentVaultWordProvider {
     tokenizer: Tokenizer,
     includePrefixPatterns: string[],
     excludePrefixPatterns: string[],
+    excludePathGlobPatterns: string[],
     onlyUnderCurrentDirectory: boolean,
   ) {
     this.tokenizer = tokenizer;
     this.includePrefixPatterns = includePrefixPatterns;
     this.excludePrefixPatterns = excludePrefixPatterns;
+    this.excludePathGlobPatterns = excludePathGlobPatterns;
     this.onlyUnderCurrentDirectory = onlyUnderCurrentDirectory;
   }
 }

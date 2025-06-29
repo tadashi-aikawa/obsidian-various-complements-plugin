@@ -2,6 +2,7 @@ import type { App } from "obsidian";
 import { hasSameElement } from "../../src/util/collection-helper";
 import type { AppHelper } from "../app-helper";
 import type { InternalLinkWord, Word } from "../model/Word";
+import { isMatchedGlobPatterns } from "../util/glob";
 import { synonymAliases } from "../util/strings";
 import { pushWord, type WordsByFirstLetter } from "./suggester";
 
@@ -17,6 +18,7 @@ export class InternalLinkWordProvider {
   refreshWords(option: {
     wordAsInternalLinkAlias: boolean;
     excludePathPrefixPatterns: string[];
+    excludePathGlobPatterns: string[];
     makeSynonymAboutEmoji: boolean;
     makeSynonymAboutAccentsDiacritics: boolean;
     frontMatterKeyForExclusion: string;
@@ -30,6 +32,10 @@ export class InternalLinkWordProvider {
         if (
           option.excludePathPrefixPatterns.some((x) => f.path.startsWith(x))
         ) {
+          return false;
+        }
+
+        if (isMatchedGlobPatterns(f.path, option.excludePathGlobPatterns)) {
           return false;
         }
 
