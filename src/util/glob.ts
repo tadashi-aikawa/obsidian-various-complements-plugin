@@ -1,4 +1,4 @@
-import micromatch from "micromatch";
+import { minimatch } from "minimatch";
 
 export function isMatchedGlobPatterns(
   path: string,
@@ -9,7 +9,7 @@ export function isMatchedGlobPatterns(
   }
 
   try {
-    return micromatch.isMatch(path, patterns);
+    return patterns.some((p) => minimatch(path, p));
   } catch (error) {
     console.warn(`Invalid glob pattern detected: ${error}`);
     return false;

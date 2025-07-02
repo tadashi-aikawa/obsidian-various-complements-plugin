@@ -10,6 +10,7 @@
     "format": "prettier -l \"**/*.ts\"",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
+    "mobile:check": "node esbuild.config.mjs production --bundle --platform=browser",
     "pre:push": "pnpm typecheck && pnpm format && pnpm test",
     "ci": "pnpm i && pnpm build && pnpm test"
   },
@@ -19,7 +20,6 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@tsconfig/svelte": "^5.0.4",
-    "@types/micromatch": "^4.0.6",
     "@typescript/native-preview": "7.0.0-dev.20250622.1",
     "builtin-modules": "^3.3.0",
     "chokidar": "^3.6.0",
@@ -39,7 +39,7 @@
   "dependencies": {
     "chinese-tokenizer": "github:tadashi-aikawa/chinese-tokenizer",
     "emoji-regex": "^10.3.0",
-    "micromatch": "^4.0.5",
+    "minimatch": "^10.0.3",
     "svelte-lucide-icons": "^0.6.0",
     "ts-deepmerge": "^7.0.1"
   },

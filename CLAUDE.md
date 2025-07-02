@@ -43,7 +43,7 @@ pnpm ci
 - **Testing**: Jest with esbuild-jest transformer
 - **Obsidian API**: v0.16.0
 - **Node.js**: v22
-- **Glob Matching**: micromatch v4.0.7 for high-performance path pattern matching
+- **Glob Matching**: minimatch v10.0.3 for cross-platform path pattern matching (replaced micromatch for mobile compatibility)
 
 ## Architecture Overview
 
@@ -166,7 +166,7 @@ The plugin provides flexible path exclusion capabilities for Current Vault and I
 - Minimal processing overhead
 
 **Glob Path Patterns** (More Flexible):
-- Advanced wildcard pattern matching using micromatch
+- Advanced wildcard pattern matching using minimatch
 - Supports complex patterns like `**/attachments`, `**/*.{png,jpg}`, `Private/**`
 - Higher processing overhead - use only when prefix patterns are insufficient
 
@@ -193,4 +193,20 @@ The plugin provides flexible path exclusion capabilities for Current Vault and I
 - Word indexing is real-time with status indicators in the status bar
 - Performance is critical - efficient tokenization and caching are essential
 - lintやformatのチェックをするときは `pnpm pre:push` を実行してください。まとめて確認できるので便利です。そして、pnpmのformatによって意図した改行が失われてしまう場合は、pnpmのformatを無視するコメントを入れてください。
+
+## Obsidian Mobile Compatibility Issues (2025/07/03)
+
+### Issue #356: Plugin fails to load on mobile
+
+**根本原因**: micromatch ライブラリが Node.js の `process` オブジェクトに依存し、Obsidian Mobile では利用不可
+
+**解決方法**: micromatch → minimatch への置き換え
+- micromatch: Node.js 環境専用（`process.cwd()` を必須使用）
+- minimatch: ブラウザ環境対応（`process` の存在チェック付きでフォールバック）
+
+**実装ガイドライン**:
+- Obsidian Plugin では Node.js API への依存を避ける
+- ライブラリ選定時は `engines` フィールドと `browser` フィールドを確認
+- `process`, `fs`, `path` などの Node.js 固有モジュールは使用不可
+- モバイル対応が必要な場合は事前にブラウザ環境での動作確認を実施
 
