@@ -1,0 +1,53 @@
+name: Bug Report
+description: Bug report form.
+title: "[Bug] "
+assignees:
+  - tadashi-aikawa
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce in the Sandbox Vault
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+    validations:
+      required: true
+  - type: input
+    id: obsidian-version
+    attributes:
+      label: Obsidian Version
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Various Complements Version
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: Windows
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
