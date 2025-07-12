@@ -1,3 +1,121 @@
+/* --- Category Button Bar Modern Style --- */
+.various-complements__settings__category-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 0.5rem;
+}
+.various-complements__settings__category-btn {
+  background: none;
+  border: none;
+  color: var(--text-normal);
+  font-size: 1rem;
+  font-family: inherit;
+  padding: 0.25rem 1.1rem 0.25rem 1.1rem;
+  margin: 0;
+  border-radius: 0;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-bottom 0.15s;
+  outline: none;
+}
+.various-complements__settings__category-btn.is-active {
+  color: var(--interactive-accent);
+  border-bottom: 2px solid var(--interactive-accent);
+  font-weight: 600;
+}
+.various-complements__settings__category-btn:focus {
+  color: var(--interactive-accent);
+}
+
+/* Category Button Bar Modern Style ENDS */
+
+
+/* --- tutorial Starts --- */
+
+.vc-tutorial-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-grow: 1;
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-weight: 500;
+  pointer-events: none; /* Let clicks pass through to the nav bar */
+}
+
+.vc-tutorial-text {
+  animation: vc-fade-in 0.3s ease-out;
+}
+
+@keyframes vc-fade-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vc-tutorial-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--interactive-accent);
+}
+
+.vc-tutorial-arrow-swipe-right {
+  animation: vc-swipe-right 1.5s ease-in-out infinite;
+}
+@keyframes vc-swipe-right {
+  0%   { transform: translateX(-15px); opacity: 0; }
+  30%  { transform: translateX(0); opacity: 1; }
+  70%  { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(15px); opacity: 0; }
+}
+
+.vc-tutorial-arrow-swipe-left {
+  animation: vc-swipe-left 1.5s ease-in-out infinite;
+}
+@keyframes vc-swipe-left {
+  0%   { transform: translateX(15px) scaleX(-1); opacity: 0; }
+  30%  { transform: translateX(0) scaleX(-1); opacity: 1; }
+  70%  { transform: translateX(0) scaleX(-1); opacity: 1; }
+  100% { transform: translateX(-15px) scaleX(-1); opacity: 0; }
+}
+
+.vc-tutorial-arrow-swipe-up {
+  animation: vc-swipe-up 1.5s ease-in-out infinite;
+}
+@keyframes vc-swipe-up {
+  0%   { transform: translateY(15px) rotate(-90deg); opacity: 0; }
+  30%  { transform: translateY(0) rotate(-90deg); opacity: 1; }
+  70%  { transform: translateY(0) rotate(-90deg); opacity: 1; }
+  100% { transform: translateY(-15px) rotate(-90deg); opacity: 0; }
+}
+
+.vc-tutorial-tap-pulse {
+  width: 24px;
+  height: 24px;
+  background-color: var(--interactive-accent);
+  border-radius: 50%;
+  animation: vc-tap-pulse 1.5s ease-in-out infinite;
+}
+@keyframes vc-tap-pulse {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 0.3; }
+  100% { transform: scale(0.8); opacity: 0.7; }
+}
+
+/* Celebration animation & Tap animation */
+.vc-mobile-nav.vc-tutorial-complete {
+  animation: vc-tutorial-celebrate 0.5s ease-out;
+}
+@keyframes vc-tutorial-celebrate {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--interactive-accent-hover); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); box-shadow: 0 0 0 10px transparent; }
+}
+
+/* End tutorial */
+
 .various-complements__settings__text-area-path {
   height: 120px;
   width: 500px;
