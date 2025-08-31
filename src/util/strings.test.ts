@@ -9,6 +9,8 @@ import {
   excludeSpace,
   findCommonPrefix,
   type FuzzyResult,
+  // Avoid https://github.com/aelbore/esbuild-jest/issues/57
+  isEOTinCodeBlock as isEOTinCodeBlock_,
   isInternalLink,
   joinNumberWithSymbol,
   lowerIncludes,
@@ -20,6 +22,11 @@ import {
   startsSmallLetterOnlyFirst,
   synonymAliases,
 } from "./strings";
+
+// Helper to visually construct multiline test inputs without escaping backticks
+// WARN: To ensure the formatter inserts a line break, we deliberately use a long variable name
+const ________________________________________lines = (...xs: string[]) =>
+  xs.join("\n");
 
 describe.each<{ one: string; another: string; expected: boolean }>`
   one            | another          | expected
@@ -280,5 +287,209 @@ describe.each<{ tokens: string[]; expected: string[] }>`
 `("joinNumberWithSymbol", ({ tokens, expected }) => {
   test(`joinNumberWithSymbol(${tokens}) = ${expected}`, () => {
     expect(joinNumberWithSymbol(tokens)).toStrictEqual(expected);
+  });
+});
+
+describe.each<{ _description: string; text: string; expected: boolean }>([
+  { _description: "空文字はコードブロック外で終了", text: "", expected: false },
+  {
+    _description: "通常テキストはコードブロック外で終了",
+    text: ________________________________________lines(
+      "Hello world",
+      "This is normal text",
+    ),
+    expected: false,
+  },
+  {
+    _description: "フェンス付きコードブロックが閉じて終了",
+    text: ________________________________________lines(
+      "```typescript",
+      "const x = 1;",
+      "```",
+    ),
+    expected: false,
+  },
+  {
+    _description: "フェンス付きコードブロックが未閉鎖で終了",
+    text: ________________________________________lines(
+      "```typescript",
+      "const x = 1;",
+    ),
+    expected: true,
+  },
+  {
+    _description: "複数行コードブロックが未閉鎖で終了",
+    text: ________________________________________lines(
+      "```javascript",
+      "function test() {",
+      "  return 42;",
+      "}",
+    ),
+    expected: true,
+  },
+  {
+    _description: "チルダフェンスが閉じて終了",
+    text: ________________________________________lines(
+      "~~~python",
+      "print('hello')",
+      "~~~",
+    ),
+    expected: false,
+  },
+  {
+    _description: "チルダフェンスが未閉鎖で終了",
+    text: ________________________________________lines(
+      "~~~python",
+      "print('hello')",
+    ),
+    expected: true,
+  },
+  {
+    _description: "前後に閉じたコードブロックを挟む通常テキストで終了",
+    text: ________________________________________lines(
+      "```js",
+      "const a = 1;",
+      "```",
+      "",
+      "Some text",
+      "",
+      "```ts",
+      "const b = 2;",
+      "```",
+    ),
+    expected: false,
+  },
+  {
+    _description: "途中で未閉鎖のコードブロックで終了",
+    text: ________________________________________lines(
+      "```js",
+      "const a = 1;",
+      "```",
+      "",
+      "Some text",
+      "",
+      "```ts",
+      "const b = 2;",
+    ),
+    expected: true,
+  },
+  {
+    _description: "4バッククォートのコードブロックが閉じて終了",
+    text: ________________________________________lines(
+      "````typescript",
+      "const x = 1;",
+      "````",
+    ),
+    expected: false,
+  },
+  {
+    _description: "4バッククォートが未閉鎖で終了",
+    text: ________________________________________lines(
+      "````typescript",
+      "const x = 1;",
+    ),
+    expected: true,
+  },
+  {
+    _description: "異なるフェンス記号で閉じず未閉鎖で終了",
+    text: ________________________________________lines(
+      "```typescript",
+      "const x = 1;",
+      "~~~",
+    ),
+    expected: true,
+  },
+  {
+    _description: "4バッククォートを3で閉じず未閉鎖で終了",
+    text: ________________________________________lines(
+      "````typescript",
+      "const x = 1;",
+      "```",
+    ),
+    expected: true,
+  },
+  {
+    _description: "異なる長さ(5)で閉じて終了",
+    text: ________________________________________lines(
+      "```typescript",
+      "const x = 1;",
+      "`````",
+    ),
+    expected: false,
+  },
+  {
+    _description: "コード内に```を含み未閉鎖で終了",
+    text: ________________________________________lines(
+      "```",
+      "This is ``` inside code",
+      "Still in code block",
+    ),
+    expected: true,
+  },
+  {
+    _description: "インデント付きフェンスは閉じて終了",
+    text: ________________________________________lines(
+      "  ```typescript",
+      "  const x = 1;",
+      "  ```",
+    ),
+    expected: false,
+  },
+  {
+    _description: "言語指定前に空白のある開始フェンスで未閉鎖終了",
+    text: ________________________________________lines(
+      "```   typescript",
+      "const x = 1;",
+    ),
+    expected: true,
+  },
+  {
+    _description: "テキスト→閉じたコードブロック→テキストで終了",
+    text: ________________________________________lines(
+      "Regular text",
+      "```python",
+      "code here",
+      "```",
+      "More text",
+    ),
+    expected: false,
+  },
+  {
+    _description: "最後のコードブロックが未閉鎖で終了",
+    text: ________________________________________lines(
+      "```",
+      "code",
+      "```",
+      "",
+      "```",
+      "more code",
+    ),
+    expected: true,
+  },
+  {
+    _description: "異種フェンス混在。最後が未閉鎖で終了",
+    text: ________________________________________lines(
+      "~~~js",
+      "code",
+      "~~~",
+      "",
+      "```ts",
+      "unfinished",
+    ),
+    expected: true,
+  },
+  {
+    _description: "連続フェンス後に未閉鎖コードで終了",
+    text: ________________________________________lines(
+      "```",
+      "```",
+      "```",
+      "code",
+    ),
+    expected: true,
+  },
+])("isEOTinCodeBlock", ({ text, expected }) => {
+  test(`isEOTinCodeBlock should return ${expected} for text ending ${expected ? "inside" : "outside"} code block`, () => {
+    expect(isEOTinCodeBlock_(text)).toBe(expected);
   });
 });

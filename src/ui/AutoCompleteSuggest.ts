@@ -929,6 +929,16 @@ export class AutoCompleteSuggest
       return null;
     }
 
+    if (
+      this.settings.disableSuggestionsInCodeBlock &&
+      this.appHelper.inCodeBlock(editor)
+    ) {
+      onReturnNull(
+        `Suggestions are disabled while the cursor is inside a Code block.`,
+      );
+      return null;
+    }
+
     const tokens = this.tokenizer.tokenize(currentLineUntilCursor, true);
     showDebugLog(`tokens is ${tokens}`);
 

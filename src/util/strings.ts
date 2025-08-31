@@ -204,3 +204,44 @@ export function joinNumberWithSymbol(tokens: string[]): string[] {
   ret.push(stock);
   return ret;
 }
+
+/**
+ * Check if the text ends while still being inside a code block.
+ */
+export function isEOTinCodeBlock(text: string): boolean {
+  const lines = text.split("\n");
+
+  let inCodeBlock = false;
+  let codeBlockDelimiter = "";
+  let codeBlockDelimiterLength = 0;
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+
+    // Check for code block start/end (``` or ~~~)
+    const codeBlockMatch = trimmedLine.match(/^(`{3,}|~{3,})/);
+
+    if (codeBlockMatch) {
+      const delimiter = codeBlockMatch[1];
+      const delimiterChar = delimiter[0]; // ` or ~
+      const delimiterLength = delimiter.length;
+
+      if (!inCodeBlock) {
+        // Starting a new code block
+        inCodeBlock = true;
+        codeBlockDelimiter = delimiterChar;
+        codeBlockDelimiterLength = delimiterLength;
+      } else if (
+        delimiterChar === codeBlockDelimiter &&
+        delimiterLength >= codeBlockDelimiterLength
+      ) {
+        // Ending the current code block (must be same char and >= length)
+        inCodeBlock = false;
+        codeBlockDelimiter = "";
+        codeBlockDelimiterLength = 0;
+      }
+    }
+  }
+
+  return inCodeBlock;
+}

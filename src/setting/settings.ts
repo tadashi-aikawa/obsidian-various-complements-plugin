@@ -31,6 +31,7 @@ export interface Settings {
   delayMilliSeconds: number;
   disableSuggestionsDuringImeOn: boolean;
   disableSuggestionsInMathBlock: boolean;
+  disableSuggestionsInCodeBlock: boolean;
   // XXX: Want to rename at next major version up
   insertSpaceAfterCompletion: boolean;
   firstCharactersDisableSuggestions: string;
@@ -154,6 +155,7 @@ export const DEFAULT_SETTINGS: Settings = {
   delayMilliSeconds: 0,
   disableSuggestionsDuringImeOn: false,
   disableSuggestionsInMathBlock: false,
+  disableSuggestionsInCodeBlock: false,
   insertSpaceAfterCompletion: false,
   firstCharactersDisableSuggestions: ":/^",
   patternsToSuppressTrigger: ["^~~~.*", "^```.*"],
@@ -527,12 +529,28 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Disable suggestions in the Math block")
-      .setDesc("It doesn't support the inline Math block.")
+      .setDesc(
+        "Disables suggestions within math blocks. This setting does not apply to inline blocks.",
+      )
       .addToggle((tc) => {
         tc.setValue(
           this.plugin.settings.disableSuggestionsInMathBlock,
         ).onChange(async (value) => {
           this.plugin.settings.disableSuggestionsInMathBlock = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName("Disable suggestions in the Code block")
+      .setDesc(
+        "Disables suggestions within code blocks. This setting does not apply to inline blocks.",
+      )
+      .addToggle((tc) => {
+        tc.setValue(
+          this.plugin.settings.disableSuggestionsInCodeBlock,
+        ).onChange(async (value) => {
+          this.plugin.settings.disableSuggestionsInCodeBlock = value;
           await this.plugin.saveSettings();
         });
       });

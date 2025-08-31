@@ -10,6 +10,7 @@ import {
   TFile,
   Vault,
 } from "obsidian";
+import { isEOTinCodeBlock } from "./util/strings";
 
 interface UnsafeAppInterface {
   isMobile: boolean;
@@ -211,6 +212,13 @@ export class AppHelper {
     const numberOfDollarPair =
       this.getContentUntilCursor(editor).match(/\$\$\n/g)?.length ?? 0;
     return numberOfDollarPair % 2 !== 0;
+  }
+
+  /**
+   * WARN: This code does not support inline code blocks.
+   */
+  inCodeBlock(editor: Editor): boolean {
+    return isEOTinCodeBlock(this.getContentUntilCursor(editor));
   }
 
   searchPhantomLinks(): { path: string; link: string }[] {
