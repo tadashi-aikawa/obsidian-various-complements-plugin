@@ -68,6 +68,7 @@ describe.each<{
   ${{}}                                    | ${"## @smi"}       | ${[{ word: "## @smi", offset: 0 }, { word: "@smi", offset: 3 }]}
   ${{}}                                    | ${"$\\alpha"}      | ${[{ word: "$\\alpha", offset: 0 }, { word: "\\alpha", offset: 1 }]}
   ${{}}                                    | ${"::one::two"}    | ${[{ word: "::one::two", offset: 0 }, { word: "one::two", offset: 2 }, { word: "two", offset: 7 }]}
+  ${{}}                                    | ${"]]]"}           | ${[{ word: "]]]", offset: 0 }]}
   ${{}}                                    | ${"__a __c__ e__"} | ${[{ word: "__a __c__ e__", offset: 0 }, { word: "a __c__ e__", offset: 2 }, { word: "c__ e__", offset: 6 }, { word: "e__", offset: 10 }]}
   ${{ treatUnderscoreAsPartOfWord: true }} | ${"__a __c__ e__"} | ${[{ word: "__a __c__ e__", offset: 0 }, { word: "__c__ e__", offset: 4 }, { word: "e__", offset: 10 }]}
 `("recursiveTokenize", ({ constructorArgs, content, expected }) => {

@@ -23,6 +23,11 @@ export class DefaultTokenizer extends AbstractTokenizer {
       word: content.slice(i),
       offset: i,
     }));
+
+    if (results.length === 0) {
+      return [{ word: content, offset: 0 }];
+    }
+
     return results[0].offset === 0
       ? results
       : [{ word: content, offset: 0 }, ...results];
