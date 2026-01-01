@@ -893,7 +893,8 @@ export class AutoCompleteSuggest
     if (
       equalsAsLiterals(this.previousCurrentLine, cl) &&
       !this.runManually &&
-      !currentFrontMatter
+      !currentFrontMatter &&
+      !this.isOpen
     ) {
       this.previousCurrentLine = cl;
       onReturnNull("Don't show suggestions because there are no changes");
@@ -962,7 +963,8 @@ export class AutoCompleteSuggest
     if (
       currentTokenSeparatedWhiteSpace ===
         this.pastCurrentTokenSeparatedWhiteSpace &&
-      !this.runManually
+      !this.runManually &&
+      !this.isOpen
     ) {
       onReturnNull(
         `Don't show suggestions because currentTokenSeparatedWhiteSpace doesn't change`,
