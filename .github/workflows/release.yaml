@@ -11,8 +11,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-      - run: npm install -g corepack@latest && corepack enable && npm i -D --no-save conventional-changelog-conventionalcommits @semantic-release/git @semantic-release/exec
+          node-version: "24"
+      - run: npm install -g pnpm && npm i -D --no-save conventional-changelog-conventionalcommits @semantic-release/git @semantic-release/exec
       - uses: cycjimmy/semantic-release-action@v4
         with:
           # バージョンは固定にしておいたほうがいい

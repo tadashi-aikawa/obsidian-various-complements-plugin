@@ -11,6 +11,6 @@
 
 ### 利用技術
 
-- Node.js v22
+- Node.js v24
 - pnpm (フォーマッター)
 - Jest (テスト)

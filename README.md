@@ -33,7 +33,7 @@ Before creating a pull request, please make an [issue] or a [discussion]😉
 ## 🖥️ For developers
 
 - Requirements
-    - Node.js v22
+    - Node.js v24
 
 ### Development
 
@@ -46,7 +46,6 @@ git config core.hooksPath hooks
 #### Install dependencies
 
 ```bash
-corepack enable
 pnpm install
 ```
 

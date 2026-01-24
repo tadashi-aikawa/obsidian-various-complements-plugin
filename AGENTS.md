@@ -37,4 +37,3 @@
 ## Security & Configuration Tips
 - Local dev vault: set `VAULT_DIR` in `esbuild.config.mjs` to your Obsidian vault to enable hot-copying during `pnpm dev`.
 - External modules: Obsidian and Node builtins are marked external in bundling; avoid relying on unavailable runtime modules.
-- Requirements: Node.js 22 (`.mise.toml`), `pnpm` via `corepack`.
