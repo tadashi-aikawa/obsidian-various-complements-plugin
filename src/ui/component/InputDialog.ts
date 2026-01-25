@@ -1,4 +1,4 @@
-import { Modal } from "obsidian";
+import { App, Modal } from "obsidian";
 
 export class InputDialog extends Modal {
   inputEl!: HTMLInputElement;
@@ -7,12 +7,13 @@ export class InputDialog extends Modal {
 
   constructor(
     public args: {
+      app: App;
       title: string;
       placeholder?: string;
       defaultValue?: string;
     },
   ) {
-    super(app);
+    super(args.app);
   }
 
   onOpen(): void {

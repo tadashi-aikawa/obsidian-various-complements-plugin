@@ -814,7 +814,8 @@ export class AutoCompleteSuggest
       this.selectionHistoryStorage = new SelectionHistoryStorage(
         await this.unsafeLoadHistoryData(),
         this.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory,
-        this.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep,
+        this.settings.intelligentSuggestionPrioritization
+          .maxNumberOfHistoryToKeep,
       );
       this.selectionHistoryStorage.purge();
     } else {
@@ -1150,7 +1151,8 @@ export class AutoCompleteSuggest
     const pattern = this.settings
       .insertAliasTransformedFromDisplayedInternalLink.enabled
       ? new RegExp(
-          this.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp,
+          this.settings.insertAliasTransformedFromDisplayedInternalLink
+            .beforeRegExp,
         )
       : null;
     const match = (value: string) =>

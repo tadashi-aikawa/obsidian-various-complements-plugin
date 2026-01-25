@@ -31,6 +31,7 @@ async function selectWithCustomAliasImpl(
   }
 
   const input = await new InputDialog({
+    app: popup.app,
     title: "Type custom alias",
     defaultValue: item.value,
   }).open({ initialSelect: true });

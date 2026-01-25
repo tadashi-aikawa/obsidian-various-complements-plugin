@@ -4,7 +4,8 @@ export const groupBy = <T>(
 ): { [key: string]: T[] } =>
   values.reduce(
     (prev, cur, _1, _2, k = toKey(cur)) => (
-      (prev[k] || (prev[k] = [])).push(cur), prev
+      (prev[k] || (prev[k] = [])).push(cur),
+      prev
     ),
     {} as { [key: string]: T[] },
   );

@@ -132,7 +132,7 @@ export class AppHelper {
   }
 
   getCurrentDirname(): string | null {
-    return this.getActiveFile()?.parent.path ?? null;
+    return this.getActiveFile()?.parent?.path ?? null;
   }
 
   getCurrentEditor(): Editor | null {

@@ -259,6 +259,7 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 export class VariousComplementsSettingTab extends PluginSettingTab {
+  app: App;
   plugin: VariousComponents;
 
   constructor(app: App, plugin: VariousComponents) {
@@ -328,7 +329,7 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           }).setValue(this.plugin.settings.cedictPath);
         });
 
-      const hasCedict = await app.vault.adapter.exists(
+      const hasCedict = await this.app.vault.adapter.exists(
         this.plugin.settings.cedictPath,
       );
       if (!hasCedict) {
