@@ -2,6 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import {
   allAlphabets,
   allNumbersOrFewSymbols,
+  applyQueryFirstLetterCase,
   capitalizeFirstLetter,
   encodeSpace,
   equalsAsLiterals,
@@ -175,6 +176,38 @@ describe.each`
 `("capitalizeFirstLetter", ({ text, expected }) => {
   test(`capitalizeFirstLetter(${text}) = ${expected}`, () => {
     expect(capitalizeFirstLetter(text)).toBe(expected);
+  });
+});
+
+describe.each<{ value: string; query: string; expected: string }>`
+  value           | query       | expected
+  ${"Memory"}     | ${"memory"} | ${"memory"}
+  ${"Memory"}     | ${"m"}      | ${"memory"}
+  ${"memory"}     | ${"Memory"} | ${"Memory"}
+  ${"memory"}     | ${"M"}      | ${"Memory"}
+  ${"Memory"}     | ${"Memory"} | ${"Memory"}
+  ${"Memory"}     | ${"M"}      | ${"Memory"}
+  ${"memory"}     | ${"memory"} | ${"memory"}
+  ${"memory"}     | ${"m"}      | ${"memory"}
+  ${"AWS"}        | ${"a"}      | ${"AWS"}
+  ${"AWS"}        | ${"A"}      | ${"AWS"}
+  ${"New York"}   | ${"n"}      | ${"New York"}
+  ${"New York"}   | ${"N"}      | ${"New York"}
+  ${"AWS Lambda"} | ${"a"}      | ${"AWS Lambda"}
+  ${"AWS Lambda"} | ${"A"}      | ${"AWS Lambda"}
+  ${"iPhone"}     | ${"i"}      | ${"iPhone"}
+  ${"iPhone"}     | ${"I"}      | ${"iPhone"}
+  ${"can I use"}  | ${"c"}      | ${"can I use"}
+  ${"can I use"}  | ${"C"}      | ${"Can I use"}
+  ${"Plan A"}     | ${"p"}      | ${"plan A"}
+  ${"Plan A"}     | ${"P"}      | ${"Plan A"}
+  ${"Memory"}     | ${""}       | ${"Memory"}
+  ${""}           | ${"memory"} | ${""}
+  ${"1value"}     | ${"memory"} | ${"1value"}
+  ${"Memory"}     | ${"1query"} | ${"Memory"}
+`("applyQueryFirstLetterCase", ({ value, query, expected }) => {
+  test(`applyQueryFirstLetterCase(${value}, ${query}) = ${expected}`, () => {
+    expect(applyQueryFirstLetterCase(value, query)).toBe(expected);
   });
 });
 

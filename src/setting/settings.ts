@@ -96,6 +96,7 @@ export interface Settings {
   // internal link complement
   enableInternalLinkComplement: boolean;
   suggestInternalLinkWithAlias: boolean;
+  preserveFirstLetterCaseOnInternalLink: boolean;
   excludeInternalLinkPathPrefixPatterns: string;
   excludeInternalLinkPathGlobPatterns: string[];
   excludeSelfInternalLink: boolean;
@@ -220,6 +221,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // internal link complement
   enableInternalLinkComplement: true,
   suggestInternalLinkWithAlias: false,
+  preserveFirstLetterCaseOnInternalLink: false,
   excludeInternalLinkPathPrefixPatterns: "",
   excludeInternalLinkPathGlobPatterns: [],
   excludeSelfInternalLink: false,
@@ -1184,6 +1186,19 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           ).onChange(async (value) => {
             this.plugin.settings.suggestInternalLinkWithAlias = value;
             await this.plugin.saveSettings({ internalLink: true });
+          });
+        });
+      new Setting(containerEl)
+        .setName("Preserve first-letter case")
+        .setDesc(
+          "If the first letter case differs between the query and the displayed text, insert with an alias using the query's first-letter case.",
+        )
+        .addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.preserveFirstLetterCaseOnInternalLink,
+          ).onChange(async (value) => {
+            this.plugin.settings.preserveFirstLetterCaseOnInternalLink = value;
+            await this.plugin.saveSettings();
           });
         });
       new Setting(containerEl)

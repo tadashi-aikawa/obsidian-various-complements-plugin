@@ -99,6 +99,61 @@ export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export function applyQueryFirstLetterCase(
+  value: string,
+  query: string,
+): string {
+  if (!query) {
+    return value;
+  }
+
+  const words = value.split(" ");
+  let offset = 0;
+  const hasUpperExceptSingleLetter = words.some((word) => {
+    if (word.length <= 1) {
+      offset += word.length + 1;
+      return false;
+    }
+
+    for (let i = 0; i < word.length; i++) {
+      const ch = word.charAt(i);
+      if (ch >= "A" && ch <= "Z") {
+        if (i > 0 || offset !== 0) {
+          return true;
+        }
+      }
+    }
+
+    offset += word.length + 1;
+    return false;
+  });
+  if (hasUpperExceptSingleLetter) {
+    return value;
+  }
+
+  const queryFirst = query.charAt(0);
+  const valueFirst = value.charAt(0);
+  if (!queryFirst || !valueFirst) {
+    return value;
+  }
+
+  const queryUpper = queryFirst.toUpperCase();
+  const queryLower = queryFirst.toLowerCase();
+  if (queryUpper === queryLower) {
+    return value;
+  }
+
+  const adjustedFirst =
+    queryFirst === queryUpper
+      ? valueFirst.toUpperCase()
+      : valueFirst.toLowerCase();
+  if (adjustedFirst === valueFirst) {
+    return value;
+  }
+
+  return adjustedFirst + value.slice(1);
+}
+
 export function startsSmallLetterOnlyFirst(str: string): boolean {
   return Boolean(str.match(/^[A-Z][^A-Z]+$/));
 }

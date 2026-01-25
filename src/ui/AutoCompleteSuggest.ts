@@ -38,7 +38,12 @@ import { createTokenizer, type Tokenizer } from "../tokenizer/tokenizer";
 import { TokenizeStrategy } from "../tokenizer/TokenizeStrategy";
 import { setEquals, uniqWith } from "../util/collection-helper";
 import { DEFAULT_HISTORIES_PATH } from "../util/path";
-import { encodeSpace, equalsAsLiterals, isInternalLink } from "../util/strings";
+import {
+  applyQueryFirstLetterCase,
+  encodeSpace,
+  equalsAsLiterals,
+  isInternalLink,
+} from "../util/strings";
 import type { CommandReturnType } from "./popup-commands";
 import * as commands from "./popup-commands";
 import type { ProviderStatusBar } from "./ProviderStatusBar";
@@ -1134,7 +1139,19 @@ export class AutoCompleteSuggest
   constructInternalLinkText(
     word: InternalLinkWord,
     forceWithAlias: boolean,
+    option?: {
+      preserveFirstLetterCase?: boolean;
+    },
   ): string {
+    const query = word.query;
+    const preserveFirstLetterCase = Boolean(
+      option?.preserveFirstLetterCase && query,
+    );
+    const applyQueryFirstLetterCaseIfNeeded = (value: string): string =>
+      preserveFirstLetterCase
+        ? applyQueryFirstLetterCase(value, query!)
+        : value;
+
     // With aliases
     if (
       (this.settings.suggestInternalLinkWithAlias || forceWithAlias) &&
@@ -1143,9 +1160,10 @@ export class AutoCompleteSuggest
       const { link } = this.appHelper.optimizeMarkdownLinkText(
         word.aliasMeta.origin,
       )!;
+      const displayed = applyQueryFirstLetterCaseIfNeeded(word.value);
       return this.appHelper.useWikiLinks
-        ? `[[${link}|${word.value}]]`
-        : `[${word.value}](${encodeSpace(link)}.md)`;
+        ? `[[${link}|${displayed}]]`
+        : `[${displayed}](${encodeSpace(link)}.md)`;
     }
 
     const pattern = this.settings
@@ -1172,20 +1190,27 @@ export class AutoCompleteSuggest
       this.appHelper.newLinkFormat === "shortest" &&
       displayed.includes("/")
     ) {
+      const alias = applyQueryFirstLetterCaseIfNeeded(word.value);
       return this.appHelper.useWikiLinks
-        ? `[[${link}|${word.value}]]`
-        : `[${word.value}](${encodeSpace(link)}.md)`;
+        ? `[[${link}|${alias}]]`
+        : `[${alias}](${encodeSpace(link)}.md)`;
     }
 
     if (this.appHelper.useWikiLinks) {
-      return match(link)
-        ? `[[${link}|${replaceByPattern(link)}]]`
-        : `[[${link}]]`;
+      if (match(link)) {
+        const alias = applyQueryFirstLetterCaseIfNeeded(replaceByPattern(link));
+        return `[[${link}|${alias}]]`;
+      }
+
+      const alias = applyQueryFirstLetterCaseIfNeeded(displayed);
+      return alias !== link ? `[[${link}|${alias}]]` : `[[${link}]]`;
     }
 
-    return match(displayed)
-      ? `[${replaceByPattern(displayed)}](${encodeSpace(link)}.md)`
-      : `[${displayed}](${encodeSpace(link)}.md)`;
+    const displayedText = match(displayed)
+      ? replaceByPattern(displayed)
+      : displayed;
+    const alias = applyQueryFirstLetterCaseIfNeeded(displayedText);
+    return `[${alias}](${encodeSpace(link)}.md)`;
   }
 
   selectSuggestion(word: Word): void {
@@ -1204,7 +1229,10 @@ export class AutoCompleteSuggest
 
     let insertedText = word.value;
     if (word.type === "internalLink") {
-      insertedText = this.constructInternalLinkText(word, forceWithAlias);
+      insertedText = this.constructInternalLinkText(word, forceWithAlias, {
+        preserveFirstLetterCase:
+          this.settings.preserveFirstLetterCaseOnInternalLink,
+      });
     }
 
     if (word.type === "frontMatter") {
