@@ -49,6 +49,7 @@ export interface Settings {
   hotkeys: {
     select: Hotkey[];
     "select with custom alias": Hotkey[];
+    "select with custom alias and add to aliases": Hotkey[];
     "select with query alias": Hotkey[];
     up: Hotkey[];
     down: Hotkey[];
@@ -172,6 +173,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hotkeys: {
     select: [{ modifiers: [], key: "Enter" }],
     "select with custom alias": [],
+    "select with custom alias and add to aliases": [],
     "select with query alias": [],
     up: [{ modifiers: [], key: "ArrowUp" }],
     down: [{ modifiers: [], key: "ArrowDown" }],

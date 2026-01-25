@@ -1,10 +1,54 @@
-import { Notice } from "obsidian";
+import { Notice, parseFrontMatterAliases } from "obsidian";
 import type { InternalLinkWord, Word } from "../../src/model/Word";
 import { excludeEmoji, findCommonPrefix } from "../util/strings";
 import type { AutoCompleteSuggest } from "./AutoCompleteSuggest";
 import { InputDialog } from "./component/InputDialog";
 
 export type CommandReturnType = boolean | undefined;
+
+type CustomAliasSelection = {
+  item: InternalLinkWord;
+  input: string;
+  changed: boolean;
+} | null;
+
+async function selectWithCustomAliasImpl(
+  popup: AutoCompleteSuggest,
+  evt: KeyboardEvent,
+): Promise<CustomAliasSelection> {
+  if (!popup.context || evt.isComposing) {
+    return null;
+  }
+
+  if (popup.selectionLock) {
+    popup.close();
+    return null;
+  }
+
+  const item = popup.suggestions.values[popup.suggestions.selectedItem];
+  if (item.type !== "internalLink") {
+    return null;
+  }
+
+  const input = await new InputDialog({
+    title: "Type custom alias",
+    defaultValue: item.value,
+  }).open({ initialSelect: true });
+  if (!input) {
+    return null;
+  }
+
+  if (item.value === input) {
+    return { item, input, changed: false };
+  }
+
+  item.aliasMeta = {
+    origin: item.aliasMeta?.origin ?? item.value,
+  };
+  item.value = input;
+
+  return { item, input, changed: true };
+}
 
 export function select(
   popup: AutoCompleteSuggest,
@@ -33,36 +77,48 @@ export async function selectWithCustomAlias(
   popup: AutoCompleteSuggest,
   evt: KeyboardEvent,
 ): Promise<InternalLinkWord | null> {
-  if (!popup.context || evt.isComposing) {
+  const result = await selectWithCustomAliasImpl(popup, evt);
+  return result?.item ?? null;
+}
+
+export async function selectWithCustomAliasAndAddToAliases(
+  popup: AutoCompleteSuggest,
+  evt: KeyboardEvent,
+): Promise<InternalLinkWord | null> {
+  const result = await selectWithCustomAliasImpl(popup, evt);
+  if (!result) {
     return null;
   }
 
-  if (popup.selectionLock) {
-    popup.close();
-    return null;
-  }
-
-  const item = popup.suggestions.values[popup.suggestions.selectedItem];
-  if (item.type !== "internalLink") {
-    return null;
-  }
-
-  const input = await new InputDialog({
-    title: "Type custom alias",
-    defaultValue: item.value,
-  }).open({ initialSelect: true });
-  if (!input) {
-    return null;
-  }
-
-  if (item.value === input) {
+  const { item, input, changed } = result;
+  if (!changed || item.phantom) {
     return item;
   }
 
-  item.aliasMeta = {
-    origin: item.aliasMeta?.origin ?? item.value,
-  };
-  item.value = input;
+  const markdownFile = popup.appHelper.getMarkdownFileByPath(item.createdPath);
+  if (!markdownFile) {
+    return item;
+  }
+
+  let updated = false;
+  await popup.app.fileManager.processFrontMatter(
+    markdownFile,
+    (frontmatter) => {
+      const aliases = parseFrontMatterAliases(frontmatter) ?? [];
+      if (!aliases.includes(input)) {
+        frontmatter.aliases = [...aliases, input];
+        updated = true;
+      }
+    },
+  );
+
+  if (updated) {
+    const refreshedRef = popup.app.metadataCache.on("changed", (f) => {
+      popup.refreshInternalLinkTokens();
+      popup.app.metadataCache.offref(refreshedRef);
+    });
+  }
+
   return item;
 }
 

@@ -606,6 +606,22 @@ export class AutoCompleteSuggest
         },
       ],
       [
+        "select with custom alias and add to aliases",
+        (evt) => {
+          // For restore the context of suggestions to insert editor after submitted input
+          this.spareEditorSuggestContext = this.context;
+
+          commands
+            .selectWithCustomAliasAndAddToAliases(this, evt)
+            .then((item) => {
+              if (item) {
+                this.selectSuggestion(item);
+              }
+            });
+          return false;
+        },
+      ],
+      [
         "select with query alias",
         (evt) => {
           const item = commands.selectWithQueryAlias(this, evt);
