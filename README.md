@@ -46,7 +46,7 @@ git config core.hooksPath hooks
 #### Install dependencies
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 ```
 
 #### Build for development

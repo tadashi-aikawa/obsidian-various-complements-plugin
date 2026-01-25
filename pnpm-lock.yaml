@@ -12,68 +12,68 @@ importers:
         specifier: github:tadashi-aikawa/chinese-tokenizer
         version: https://codeload.github.com/tadashi-aikawa/chinese-tokenizer/tar.gz/32f7e49b6ba38733a39ccd6ccd4df294048052ac
       emoji-regex:
-        specifier: ^10.6.0
+        specifier: 10.6.0
         version: 10.6.0
       minimatch:
-        specifier: ^10.1.1
+        specifier: 10.1.1
         version: 10.1.1
       svelte-lucide-icons:
-        specifier: ^0.6.0
+        specifier: 0.6.0
         version: 0.6.0
       ts-deepmerge:
-        specifier: ^7.0.3
+        specifier: 7.0.3
         version: 7.0.3
     devDependencies:
       '@jest/globals':
-        specifier: ^30.2.0
+        specifier: 30.2.0
         version: 30.2.0
       '@tsconfig/svelte':
-        specifier: ^5.0.6
+        specifier: 5.0.6
         version: 5.0.6
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260117.1
         version: 7.0.0-dev.20260117.1
       builtin-modules:
-        specifier: ^5.0.0
+        specifier: 5.0.0
         version: 5.0.0
       chokidar:
-        specifier: ^5.0.0
+        specifier: 5.0.0
         version: 5.0.0
       esbuild:
-        specifier: ^0.27.2
+        specifier: 0.27.2
         version: 0.27.2
       esbuild-jest:
-        specifier: ^0.5.0
+        specifier: 0.5.0
         version: 0.5.0(esbuild@0.27.2)
       esbuild-svelte:
-        specifier: ^0.8.1
-        version: 0.8.2(esbuild@0.27.2)(svelte@4.2.20)
+        specifier: 0.8.1
+        version: 0.8.1(esbuild@0.27.2)(svelte@4.2.18)
       jest:
-        specifier: ^30.2.0
+        specifier: 30.2.0
         version: 30.2.0(@types/node@25.0.9)
       obsidian:
-        specifier: ^1.11.4
+        specifier: 1.11.4
         version: 1.11.4(@codemirror/state@6.5.0)(@codemirror/view@6.38.6)
       prettier:
         specifier: 3.8.0
         version: 3.8.0
       prettier-plugin-organize-imports:
-        specifier: ^4.3.0
+        specifier: 4.3.0
         version: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
       prettier-plugin-svelte:
-        specifier: ^3.4.1
-        version: 3.4.1(prettier@3.8.0)(svelte@4.2.20)
+        specifier: 3.4.1
+        version: 3.4.1(prettier@3.8.0)(svelte@4.2.18)
       svelte:
-        specifier: ^4.2.18
-        version: 4.2.20
+        specifier: 4.2.18
+        version: 4.2.18
       svelte-preprocess:
-        specifier: ^5.1.3
-        version: 5.1.4(@babel/core@7.28.6)(svelte@4.2.20)(typescript@5.9.3)
+        specifier: 5.1.3
+        version: 5.1.3(@babel/core@7.28.6)(svelte@4.2.18)(typescript@5.9.3)
       tslib:
-        specifier: ^2.8.1
+        specifier: 2.8.1
         version: 2.8.1
       typescript:
-        specifier: ^5.9.3
+        specifier: 5.9.3
         version: 5.9.3
 
 packages:
@@ -1136,12 +1136,12 @@ packages:
     peerDependencies:
       esbuild: '>=0.8.50'
 
-  esbuild-svelte@0.8.2:
-    resolution: {integrity: sha512-tG97WrhH/OH8wFCmRBk6sRggMVMPNZDktGx1jJcvh9Obvjwm8M1UYoXmliuLL+4fs/wfyVVwM2fvyNYz2e6UPQ==}
+  esbuild-svelte@0.8.1:
+    resolution: {integrity: sha512-iswZSetqRxYaQoWMd38Gu6AanIL6KFsVj8/unei7qTaxjAkRDulW62/Bc5nmeogKBWekBvrPOE106wui7gYARQ==}
     engines: {node: '>=14'}
     peerDependencies:
       esbuild: '>=0.9.6'
-      svelte: '>=3.43.0 <6 || ^5.0.0-next.0'
+      svelte: '>=3.43.0 <6'
 
   esbuild@0.27.2:
     resolution: {integrity: sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw==}
@@ -2098,9 +2098,9 @@ packages:
   svelte-lucide-icons@0.6.0:
     resolution: {integrity: sha512-ANPjmaP4oHyuHgjzsIVDN5iQsa5wL8FLgEB70DHNp3sziDa3Qf1gih1wtAfoUhTql8lHtyWBGGSv8QZm5/b70A==}
 
-  svelte-preprocess@5.1.4:
-    resolution: {integrity: sha512-IvnbQ6D6Ao3Gg6ftiM5tdbR6aAETwjhHV+UKGf5bHGYR69RQvF1ho0JKPcbUON4vy4R7zom13jPjgdOWCQ5hDA==}
-    engines: {node: '>= 16.0.0'}
+  svelte-preprocess@5.1.3:
+    resolution: {integrity: sha512-xxAkmxGHT+J/GourS5mVJeOXZzne1FR5ljeOUAMXUkfEhkLEllRreXpbl3dIYJlcJRfL1LO1uIAPpBpBfiqGPw==}
+    engines: {node: '>= 16.0.0', pnpm: ^8.0.0}
     peerDependencies:
       '@babel/core': ^7.10.2
       coffeescript: ^2.5.1
@@ -2135,8 +2135,8 @@ packages:
       typescript:
         optional: true
 
-  svelte@4.2.20:
-    resolution: {integrity: sha512-eeEgGc2DtiUil5ANdtd8vPwt9AgaMdnuUFnPft9F5oMvU/FHu5IHFic+p1dR/UOB7XU2mX2yHW+NcTch4DCh5Q==}
+  svelte@4.2.18:
+    resolution: {integrity: sha512-d0FdzYIiAePqRJEb90WlJDkjUEx42xhivxN8muUBmfZnP+tzUgz12DJ2hRJi8sIHCME7jeK1PTMgKPSfTd8JrA==}
     engines: {node: '>=16'}
 
   synckit@0.11.12:
@@ -3397,11 +3397,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  esbuild-svelte@0.8.2(esbuild@0.27.2)(svelte@4.2.20):
+  esbuild-svelte@0.8.1(esbuild@0.27.2)(svelte@4.2.18):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       esbuild: 0.27.2
-      svelte: 4.2.20
+      svelte: 4.2.18
 
   esbuild@0.27.2:
     optionalDependencies:
@@ -4349,10 +4349,10 @@ snapshots:
       prettier: 3.8.0
       typescript: 5.9.3
 
-  prettier-plugin-svelte@3.4.1(prettier@3.8.0)(svelte@4.2.20):
+  prettier-plugin-svelte@3.4.1(prettier@3.8.0)(svelte@4.2.18):
     dependencies:
       prettier: 3.8.0
-      svelte: 4.2.20
+      svelte: 4.2.18
 
   prettier@3.8.0: {}
 
@@ -4575,19 +4575,19 @@ snapshots:
 
   svelte-lucide-icons@0.6.0: {}
 
-  svelte-preprocess@5.1.4(@babel/core@7.28.6)(svelte@4.2.20)(typescript@5.9.3):
+  svelte-preprocess@5.1.3(@babel/core@7.28.6)(svelte@4.2.18)(typescript@5.9.3):
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
       magic-string: 0.30.21
       sorcery: 0.11.1
       strip-indent: 3.0.0
-      svelte: 4.2.20
+      svelte: 4.2.18
     optionalDependencies:
       '@babel/core': 7.28.6
       typescript: 5.9.3
 
-  svelte@4.2.20:
+  svelte@4.2.18:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.5
