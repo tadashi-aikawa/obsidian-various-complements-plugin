@@ -330,6 +330,36 @@ export class AppHelper {
     return !!cm5or6?.display?.input?.composing;
   }
 
+  /**
+   * Unsafe method
+   */
+  getVisibleLineRange(): { from: number; to: number } | null {
+    const markdownView =
+      this.unsafeApp.workspace.getActiveViewOfType(MarkdownView);
+    if (!markdownView) {
+      return null;
+    }
+
+    const cm: any = (markdownView.editor as any).cm;
+    if (!cm?.visibleRanges || !cm?.state?.doc) {
+      return null;
+    }
+
+    const visibleRanges = cm.visibleRanges as Array<{
+      from: number;
+      to: number;
+    }>;
+    if (visibleRanges.length === 0) {
+      return null;
+    }
+
+    const first = visibleRanges[0];
+    const last = visibleRanges[visibleRanges.length - 1];
+    const fromLine = cm.state.doc.lineAt(first.from).number - 1;
+    const toLine = cm.state.doc.lineAt(last.to).number - 1;
+    return { from: fromLine, to: toLine };
+  }
+
   isMobile(): boolean {
     return this.unsafeApp.isMobile;
   }

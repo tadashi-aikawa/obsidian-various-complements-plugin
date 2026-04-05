@@ -117,6 +117,14 @@ export class AutoCompleteSuggest
 
   spareEditorSuggestContext: EditorSuggestContext | null = null;
 
+  private predictableCycleState: {
+    originalToken: string;
+    replacementStartCh: number;
+    line: number;
+    candidates: string[];
+    currentIndex: number;
+  } | null = null;
+
   private constructor(app: App, statusBar: ProviderStatusBar) {
     super(app);
     this.appHelper = new AppHelper(app);
@@ -202,6 +210,7 @@ export class AutoCompleteSuggest
     ins.activeLeafChangeRef = app.workspace.on(
       "active-leaf-change",
       async (_) => {
+        ins.predictableCycleState = null;
         await ins.refreshCurrentFileTokens();
         ins.refreshInternalLinkTokens();
         ins.updateFrontMatterToken();
@@ -247,6 +256,30 @@ export class AutoCompleteSuggest
     }
 
     const cursor = editor.getCursor();
+
+    // Check if we are continuing an existing cycle
+    if (this.predictableCycleState) {
+      const state = this.predictableCycleState;
+      const currentCandidate = state.candidates[state.currentIndex];
+      const expectedCh = state.replacementStartCh + currentCandidate.length;
+      if (cursor.line === state.line && cursor.ch === expectedCh) {
+        // Advance to next candidate
+        state.currentIndex = (state.currentIndex + 1) % state.candidates.length;
+        const nextCandidate = state.candidates[state.currentIndex];
+        editor.replaceRange(
+          nextCandidate,
+          { line: state.line, ch: state.replacementStartCh },
+          cursor,
+        );
+        this.close();
+        this.debounceClose();
+        return;
+      }
+      // Cursor moved or changed — reset cycle
+      this.predictableCycleState = null;
+    }
+
+    // Start a new cycle
     const currentToken = this.tokenizer
       .tokenize(editor.getLine(cursor.line).slice(0, cursor.ch))
       .last();
@@ -254,35 +287,76 @@ export class AutoCompleteSuggest
       return;
     }
 
-    let suggestion = this.tokenizer
-      .tokenize(
-        editor.getRange({ line: Math.max(cursor.line - 50, 0), ch: 0 }, cursor),
-      )
-      .reverse()
-      .slice(1)
-      .find((x) => x.startsWith(currentToken));
-    if (!suggestion) {
-      suggestion = this.tokenizer
-        .tokenize(
-          editor.getRange(cursor, {
-            line: Math.min(cursor.line + 50, editor.lineCount() - 1),
-            ch: 0,
-          }),
-        )
-        .find((x) => x.startsWith(currentToken));
-    }
-    if (!suggestion) {
+    const candidates = this.collectPredictableCandidates(
+      editor,
+      cursor,
+      currentToken,
+    );
+    // candidates always ends with originalToken; skip if it's the only entry
+    if (candidates.length <= 1) {
       return;
     }
 
+    const replacementStartCh = cursor.ch - currentToken.length;
+    this.predictableCycleState = {
+      originalToken: currentToken,
+      replacementStartCh,
+      line: cursor.line,
+      candidates,
+      currentIndex: 0,
+    };
+
+    const suggestion = candidates[0];
     editor.replaceRange(
       suggestion,
-      { line: cursor.line, ch: cursor.ch - currentToken.length },
-      { line: cursor.line, ch: cursor.ch },
+      { line: cursor.line, ch: replacementStartCh },
+      cursor,
     );
 
     this.close();
     this.debounceClose();
+  }
+
+  private collectPredictableCandidates(
+    editor: Editor,
+    cursor: EditorPosition,
+    originalToken: string,
+  ): string[] {
+    const seen = new Set<string>();
+    const candidates: string[] = [];
+
+    const addIfNew = (token: string) => {
+      if (
+        token.startsWith(originalToken) &&
+        token !== originalToken &&
+        !seen.has(token)
+      ) {
+        seen.add(token);
+        candidates.push(token);
+      }
+    };
+
+    // Determine search range
+    const visibleRange = this.appHelper.getVisibleLineRange();
+    const rangeStart = visibleRange?.from ?? Math.max(cursor.line - 50, 0);
+    const rangeEnd =
+      visibleRange?.to ?? Math.min(cursor.line + 50, editor.lineCount() - 1);
+
+    // Above cursor (nearest first)
+    const textAbove = editor.getRange({ line: rangeStart, ch: 0 }, cursor);
+    this.tokenizer.tokenize(textAbove).reverse().slice(1).forEach(addIfNew);
+
+    // Below cursor
+    const textBelow = editor.getRange(cursor, {
+      line: rangeEnd,
+      ch: editor.getLine(rangeEnd).length,
+    });
+    this.tokenizer.tokenize(textBelow).forEach(addIfNew);
+
+    // Append original token at the end for cycling back
+    candidates.push(originalToken);
+
+    return candidates;
   }
 
   unregister() {
