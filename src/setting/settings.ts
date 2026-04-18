@@ -102,6 +102,7 @@ export interface Settings {
   excludeInternalLinkPathGlobPatterns: string[];
   excludeSelfInternalLink: boolean;
   excludeExistingInActiveFileInternalLinks: boolean;
+  excludeUnresolvedInternalLinks: boolean;
 
   updateInternalLinksOnSave: boolean;
   insertAliasTransformedFromDisplayedInternalLink: {
@@ -227,6 +228,7 @@ export const DEFAULT_SETTINGS: Settings = {
   excludeInternalLinkPathGlobPatterns: [],
   excludeSelfInternalLink: false,
   excludeExistingInActiveFileInternalLinks: false,
+  excludeUnresolvedInternalLinks: false,
   updateInternalLinksOnSave: true,
   insertAliasTransformedFromDisplayedInternalLink: {
     enabled: false,
@@ -1331,6 +1333,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             ).onChange(async (value) => {
               this.plugin.settings.excludeExistingInActiveFileInternalLinks =
                 value;
+              await this.plugin.saveSettings({ internalLink: true });
+            });
+          });
+        },
+      );
+      addFilterableSetting(
+        "Exclude unresolved internal links",
+        "Exclude internal links that point to non-existing files (phantom links) from the suggestions.",
+        (setting) => {
+          setting.addToggle((tc) => {
+            tc.setValue(
+              this.plugin.settings.excludeUnresolvedInternalLinks,
+            ).onChange(async (value) => {
+              this.plugin.settings.excludeUnresolvedInternalLinks = value;
               await this.plugin.saveSettings({ internalLink: true });
             });
           });
