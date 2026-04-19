@@ -851,6 +851,7 @@ export class AutoCompleteSuggest
       frontMatterKeyForExclusion:
         this.settings.frontMatterKeyForExclusionInternalLink,
       tagsForExclusion: this.settings.tagsForExclusionInternalLink,
+      excludeUnresolvedLinks: this.settings.excludeUnresolvedInternalLinks,
     });
 
     this.statusBar.setInternalLinkIndexed(

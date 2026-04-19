@@ -23,6 +23,7 @@ export class InternalLinkWordProvider {
     makeSynonymAboutAccentsDiacritics: boolean;
     frontMatterKeyForExclusion: string;
     tagsForExclusion: string[];
+    excludeUnresolvedLinks: boolean;
   }): void {
     this.clearWords();
 
@@ -107,21 +108,22 @@ export class InternalLinkWordProvider {
         }
       });
 
-    const unresolvedInternalLinkWords: InternalLinkWord[] = this.appHelper
-      .searchPhantomLinks()
-      .map(({ path, link }) => {
-        return {
-          value: link,
-          type: "internalLink",
-          createdPath: path,
-          aliases: synonymAliases(link, {
-            emoji: option.makeSynonymAboutEmoji,
-            accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
-          }),
-          description: `Appeared in -> ${path}`,
-          phantom: true,
-        };
-      });
+    const unresolvedInternalLinkWords: InternalLinkWord[] =
+      option.excludeUnresolvedLinks
+        ? []
+        : this.appHelper.searchPhantomLinks().map(({ path, link }) => {
+            return {
+              value: link,
+              type: "internalLink",
+              createdPath: path,
+              aliases: synonymAliases(link, {
+                emoji: option.makeSynonymAboutEmoji,
+                accentsDiacritics: option.makeSynonymAboutAccentsDiacritics,
+              }),
+              description: `Appeared in -> ${path}`,
+              phantom: true,
+            };
+          });
 
     this.words = [...resolvedInternalLinkWords, ...unresolvedInternalLinkWords];
     for (const word of this.words) {
