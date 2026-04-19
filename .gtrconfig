@@ -1,0 +1,3 @@
+[hooks]
+    postCreate = mise trust
+    postCreate = pnpm install --frozen-lockfile
