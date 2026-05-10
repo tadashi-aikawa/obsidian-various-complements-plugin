@@ -1,0 +1,4 @@
+allowBuilds:
+  esbuild: true
+  svelte-preprocess: true
+  unrs-resolver: true

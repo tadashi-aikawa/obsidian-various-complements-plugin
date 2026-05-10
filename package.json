@@ -12,7 +12,7 @@
     "test:watch": "jest --watch",
     "mobile:check": "node esbuild.config.mjs production --bundle --platform=browser",
     "pre:push": "pnpm typecheck && pnpm format && pnpm test",
-    "ci": "pnpm i && pnpm build && pnpm test"
+    "verify": "pnpm ci && pnpm build && pnpm pre:push && pnpm mobile:check"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
@@ -44,3 +44,4 @@
     "ts-deepmerge": "7.0.3"
   }
 }
+

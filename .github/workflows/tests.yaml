@@ -21,4 +21,4 @@ jobs:
           node-version: "24"
 
       - run: npm install -g pnpm
-      - run: pnpm run ci
+      - run: pnpm verify

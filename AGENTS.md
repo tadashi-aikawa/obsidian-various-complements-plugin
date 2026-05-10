@@ -14,7 +14,7 @@
 - `pnpm typecheck`: Run TypeScript in strict mode without emit.
 - `pnpm test` | `pnpm test:watch`: Run Jest tests (with coverage by default).
 - `pnpm format`: Prettier check for `*.ts` files.
-- `pnpm run ci`: Install, build, and test (used by CI/Release).
+- `pnpm verify`: Install, Build, Check for CI.
 
 ## Coding Style & Naming Conventions
 - Language: TypeScript (strict). UI in Svelte where applicable.
