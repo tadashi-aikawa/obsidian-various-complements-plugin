@@ -66,7 +66,7 @@ pnpm test --watch
 #### CI
 
 ```bash
-pnpm run ci
+pnpm verify
 ```
 
 #### Release
