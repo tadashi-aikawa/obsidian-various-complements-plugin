@@ -12,10 +12,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - run: npm install -g pnpm && npm i -D --no-save conventional-changelog-conventionalcommits @semantic-release/git @semantic-release/exec
-      - uses: cycjimmy/semantic-release-action@v4
-        with:
-          # バージョンは固定にしておいたほうがいい
-          semantic_version: 24.2.1
+      - run: npm i -g pnpm@11.0.8
+      - run: |
+          pnpm dlx \
+             --package semantic-release@24 \
+             --package conventional-changelog-conventionalcommits \
+             --package @semantic-release/git \
+             --package @semantic-release/exec \
+              semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
