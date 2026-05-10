@@ -71,6 +71,9 @@ export default class VariousComponents extends Plugin {
             DEFAULT_HISTORIES_PATH,
         ),
         this.suggester.selectionHistoryStorage?.data ?? {},
+        this.settings.intelligentSuggestionPrioritization.prettyPrintHistoryFile
+          ? 2
+          : undefined,
       );
     }, 5000);
 

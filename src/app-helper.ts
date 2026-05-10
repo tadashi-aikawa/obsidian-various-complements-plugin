@@ -47,8 +47,11 @@ export class AppHelper {
     return JSON.parse(await this.loadFile(path)) as T;
   }
 
-  async saveJson<T>(path: string, data: T): Promise<void> {
-    await this.unsafeApp.vault.adapter.write(path, JSON.stringify(data));
+  async saveJson<T>(path: string, data: T, space?: number): Promise<void> {
+    await this.unsafeApp.vault.adapter.write(
+      path,
+      JSON.stringify(data, null, space),
+    );
   }
 
   equalsAsEditorPosition(one: EditorPosition, other: EditorPosition): boolean {

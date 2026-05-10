@@ -127,6 +127,7 @@ export interface Settings {
   intelligentSuggestionPrioritization: {
     enabled: boolean;
     historyFilePath: string;
+    prettyPrintHistoryFile: boolean;
     // If set 0, it will never remove
     maxDaysToKeepHistory: number;
     // If set 0, it will never remove
@@ -252,6 +253,7 @@ export const DEFAULT_SETTINGS: Settings = {
   intelligentSuggestionPrioritization: {
     enabled: true,
     historyFilePath: "",
+    prettyPrintHistoryFile: false,
     maxDaysToKeepHistory: 30,
     maxNumberOfHistoryToKeep: 0,
   },
@@ -1618,6 +1620,23 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               this.plugin.settings.intelligentSuggestionPrioritization
                 .historyFilePath,
             );
+          });
+        },
+      );
+
+      addFilterableSetting(
+        "Pretty-print history file",
+        "Save the history file with indentation to make Git diffs smaller.",
+        (setting) => {
+          setting.addToggle((tc) => {
+            tc.setValue(
+              this.plugin.settings.intelligentSuggestionPrioritization
+                .prettyPrintHistoryFile,
+            ).onChange(async (value) => {
+              this.plugin.settings.intelligentSuggestionPrioritization.prettyPrintHistoryFile =
+                value;
+              await this.plugin.saveSettings();
+            });
           });
         },
       );
