@@ -1,4 +1,3 @@
 #!/bin/sh
 set -eu
-gitleaks git --staged
-
+betterleaks git --staged

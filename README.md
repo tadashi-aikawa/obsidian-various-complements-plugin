@@ -34,7 +34,7 @@ Before creating a pull request, please make an [issue] or a [discussion]😉
 
 - Requirements
     - Node.js v24
-    - [Gitleaks](https://github.com/gitleaks/gitleaks)
+    - [Betterleaks](https://github.com/betterleaks)
 
 ### Development
 
