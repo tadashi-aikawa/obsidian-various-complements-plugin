@@ -12,6 +12,7 @@ import {
   type FuzzyResult,
   // Avoid https://github.com/aelbore/esbuild-jest/issues/57
   isEOTinCodeBlock as isEOTinCodeBlock_,
+  isInsideInlineCode,
   isInternalLink,
   joinNumberWithSymbol,
   lowerIncludes,
@@ -524,5 +525,20 @@ describe.each<{ _description: string; text: string; expected: boolean }>([
 ])("isEOTinCodeBlock", ({ text, expected }) => {
   test(`isEOTinCodeBlock should return ${expected} for text ending ${expected ? "inside" : "outside"} code block`, () => {
     expect(isEOTinCodeBlock_(text)).toBe(expected);
+  });
+});
+
+describe.each<{ lineUntilCursor: string; expected: boolean }>`
+  lineUntilCursor   | expected
+  ${""}             | ${false}
+  ${"no backtick"}  | ${false}
+  ${"`code"}        | ${true}
+  ${"text `inline"} | ${true}
+  ${"`code`"}       | ${false}
+  ${"`a` and `b`"}  | ${false}
+  ${"`a` then `b"}  | ${true}
+`("isInsideInlineCode", ({ lineUntilCursor, expected }) => {
+  test(`isInsideInlineCode(${JSON.stringify(lineUntilCursor)}) = ${expected}`, () => {
+    expect(isInsideInlineCode(lineUntilCursor)).toBe(expected);
   });
 });

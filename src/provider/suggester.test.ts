@@ -216,6 +216,17 @@ describe("suggestWords", () => {
     frontMatter: {}, // TODO: Add value
   });
 
+  test("Query: a (excludeInternalLink)", () => {
+    const indexedWords = createIndexedWords();
+    const actual = suggestWords(indexedWords, "a", 10, {
+      excludeInternalLink: true,
+    });
+    // No internalLink candidates are collected...
+    expect(actual.every((x) => x.type !== "internalLink")).toBe(true);
+    // ...but other providers still produce candidates.
+    expect(actual.length).toBeGreaterThan(0);
+  });
+
   test("Query: a", () => {
     const indexedWords = createIndexedWords();
     expect(suggestWords(indexedWords, "a", 10)).toStrictEqual([

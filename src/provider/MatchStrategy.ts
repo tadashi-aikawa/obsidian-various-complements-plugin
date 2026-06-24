@@ -22,6 +22,7 @@ type Handler = (
       internalLink: number;
     };
     globalMinChar?: number;
+    excludeInternalLink?: boolean;
   },
 ) => Word[];
 

@@ -103,6 +103,7 @@ export interface Settings {
   excludeSelfInternalLink: boolean;
   excludeExistingInActiveFileInternalLinks: boolean;
   excludeUnresolvedInternalLinks: boolean;
+  excludeInternalLinksInCode: boolean;
 
   updateInternalLinksOnSave: boolean;
   insertAliasTransformedFromDisplayedInternalLink: {
@@ -230,6 +231,7 @@ export const DEFAULT_SETTINGS: Settings = {
   excludeSelfInternalLink: false,
   excludeExistingInActiveFileInternalLinks: false,
   excludeUnresolvedInternalLinks: false,
+  excludeInternalLinksInCode: false,
   updateInternalLinksOnSave: true,
   insertAliasTransformedFromDisplayedInternalLink: {
     enabled: false,
@@ -1350,6 +1352,20 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             ).onChange(async (value) => {
               this.plugin.settings.excludeUnresolvedInternalLinks = value;
               await this.plugin.saveSettings({ internalLink: true });
+            });
+          });
+        },
+      );
+      addFilterableSetting(
+        "Exclude internal links in code",
+        "Exclude internal link suggestions when the cursor is inside a code block or inline code. Unlike the 'Disable suggestions in the Code block' option, this targets only internal link suggestions and also applies to inline code.",
+        (setting) => {
+          setting.addToggle((tc) => {
+            tc.setValue(
+              this.plugin.settings.excludeInternalLinksInCode,
+            ).onChange(async (value) => {
+              this.plugin.settings.excludeInternalLinksInCode = value;
+              await this.plugin.saveSettings();
             });
           });
         },

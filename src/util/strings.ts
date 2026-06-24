@@ -300,3 +300,14 @@ export function isEOTinCodeBlock(text: string): boolean {
 
   return inCodeBlock;
 }
+
+/**
+ * Check if the cursor (end of the given current-line text) is inside an inline
+ * code span. Uses a simple odd-count heuristic on backticks in the line.
+ *
+ * WARN: This does not support multi-backtick inline code (e.g. ``code``).
+ */
+export function isInsideInlineCode(lineUntilCursor: string): boolean {
+  const backquotes = lineUntilCursor.match(/`/g)?.length ?? 0;
+  return backquotes % 2 === 1;
+}

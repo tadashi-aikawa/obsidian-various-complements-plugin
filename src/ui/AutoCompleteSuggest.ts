@@ -508,6 +508,18 @@ export class AutoCompleteSuggest
           parsedQuery.completionMode,
         );
 
+        // Exclude internal link candidates at collection time (so the result
+        // still fills up to "Max number of suggestions") when the cursor is in
+        // a code environment. Skipped during the explicit linkify fallback
+        // (completionMode diverges from the configured strategy), which is an
+        // intentional link action by the user. Computed once: cheap inline
+        // check first, heavy O(N) code-block scan last.
+        const excludeInternalLinkInCode =
+          this.settings.excludeInternalLinksInCode &&
+          this.completionMode === this.matchStrategy.name &&
+          (this.appHelper.inInlineCode(context.editor) ||
+            this.appHelper.inCodeBlock(context.editor));
+
         let words = parsedQuery.queries
           .filter(
             (x, i, xs) =>
@@ -550,6 +562,7 @@ export class AutoCompleteSuggest
                 globalMinChar:
                   this.settings.minNumberOfCharactersTriggered ||
                   this.tokenizerStrategy.triggerThreshold,
+                excludeInternalLink: excludeInternalLinkInCode,
               },
             ).map((word) => ({ ...word, offset: q.offset }));
           })
