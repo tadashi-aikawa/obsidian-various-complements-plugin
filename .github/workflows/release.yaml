@@ -13,12 +13,14 @@ jobs:
         with:
           node-version: "24"
       - run: npm i -g pnpm@11.5.2
+      # conventionalcommits v10はrelease notesが空になるバグがあるため9.3.1に固定
+      # https://github.com/semantic-release/release-notes-generator/issues/992
       - run: |
           pnpm dlx \
-             --package semantic-release@24 \
-             --package conventional-changelog-conventionalcommits \
-             --package @semantic-release/git \
-             --package @semantic-release/exec \
+             --package semantic-release@24.2.9 \
+             --package conventional-changelog-conventionalcommits@9.3.1 \
+             --package @semantic-release/git@10.0.1 \
+             --package @semantic-release/exec@7.1.0 \
               semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
