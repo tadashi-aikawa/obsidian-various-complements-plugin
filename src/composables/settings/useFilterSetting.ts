@@ -1,9 +1,16 @@
 import type { Setting, SettingGroup } from "obsidian";
 
+const ALWAYS_VISIBLE = () => true;
+
 export const useFilterSetting = (group: SettingGroup) => {
   const filterTargets: {
     settingEl: HTMLElement;
     getSearchText: () => string;
+    isVisible: () => boolean;
+  }[] = [];
+  const conditionalElements: {
+    el: HTMLElement;
+    isVisible: () => boolean;
   }[] = [];
   let latestQuery = "";
 
@@ -14,22 +21,32 @@ export const useFilterSetting = (group: SettingGroup) => {
     for (const target of filterTargets) {
       const searchText = target.getSearchText().toLowerCase();
       const isMatch = shouldShowAll || searchText.includes(normalizedQuery);
-      target.settingEl.toggle(isMatch);
+      target.settingEl.toggle(isMatch && target.isVisible());
+    }
+    for (const target of conditionalElements) {
+      target.el.toggle(target.isVisible());
     }
   };
 
   const addFilterTarget = (
     element: HTMLElement,
     getSearchText: () => string,
+    isVisible: () => boolean,
   ) => {
-    filterTargets.push({ settingEl: element, getSearchText });
+    filterTargets.push({ settingEl: element, getSearchText, isVisible });
     applyFilter(latestQuery);
   };
 
+  /**
+   * Adds a setting to the group.
+   * `option.visible` makes the setting depend on another setting: it is shown
+   * only while the predicate returns true and the filter query matches.
+   */
   const addFilterableSetting = (
     name: string,
     desc: string | DocumentFragment | null,
     build: (setting: Setting) => void,
+    option?: { visible?: () => boolean },
   ) => {
     const searchText = name.trim();
     group.addSetting((setting) => {
@@ -38,8 +55,30 @@ export const useFilterSetting = (group: SettingGroup) => {
         setting.setDesc(desc);
       }
       build(setting);
-      addFilterTarget(setting.settingEl, () => searchText);
+      addFilterTarget(
+        setting.settingEl,
+        () => searchText,
+        option?.visible ?? ALWAYS_VISIBLE,
+      );
     });
+  };
+
+  /**
+   * Registers an element (ex: a warning message) that is shown only while
+   * `isVisible` returns true. Unlike settings, it ignores the filter query.
+   */
+  const addConditionalElement = (el: HTMLElement, isVisible: () => boolean) => {
+    conditionalElements.push({ el, isVisible });
+    el.toggle(isVisible());
+  };
+
+  /**
+   * Re-evaluates the visibility of every registered element.
+   * Call it after changing a setting that other settings depend on, instead of
+   * rebuilding the whole settings tab.
+   */
+  const refresh = () => {
+    applyFilter(latestQuery);
   };
 
   group.addSearch((sc) => {
@@ -48,5 +87,5 @@ export const useFilterSetting = (group: SettingGroup) => {
     });
   });
 
-  return { addFilterableSetting };
+  return { addFilterableSetting, addConditionalElement, refresh };
 };

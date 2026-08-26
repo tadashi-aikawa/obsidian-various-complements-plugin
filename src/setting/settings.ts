@@ -276,13 +276,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  async display(): Promise<void> {
-    let { containerEl } = this;
+  display(): void {
+    const { containerEl } = this;
 
     containerEl.empty();
 
     containerEl.createEl("h2", { text: "Various Complements - Settings" });
-    await this.addMainSettings(containerEl);
+    this.addMainSettings(containerEl);
     this.addAppearanceSettings(containerEl);
     this.addKeyCustomizationSettings(containerEl);
     this.addCurrentFileComplementSettings(containerEl);
@@ -295,14 +295,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     this.addDebugSettings(containerEl);
   }
 
-  private async addMainSettings(containerEl: HTMLElement) {
+  private addMainSettings(containerEl: HTMLElement) {
     containerEl.createEl("h3", {
       text: "Main",
       cls: "various-complements__settings__header various-complements__settings__header__main",
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, addConditionalElement, refresh } =
+      useFilterSetting(group);
+
+    const usesChineseStrategy = () =>
+      this.plugin.settings.strategy === TokenizeStrategy.CHINESE.name;
 
     addFilterableSetting("Strategy", null, (setting) => {
       setting.addDropdown((tc) =>
@@ -311,7 +315,8 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.strategy)
           .onChange(async (value) => {
             this.plugin.settings.strategy = value;
-            this.display();
+            refresh();
+            void refreshCedictWarning();
             await this.plugin.saveSettings({
               currentFile: true,
               currentVault: true,
@@ -320,40 +325,66 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       );
     });
 
-    if (this.plugin.settings.strategy === TokenizeStrategy.CHINESE.name) {
-      const df = document.createDocumentFragment();
-      df.append(
-        createSpan({
-          text: "The path to `cedict_ts.u8`. You can download it from ",
-        }),
-        createEl("a", {
-          href: "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
-          text: " the site ",
-        }),
-      );
+    const cedictDesc = document.createDocumentFragment();
+    cedictDesc.append(
+      createSpan({
+        text: "The path to `cedict_ts.u8`. You can download it from ",
+      }),
+      createEl("a", {
+        href: "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
+        text: " the site ",
+      }),
+    );
 
-      addFilterableSetting("CC-CEDICT path", df, (setting) => {
+    addFilterableSetting(
+      "CC-CEDICT path",
+      cedictDesc,
+      (setting) => {
         setting
           .setClass("various-complements__settings__nested")
           .addText((cb) => {
             TextComponentEvent.onChange(cb, async (value) => {
               this.plugin.settings.cedictPath = value;
+              void refreshCedictWarning();
               await this.plugin.saveSettings();
-              await this.display();
             }).setValue(this.plugin.settings.cedictPath);
           });
-      });
+      },
+      { visible: usesChineseStrategy },
+    );
 
-      const hasCedict = await this.app.vault.adapter.exists(
-        this.plugin.settings.cedictPath,
-      );
-      if (!hasCedict) {
-        containerEl.createEl("div", {
-          text: `⚠ cedict_ts.u8 doesn't exist in ${this.plugin.settings.cedictPath}.`,
-          cls: "various-complements__settings__warning",
-        });
+    let cedictExists = true;
+    let latestCedictCheckId = 0;
+    const cedictWarningEl = containerEl.createEl("div", {
+      cls: "various-complements__settings__warning",
+    });
+    addConditionalElement(
+      cedictWarningEl,
+      () => usesChineseStrategy() && !cedictExists,
+    );
+
+    const refreshCedictWarning = async () => {
+      if (!usesChineseStrategy()) {
+        refresh();
+        return;
       }
-    }
+
+      const checkId = ++latestCedictCheckId;
+      const path = this.plugin.settings.cedictPath;
+      // Regards an I/O failure as existing so as not to show a wrong warning
+      const exists = await this.app.vault.adapter
+        .exists(path)
+        .catch(() => true);
+      if (checkId !== latestCedictCheckId) {
+        // A newer check has started
+        return;
+      }
+
+      cedictExists = exists;
+      cedictWarningEl.setText(`⚠ cedict_ts.u8 doesn't exist in ${path}.`);
+      refresh();
+    };
+    void refreshCedictWarning();
 
     addFilterableSetting("Match strategy", null, (setting) => {
       setting.addDropdown((tc) =>
@@ -362,17 +393,18 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.matchStrategy)
           .onChange(async (value) => {
             this.plugin.settings.matchStrategy = value;
+            refresh();
             await this.plugin.saveSettings();
-            this.display();
           }),
       );
     });
-    if (this.plugin.settings.matchStrategy === MatchStrategy.PARTIAL.name) {
+    addConditionalElement(
       containerEl.createEl("div", {
         text: "⚠ `partial` is more than 10 times slower than `prefix`",
         cls: "various-complements__settings__warning",
-      });
-    }
+      }),
+      () => this.plugin.settings.matchStrategy === MatchStrategy.PARTIAL.name,
+    );
 
     addFilterableSetting("Fuzzy match", null, (setting) => {
       setting.addToggle((tc) => {
@@ -421,30 +453,30 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
       },
     );
 
-    if (
-      TokenizeStrategy.fromName(this.plugin.settings.strategy)
-        .canTreatUnderscoreAsPartOfWord
-    ) {
-      addFilterableSetting(
-        "Treat an underscore as a part of a word.",
-        "If this setting is enabled, aaa_bbb will be tokenized as a single token aaa_bbb, rather than being split into aaa and bbb.",
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings.treatUnderscoreAsPartOfWord,
-            ).onChange(async (value) => {
-              this.plugin.settings.treatUnderscoreAsPartOfWord = value;
-              await this.plugin.saveSettings({
-                internalLink: true,
-                customDictionary: true,
-                currentVault: true,
-                currentFile: true,
-              });
+    addFilterableSetting(
+      "Treat an underscore as a part of a word.",
+      "If this setting is enabled, aaa_bbb will be tokenized as a single token aaa_bbb, rather than being split into aaa and bbb.",
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.treatUnderscoreAsPartOfWord,
+          ).onChange(async (value) => {
+            this.plugin.settings.treatUnderscoreAsPartOfWord = value;
+            await this.plugin.saveSettings({
+              internalLink: true,
+              customDictionary: true,
+              currentVault: true,
+              currentFile: true,
             });
           });
-        },
-      );
-    }
+        });
+      },
+      {
+        visible: () =>
+          TokenizeStrategy.fromName(this.plugin.settings.strategy)
+            .canTreatUnderscoreAsPartOfWord,
+      },
+    );
 
     addFilterableSetting(
       "Matching without emoji",
@@ -841,95 +873,99 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, refresh } = useFilterSetting(group);
+
+    const isEnabled = () => this.plugin.settings.enableCurrentFileComplement;
 
     addFilterableSetting("Enable Current file complement", null, (setting) => {
       setting.addToggle((tc) => {
         tc.setValue(this.plugin.settings.enableCurrentFileComplement).onChange(
           async (value) => {
             this.plugin.settings.enableCurrentFileComplement = value;
+            refresh();
             await this.plugin.saveSettings({ currentFile: true });
-            this.display();
           },
         );
       });
     });
 
-    if (this.plugin.settings.enableCurrentFileComplement) {
-      addFilterableSetting(
-        "Min number of characters for indexing",
-        "It uses a default value of Strategy if set 0.",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 15, 1)
-              .setValue(this.plugin.settings.currentFileMinNumberOfCharacters)
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.currentFileMinNumberOfCharacters = value;
-                await this.plugin.saveSettings({ currentFile: true });
-              }),
-          );
-        },
-      );
-
-      addFilterableSetting(
-        "Only complement English on current file complement",
-        null,
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement,
-            ).onChange(async (value) => {
-              this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement =
-                value;
+    addFilterableSetting(
+      "Min number of characters for indexing",
+      "It uses a default value of Strategy if set 0.",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 15, 1)
+            .setValue(this.plugin.settings.currentFileMinNumberOfCharacters)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentFileMinNumberOfCharacters = value;
               await this.plugin.saveSettings({ currentFile: true });
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Only complement English on current file complement",
+      null,
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement,
+          ).onChange(async (value) => {
+            this.plugin.settings.onlyComplementEnglishOnCurrentFileComplement =
+              value;
+            await this.plugin.saveSettings({ currentFile: true });
+          });
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Min number of characters for trigger",
+      "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentFileMinNumberOfCharactersForTrigger =
+                value;
+              await this.plugin.saveSettings();
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Exclude word patterns for indexing",
+      "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
+      (setting) => {
+        setting.addTextArea((tc) => {
+          const el = tc
+            .setValue(
+              this.plugin.settings.excludeCurrentFileWordPatterns.join("\n"),
+            )
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentFileWordPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
             });
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Min number of characters for trigger",
-        "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 10, 1)
-              .setValue(
-                this.plugin.settings.currentFileMinNumberOfCharactersForTrigger,
-              )
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.currentFileMinNumberOfCharactersForTrigger =
-                  value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
-
-      addFilterableSetting(
-        "Exclude word patterns for indexing",
-        "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
-        (setting) => {
-          setting.addTextArea((tc) => {
-            const el = tc
-              .setValue(
-                this.plugin.settings.excludeCurrentFileWordPatterns.join("\n"),
-              )
-              .onChange(async (value) => {
-                this.plugin.settings.excludeCurrentFileWordPatterns =
-                  smartLineBreakSplit(value);
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path-dense";
-            return el;
-          });
-        },
-      );
-    }
+          el.inputEl.className =
+            "various-complements__settings__text-area-path-dense";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
   }
 
   private addCurrentVaultComplementSettings(containerEl: HTMLElement) {
@@ -939,168 +975,177 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, addConditionalElement, refresh } =
+      useFilterSetting(group);
+
+    const isEnabled = () => this.plugin.settings.enableCurrentVaultComplement;
 
     addFilterableSetting("Enable Current vault complement", null, (setting) => {
       setting.addToggle((tc) => {
         tc.setValue(this.plugin.settings.enableCurrentVaultComplement).onChange(
           async (value) => {
             this.plugin.settings.enableCurrentVaultComplement = value;
-            this.display();
+            refresh();
             await this.plugin.saveSettings({ currentVault: true });
           },
         );
       });
     });
 
-    if (this.plugin.settings.enableCurrentVaultComplement) {
-      addFilterableSetting(
-        "Min number of characters for indexing",
-        "It uses a default value of Strategy if set 0.",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 15, 1)
-              .setValue(this.plugin.settings.currentVaultMinNumberOfCharacters)
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.currentVaultMinNumberOfCharacters = value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
+    addFilterableSetting(
+      "Min number of characters for indexing",
+      "It uses a default value of Strategy if set 0.",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 15, 1)
+            .setValue(this.plugin.settings.currentVaultMinNumberOfCharacters)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentVaultMinNumberOfCharacters = value;
+              await this.plugin.saveSettings();
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Include prefix path patterns",
-        "Prefix match path patterns to include files.",
-        (setting) => {
-          setting.addTextArea((tac) => {
-            const el = tac
-              .setValue(
-                this.plugin.settings.includeCurrentVaultPathPrefixPatterns,
-              )
-              .setPlaceholder("Private/")
-              .onChange(async (value) => {
-                this.plugin.settings.includeCurrentVaultPathPrefixPatterns =
-                  value;
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path";
-            return el;
-          });
-        },
-      );
-      addFilterableSetting(
-        "Exclude prefix path patterns",
-        "Prefix match path patterns to exclude files.",
-        (setting) => {
-          setting.addTextArea((tac) => {
-            const el = tac
-              .setValue(
-                this.plugin.settings.excludeCurrentVaultPathPrefixPatterns,
-              )
-              .setPlaceholder("Private/")
-              .onChange(async (value) => {
-                this.plugin.settings.excludeCurrentVaultPathPrefixPatterns =
-                  value;
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path";
-            return el;
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Exclude path glob patterns",
-        "Glob patterns to exclude files. Supports wildcards like **/attachments, **/*.png, etc.",
-        (setting) => {
-          setting.addTextArea((tac) => {
-            const el = tac
-              .setValue(
-                this.plugin.settings.excludeCurrentVaultPathGlobPatterns.join(
-                  "\n",
-                ),
-              )
-              .setPlaceholder("**/attachments\n**/*.png")
-              .onChange(async (value) => {
-                this.plugin.settings.excludeCurrentVaultPathGlobPatterns =
-                  smartLineBreakSplit(value);
-                await this.plugin.saveSettings();
-                this.display();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path";
-            return el;
-          });
-        },
-      );
-      containerEl.createEl("div", {
-        text: "⚠ Glob patterns add processing overhead. Use prefix path patterns above for better performance when possible.",
-        cls: "various-complements__settings__warning",
-      });
-
-      addFilterableSetting(
-        "Include only files under current directory",
-        null,
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings
-                .includeCurrentVaultOnlyFilesUnderCurrentDirectory,
-            ).onChange(async (value) => {
-              this.plugin.settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory =
+    addFilterableSetting(
+      "Include prefix path patterns",
+      "Prefix match path patterns to include files.",
+      (setting) => {
+        setting.addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.includeCurrentVaultPathPrefixPatterns,
+            )
+            .setPlaceholder("Private/")
+            .onChange(async (value) => {
+              this.plugin.settings.includeCurrentVaultPathPrefixPatterns =
                 value;
               await this.plugin.saveSettings();
             });
-          });
-        },
-      );
-      addFilterableSetting(
-        "Min number of characters for trigger",
-        "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 10, 1)
-              .setValue(
-                this.plugin.settings
-                  .currentVaultMinNumberOfCharactersForTrigger,
-              )
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger =
-                  value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Exclude prefix path patterns",
+      "Prefix match path patterns to exclude files.",
+      (setting) => {
+        setting.addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeCurrentVaultPathPrefixPatterns,
+            )
+            .setPlaceholder("Private/")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentVaultPathPrefixPatterns =
+                value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Exclude word patterns for indexing",
-        "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
-        (setting) => {
-          setting.addTextArea((tc) => {
-            const el = tc
-              .setValue(
-                this.plugin.settings.excludeCurrentVaultWordPatterns.join("\n"),
-              )
-              .onChange(async (value) => {
-                this.plugin.settings.excludeCurrentVaultWordPatterns =
-                  smartLineBreakSplit(value);
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path-dense";
-            return el;
+    addFilterableSetting(
+      "Exclude path glob patterns",
+      "Glob patterns to exclude files. Supports wildcards like **/attachments, **/*.png, etc.",
+      (setting) => {
+        setting.addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeCurrentVaultPathGlobPatterns.join(
+                "\n",
+              ),
+            )
+            .setPlaceholder("**/attachments\n**/*.png")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentVaultPathGlobPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
+    addConditionalElement(
+      containerEl.createEl("div", {
+        text: "⚠ Glob patterns add processing overhead. Use prefix path patterns above for better performance when possible.",
+        cls: "various-complements__settings__warning",
+      }),
+      isEnabled,
+    );
+
+    addFilterableSetting(
+      "Include only files under current directory",
+      null,
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings
+              .includeCurrentVaultOnlyFilesUnderCurrentDirectory,
+          ).onChange(async (value) => {
+            this.plugin.settings.includeCurrentVaultOnlyFilesUnderCurrentDirectory =
+              value;
+            await this.plugin.saveSettings();
           });
-        },
-      );
-    }
+        });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Min number of characters for trigger",
+      "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(
+              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.currentVaultMinNumberOfCharactersForTrigger =
+                value;
+              await this.plugin.saveSettings();
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Exclude word patterns for indexing",
+      "Regexp patterns for words to be excluded from the suggestions, separated by line breaks.",
+      (setting) => {
+        setting.addTextArea((tc) => {
+          const el = tc
+            .setValue(
+              this.plugin.settings.excludeCurrentVaultWordPatterns.join("\n"),
+            )
+            .onChange(async (value) => {
+              this.plugin.settings.excludeCurrentVaultWordPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path-dense";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
   }
 
   private addCustomDictionaryComplementSettings(containerEl: HTMLElement) {
@@ -1110,7 +1155,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, refresh } = useFilterSetting(group);
+
+    const isEnabled = () =>
+      this.plugin.settings.enableCustomDictionaryComplement;
 
     addFilterableSetting(
       "Enable Custom dictionary complement",
@@ -1121,34 +1169,37 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             this.plugin.settings.enableCustomDictionaryComplement,
           ).onChange(async (value) => {
             this.plugin.settings.enableCustomDictionaryComplement = value;
+            refresh();
             await this.plugin.saveSettings({ customDictionary: true });
-            this.display();
           });
         });
       },
     );
 
-    if (this.plugin.settings.enableCustomDictionaryComplement) {
-      addFilterableSetting(
-        "Custom dictionary paths",
-        "Specify either a relative path from Vault root or URL for each line.",
-        (setting) => {
-          setting.addTextArea((tac) => {
-            const el = tac
-              .setValue(this.plugin.settings.customDictionaryPaths)
-              .setPlaceholder("dictionary.md")
-              .onChange(async (value) => {
-                this.plugin.settings.customDictionaryPaths = value;
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path";
-            return el;
-          });
-        },
-      );
+    addFilterableSetting(
+      "Custom dictionary paths",
+      "Specify either a relative path from Vault root or URL for each line.",
+      (setting) => {
+        setting.addTextArea((tac) => {
+          const el = tac
+            .setValue(this.plugin.settings.customDictionaryPaths)
+            .setPlaceholder("dictionary.md")
+            .onChange(async (value) => {
+              this.plugin.settings.customDictionaryPaths = value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting("Column delimiter", null, (setting) => {
+    addFilterableSetting(
+      "Column delimiter",
+      null,
+      (setting) => {
         setting.addDropdown((tc) =>
           tc
             .addOptions(mirrorMap(ColumnDelimiter.values(), (x) => x.name))
@@ -1158,106 +1209,113 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
               await this.plugin.saveSettings();
             }),
         );
-      });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Word regex pattern",
-        "Only load words that match the regular expression pattern.",
-        (setting) => {
-          setting.addText((cb) => {
-            cb.setValue(
-              this.plugin.settings.customDictionaryWordRegexPattern,
-            ).onChange(async (value) => {
-              this.plugin.settings.customDictionaryWordRegexPattern = value;
-              await this.plugin.saveSettings();
-            });
+    addFilterableSetting(
+      "Word regex pattern",
+      "Only load words that match the regular expression pattern.",
+      (setting) => {
+        setting.addText((cb) => {
+          cb.setValue(
+            this.plugin.settings.customDictionaryWordRegexPattern,
+          ).onChange(async (value) => {
+            this.plugin.settings.customDictionaryWordRegexPattern = value;
+            await this.plugin.saveSettings();
           });
-        },
-      );
+        });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Delimiter to hide a suggestion",
-        "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but completes to 'abcdefg'.",
-        (setting) => {
-          setting.addText((cb) => {
-            cb.setValue(
-              this.plugin.settings.delimiterToHideSuggestion,
-            ).onChange(async (value) => {
+    addFilterableSetting(
+      "Delimiter to hide a suggestion",
+      "If set ';;;', 'abcd;;;efg' is shown as 'abcd' on suggestions, but completes to 'abcdefg'.",
+      (setting) => {
+        setting.addText((cb) => {
+          cb.setValue(this.plugin.settings.delimiterToHideSuggestion).onChange(
+            async (value) => {
               this.plugin.settings.delimiterToHideSuggestion = value;
               await this.plugin.saveSettings();
-            });
-          });
-        },
-      );
+            },
+          );
+        });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Delimiter to divide suggestions for display from ones for insertion",
-        "If set ' >>> ', 'displayed >>> inserted' is shown as 'displayed' on suggestions, but completes to 'inserted'.",
-        (setting) => {
-          setting.addText((cb) => {
-            cb.setValue(
+    addFilterableSetting(
+      "Delimiter to divide suggestions for display from ones for insertion",
+      "If set ' >>> ', 'displayed >>> inserted' is shown as 'displayed' on suggestions, but completes to 'inserted'.",
+      (setting) => {
+        setting.addText((cb) => {
+          cb.setValue(
+            this.plugin.settings
+              .delimiterToDivideSuggestionsForDisplayFromInsertion,
+          ).onChange(async (value) => {
+            this.plugin.settings.delimiterToDivideSuggestionsForDisplayFromInsertion =
+              value;
+            await this.plugin.saveSettings();
+          });
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Caret location symbol after complement",
+      "If set '<CARET>' and there is '<li><CARET></li>' in custom dictionary, it complements '<li></li>' and move a caret where between '<li>' and `</li>`.",
+      (setting) => {
+        setting.addText((cb) => {
+          cb.setValue(
+            this.plugin.settings.caretLocationSymbolAfterComplement,
+          ).onChange(async (value) => {
+            this.plugin.settings.caretLocationSymbolAfterComplement = value;
+            await this.plugin.saveSettings();
+          });
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Displayed text suffix",
+      "It shows as a suffix of displayed text if there is a difference between displayed and inserted",
+      (setting) => {
+        setting.addText((cb) => {
+          cb.setValue(this.plugin.settings.displayedTextSuffix).onChange(
+            async (value) => {
+              this.plugin.settings.displayedTextSuffix = value;
+              await this.plugin.saveSettings();
+            },
+          );
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Min number of characters for trigger",
+      "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(
               this.plugin.settings
-                .delimiterToDivideSuggestionsForDisplayFromInsertion,
-            ).onChange(async (value) => {
-              this.plugin.settings.delimiterToDivideSuggestionsForDisplayFromInsertion =
+                .customDictionaryMinNumberOfCharactersForTrigger,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger =
                 value;
               await this.plugin.saveSettings();
-            });
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Caret location symbol after complement",
-        "If set '<CARET>' and there is '<li><CARET></li>' in custom dictionary, it complements '<li></li>' and move a caret where between '<li>' and `</li>`.",
-        (setting) => {
-          setting.addText((cb) => {
-            cb.setValue(
-              this.plugin.settings.caretLocationSymbolAfterComplement,
-            ).onChange(async (value) => {
-              this.plugin.settings.caretLocationSymbolAfterComplement = value;
-              await this.plugin.saveSettings();
-            });
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Displayed text suffix",
-        "It shows as a suffix of displayed text if there is a difference between displayed and inserted",
-        (setting) => {
-          setting.addText((cb) => {
-            cb.setValue(this.plugin.settings.displayedTextSuffix).onChange(
-              async (value) => {
-                this.plugin.settings.displayedTextSuffix = value;
-                await this.plugin.saveSettings();
-              },
-            );
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Min number of characters for trigger",
-        "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 10, 1)
-              .setValue(
-                this.plugin.settings
-                  .customDictionaryMinNumberOfCharactersForTrigger,
-              )
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.customDictionaryMinNumberOfCharactersForTrigger =
-                  value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
-    }
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
   }
 
   private addInternalLinkComplementSettings(containerEl: HTMLElement) {
@@ -1267,22 +1325,31 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, addConditionalElement, refresh } =
+      useFilterSetting(group);
+
+    const isEnabled = () => this.plugin.settings.enableInternalLinkComplement;
+    const usesAliasTransformation = () =>
+      isEnabled() &&
+      this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
+        .enabled;
 
     addFilterableSetting("Enable Internal link complement", null, (setting) => {
       setting.addToggle((tc) => {
         tc.setValue(this.plugin.settings.enableInternalLinkComplement).onChange(
           async (value) => {
             this.plugin.settings.enableInternalLinkComplement = value;
+            refresh();
             await this.plugin.saveSettings({ internalLink: true });
-            this.display();
           },
         );
       });
     });
 
-    if (this.plugin.settings.enableInternalLinkComplement) {
-      addFilterableSetting("Suggest with an alias", null, (setting) => {
+    addFilterableSetting(
+      "Suggest with an alias",
+      null,
+      (setting) => {
         setting.addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.suggestInternalLinkWithAlias,
@@ -1291,23 +1358,28 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings({ internalLink: true });
           });
         });
-      });
-      addFilterableSetting(
-        "Preserve first-letter case",
-        "If the first letter case differs between the query and the displayed text, insert with an alias using the query's first-letter case.",
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings.preserveFirstLetterCaseOnInternalLink,
-            ).onChange(async (value) => {
-              this.plugin.settings.preserveFirstLetterCaseOnInternalLink =
-                value;
-              await this.plugin.saveSettings();
-            });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Preserve first-letter case",
+      "If the first letter case differs between the query and the displayed text, insert with an alias using the query's first-letter case.",
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.preserveFirstLetterCaseOnInternalLink,
+          ).onChange(async (value) => {
+            this.plugin.settings.preserveFirstLetterCaseOnInternalLink = value;
+            await this.plugin.saveSettings();
           });
-        },
-      );
-      addFilterableSetting("Update internal links on save", null, (setting) => {
+        });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Update internal links on save",
+      null,
+      (setting) => {
         setting.addToggle((tc) => {
           tc.setValue(this.plugin.settings.updateInternalLinksOnSave).onChange(
             async (value) => {
@@ -1316,8 +1388,13 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             },
           );
         });
-      });
-      addFilterableSetting("Exclude self internal link", null, (setting) => {
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Exclude self internal link",
+      null,
+      (setting) => {
         setting.addToggle((tc) => {
           tc.setValue(this.plugin.settings.excludeSelfInternalLink).onChange(
             async (value) => {
@@ -1326,215 +1403,226 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             },
           );
         });
-      });
-      addFilterableSetting(
-        "Exclude existing in active file internal links",
-        "Exclude internal links present in the current file from the suggestions. Note that the number of excluded suggestions will reduce the total suggestions by the value set in the 'Max number of suggestions' option.",
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings.excludeExistingInActiveFileInternalLinks,
-            ).onChange(async (value) => {
-              this.plugin.settings.excludeExistingInActiveFileInternalLinks =
-                value;
-              await this.plugin.saveSettings({ internalLink: true });
-            });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Exclude existing in active file internal links",
+      "Exclude internal links present in the current file from the suggestions. Note that the number of excluded suggestions will reduce the total suggestions by the value set in the 'Max number of suggestions' option.",
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.excludeExistingInActiveFileInternalLinks,
+          ).onChange(async (value) => {
+            this.plugin.settings.excludeExistingInActiveFileInternalLinks =
+              value;
+            await this.plugin.saveSettings({ internalLink: true });
           });
-        },
-      );
-      addFilterableSetting(
-        "Exclude unresolved internal links",
-        "Exclude internal links that point to non-existing files (phantom links) from the suggestions.",
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings.excludeUnresolvedInternalLinks,
-            ).onChange(async (value) => {
-              this.plugin.settings.excludeUnresolvedInternalLinks = value;
-              await this.plugin.saveSettings({ internalLink: true });
-            });
+        });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Exclude unresolved internal links",
+      "Exclude internal links that point to non-existing files (phantom links) from the suggestions.",
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.excludeUnresolvedInternalLinks,
+          ).onChange(async (value) => {
+            this.plugin.settings.excludeUnresolvedInternalLinks = value;
+            await this.plugin.saveSettings({ internalLink: true });
           });
-        },
-      );
-      addFilterableSetting(
-        "Exclude internal links in code",
-        "Exclude internal link suggestions when the cursor is inside a code block or inline code. Unlike the 'Disable suggestions in the Code block' option, this targets only internal link suggestions and also applies to inline code.",
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
-              this.plugin.settings.excludeInternalLinksInCode,
-            ).onChange(async (value) => {
+        });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Exclude internal links in code",
+      "Exclude internal link suggestions when the cursor is inside a code block or inline code. Unlike the 'Disable suggestions in the Code block' option, this targets only internal link suggestions and also applies to inline code.",
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(this.plugin.settings.excludeInternalLinksInCode).onChange(
+            async (value) => {
               this.plugin.settings.excludeInternalLinksInCode = value;
               await this.plugin.saveSettings();
-            });
-          });
-        },
-      );
+            },
+          );
+        });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Insert an alias that is transformed from the displayed internal link",
-        null,
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
+    addFilterableSetting(
+      "Insert an alias that is transformed from the displayed internal link",
+      null,
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
+              .enabled,
+          ).onChange(async (value) => {
+            this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.enabled =
+              value;
+            refresh();
+            await this.plugin.saveSettings();
+          });
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Before: regular expression pattern with captures",
+      String.raw`Ex: (?<name>.+) \(.+\)$`,
+      (setting) => {
+        setting
+          .setClass("various-complements__settings__nested")
+          .addText((cb) => {
+            cb.setValue(
               this.plugin.settings
-                .insertAliasTransformedFromDisplayedInternalLink.enabled,
+                .insertAliasTransformedFromDisplayedInternalLink.beforeRegExp,
             ).onChange(async (value) => {
-              this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.enabled =
+              this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp =
                 value;
               await this.plugin.saveSettings();
-              this.display();
             });
           });
-        },
-      );
-
-      if (
-        this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink
-          .enabled
-      ) {
-        addFilterableSetting(
-          "Before: regular expression pattern with captures",
-          String.raw`Ex: (?<name>.+) \(.+\)$`,
-          (setting) => {
-            setting
-              .setClass("various-complements__settings__nested")
-              .addText((cb) => {
-                cb.setValue(
-                  this.plugin.settings
-                    .insertAliasTransformedFromDisplayedInternalLink
-                    .beforeRegExp,
-                ).onChange(async (value) => {
-                  this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.beforeRegExp =
-                    value;
-                  await this.plugin.saveSettings();
-                });
-              });
-          },
-        );
-        addFilterableSetting("After", "Ex: $<name>", (setting) => {
-          setting
-            .setClass("various-complements__settings__nested")
-            .addText((cb) => {
-              cb.setValue(
-                this.plugin.settings
-                  .insertAliasTransformedFromDisplayedInternalLink.after,
-              ).onChange(async (value) => {
-                this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.after =
-                  value;
-                await this.plugin.saveSettings();
-              });
+      },
+      { visible: usesAliasTransformation },
+    );
+    addFilterableSetting(
+      "After",
+      "Ex: $<name>",
+      (setting) => {
+        setting
+          .setClass("various-complements__settings__nested")
+          .addText((cb) => {
+            cb.setValue(
+              this.plugin.settings
+                .insertAliasTransformedFromDisplayedInternalLink.after,
+            ).onChange(async (value) => {
+              this.plugin.settings.insertAliasTransformedFromDisplayedInternalLink.after =
+                value;
+              await this.plugin.saveSettings();
             });
+          });
+      },
+      { visible: usesAliasTransformation },
+    );
+
+    addFilterableSetting(
+      "Exclude prefix path patterns",
+      "Prefix match path patterns to exclude files.",
+      (setting) => {
+        setting.addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeInternalLinkPathPrefixPatterns,
+            )
+            .setPlaceholder("Private/")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeInternalLinkPathPrefixPatterns =
+                value;
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
         });
-      }
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Exclude prefix path patterns",
-        "Prefix match path patterns to exclude files.",
-        (setting) => {
-          setting.addTextArea((tac) => {
-            const el = tac
-              .setValue(
-                this.plugin.settings.excludeInternalLinkPathPrefixPatterns,
-              )
-              .setPlaceholder("Private/")
-              .onChange(async (value) => {
-                this.plugin.settings.excludeInternalLinkPathPrefixPatterns =
-                  value;
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path";
-            return el;
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Exclude path glob patterns",
-        "Glob patterns to exclude files. Supports wildcards like **/attachments, **/*.png, etc.",
-        (setting) => {
-          setting.addTextArea((tac) => {
-            const el = tac
-              .setValue(
-                this.plugin.settings.excludeInternalLinkPathGlobPatterns.join(
-                  "\n",
-                ),
-              )
-              .setPlaceholder("**/attachments\n**/*.png")
-              .onChange(async (value) => {
-                this.plugin.settings.excludeInternalLinkPathGlobPatterns =
-                  smartLineBreakSplit(value);
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path";
-            return el;
-          });
-        },
-      );
+    addFilterableSetting(
+      "Exclude path glob patterns",
+      "Glob patterns to exclude files. Supports wildcards like **/attachments, **/*.png, etc.",
+      (setting) => {
+        setting.addTextArea((tac) => {
+          const el = tac
+            .setValue(
+              this.plugin.settings.excludeInternalLinkPathGlobPatterns.join(
+                "\n",
+              ),
+            )
+            .setPlaceholder("**/attachments\n**/*.png")
+            .onChange(async (value) => {
+              this.plugin.settings.excludeInternalLinkPathGlobPatterns =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
+    addConditionalElement(
       containerEl.createEl("div", {
         text: "⚠ Glob patterns add processing overhead. Use prefix path patterns above for better performance when possible.",
         cls: "various-complements__settings__warning",
-      });
+      }),
+      isEnabled,
+    );
 
-      addFilterableSetting(
-        "Front matter key for exclusion",
-        "Exclude internal links from the suggestions if whose front matters have the key whose name is same as this setting, and the value is 'true'",
-        (setting) => {
-          setting.addText((cb) => {
-            TextComponentEvent.onChange(cb, async (value) => {
-              this.plugin.settings.frontMatterKeyForExclusionInternalLink =
-                value;
-              await this.plugin.saveSettings({ internalLink: true });
-            }).setValue(
-              this.plugin.settings.frontMatterKeyForExclusionInternalLink,
-            );
-          });
-        },
-      );
-      addFilterableSetting(
-        "Tags for exclusion",
-        "Tags to exclude suggestions for internal links. If specifying multiple tags, separate them with line breaks.",
-        (setting) => {
-          setting.addTextArea((tc) => {
-            const el = tc
-              .setValue(
-                this.plugin.settings.tagsForExclusionInternalLink.join("\n"),
-              )
-              .onChange(async (value) => {
-                this.plugin.settings.tagsForExclusionInternalLink =
-                  smartLineBreakSplit(value);
-                await this.plugin.saveSettings();
-              });
-            el.inputEl.className =
-              "various-complements__settings__text-area-path-mini";
-            return el;
-          });
-        },
-      );
-
-      addFilterableSetting(
-        "Min number of characters for trigger",
-        "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 10, 1)
-              .setValue(
-                this.plugin.settings
-                  .internalLinkMinNumberOfCharactersForTrigger,
-              )
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger =
-                  value;
-                await this.plugin.saveSettings();
-              }),
+    addFilterableSetting(
+      "Front matter key for exclusion",
+      "Exclude internal links from the suggestions if whose front matters have the key whose name is same as this setting, and the value is 'true'",
+      (setting) => {
+        setting.addText((cb) => {
+          TextComponentEvent.onChange(cb, async (value) => {
+            this.plugin.settings.frontMatterKeyForExclusionInternalLink = value;
+            await this.plugin.saveSettings({ internalLink: true });
+          }).setValue(
+            this.plugin.settings.frontMatterKeyForExclusionInternalLink,
           );
-        },
-      );
-    }
+        });
+      },
+      { visible: isEnabled },
+    );
+    addFilterableSetting(
+      "Tags for exclusion",
+      "Tags to exclude suggestions for internal links. If specifying multiple tags, separate them with line breaks.",
+      (setting) => {
+        setting.addTextArea((tc) => {
+          const el = tc
+            .setValue(
+              this.plugin.settings.tagsForExclusionInternalLink.join("\n"),
+            )
+            .onChange(async (value) => {
+              this.plugin.settings.tagsForExclusionInternalLink =
+                smartLineBreakSplit(value);
+              await this.plugin.saveSettings();
+            });
+          el.inputEl.className =
+            "various-complements__settings__text-area-path-mini";
+          return el;
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Min number of characters for trigger",
+      "Override the main trigger setting for this provider. Set 0 to use the main setting value.",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 10, 1)
+            .setValue(
+              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.internalLinkMinNumberOfCharactersForTrigger =
+                value;
+              await this.plugin.saveSettings();
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
   }
 
   private addFrontMatterComplementSettings(containerEl: HTMLElement) {
@@ -1544,40 +1632,45 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, refresh } = useFilterSetting(group);
+
+    const isEnabled = () => this.plugin.settings.enableFrontMatterComplement;
 
     addFilterableSetting("Enable Front matter complement", null, (setting) => {
       setting.addToggle((tc) => {
         tc.setValue(this.plugin.settings.enableFrontMatterComplement).onChange(
           async (value) => {
             this.plugin.settings.enableFrontMatterComplement = value;
+            refresh();
             await this.plugin.saveSettings({ frontMatter: true });
-            this.display();
           },
         );
       });
     });
 
-    if (this.plugin.settings.enableFrontMatterComplement) {
-      addFilterableSetting(
-        "Match strategy in the front matter",
-        null,
-        (setting) => {
-          setting.addDropdown((tc) =>
-            tc
-              .addOptions(
-                mirrorMap(SpecificMatchStrategy.values(), (x) => x.name),
-              )
-              .setValue(this.plugin.settings.frontMatterComplementMatchStrategy)
-              .onChange(async (value) => {
-                this.plugin.settings.frontMatterComplementMatchStrategy = value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
+    addFilterableSetting(
+      "Match strategy in the front matter",
+      null,
+      (setting) => {
+        setting.addDropdown((tc) =>
+          tc
+            .addOptions(
+              mirrorMap(SpecificMatchStrategy.values(), (x) => x.name),
+            )
+            .setValue(this.plugin.settings.frontMatterComplementMatchStrategy)
+            .onChange(async (value) => {
+              this.plugin.settings.frontMatterComplementMatchStrategy = value;
+              await this.plugin.saveSettings();
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting("Insert comma after completion", null, (setting) => {
+    addFilterableSetting(
+      "Insert comma after completion",
+      null,
+      (setting) => {
         setting.addToggle((tc) => {
           tc.setValue(
             this.plugin.settings.insertCommaAfterFrontMatterCompletion,
@@ -1586,8 +1679,9 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
-      });
-    }
+      },
+      { visible: isEnabled },
+    );
   }
 
   private addIntelligentSuggestionPrioritizationSettings(
@@ -1599,7 +1693,10 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
     });
 
     const group = new SettingGroup(containerEl);
-    const { addFilterableSetting } = useFilterSetting(group);
+    const { addFilterableSetting, refresh } = useFilterSetting(group);
+
+    const isEnabled = () =>
+      this.plugin.settings.intelligentSuggestionPrioritization.enabled;
 
     addFilterableSetting(
       "Enable Intelligent Suggestion Prioritization",
@@ -1611,94 +1708,96 @@ export class VariousComplementsSettingTab extends PluginSettingTab {
           ).onChange(async (value) => {
             this.plugin.settings.intelligentSuggestionPrioritization.enabled =
               value;
+            refresh();
             await this.plugin.saveSettings({
               intelligentSuggestionPrioritization: true,
             });
-            this.display();
           });
         });
       },
     );
 
-    if (this.plugin.settings.intelligentSuggestionPrioritization.enabled) {
-      addFilterableSetting(
-        "history file path",
-        `Default: ${DEFAULT_HISTORIES_PATH}`,
-        (setting) => {
-          setting.addText((cb) => {
-            TextComponentEvent.onChange(cb, async (value) => {
-              this.plugin.settings.intelligentSuggestionPrioritization.historyFilePath =
-                value;
-              await this.plugin.saveSettings({
-                intelligentSuggestionPrioritization: true,
-              });
-            }).setValue(
-              this.plugin.settings.intelligentSuggestionPrioritization
-                .historyFilePath,
-            );
-          });
-        },
-      );
+    addFilterableSetting(
+      "history file path",
+      `Default: ${DEFAULT_HISTORIES_PATH}`,
+      (setting) => {
+        setting.addText((cb) => {
+          TextComponentEvent.onChange(cb, async (value) => {
+            this.plugin.settings.intelligentSuggestionPrioritization.historyFilePath =
+              value;
+            await this.plugin.saveSettings({
+              intelligentSuggestionPrioritization: true,
+            });
+          }).setValue(
+            this.plugin.settings.intelligentSuggestionPrioritization
+              .historyFilePath,
+          );
+        });
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Pretty-print history file",
-        "Save the history file with indentation to make Git diffs smaller.",
-        (setting) => {
-          setting.addToggle((tc) => {
-            tc.setValue(
+    addFilterableSetting(
+      "Pretty-print history file",
+      "Save the history file with indentation to make Git diffs smaller.",
+      (setting) => {
+        setting.addToggle((tc) => {
+          tc.setValue(
+            this.plugin.settings.intelligentSuggestionPrioritization
+              .prettyPrintHistoryFile,
+          ).onChange(async (value) => {
+            this.plugin.settings.intelligentSuggestionPrioritization.prettyPrintHistoryFile =
+              value;
+            await this.plugin.saveSettings();
+          });
+        });
+      },
+      { visible: isEnabled },
+    );
+
+    addFilterableSetting(
+      "Max days to keep history",
+      "If set 0, it will never remove",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 365, 1)
+            .setValue(
               this.plugin.settings.intelligentSuggestionPrioritization
-                .prettyPrintHistoryFile,
-            ).onChange(async (value) => {
-              this.plugin.settings.intelligentSuggestionPrioritization.prettyPrintHistoryFile =
+                .maxDaysToKeepHistory,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory =
                 value;
               await this.plugin.saveSettings();
-            });
-          });
-        },
-      );
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
 
-      addFilterableSetting(
-        "Max days to keep history",
-        "If set 0, it will never remove",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 365, 1)
-              .setValue(
-                this.plugin.settings.intelligentSuggestionPrioritization
-                  .maxDaysToKeepHistory,
-              )
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.intelligentSuggestionPrioritization.maxDaysToKeepHistory =
-                  value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
-
-      addFilterableSetting(
-        "Max number of history to keep",
-        "If set 0, it will never remove",
-        (setting) => {
-          setting.addSlider((sc) =>
-            sc
-              .setLimits(0, 10000, 1)
-              .setValue(
-                this.plugin.settings.intelligentSuggestionPrioritization
-                  .maxNumberOfHistoryToKeep,
-              )
-              .setDynamicTooltip()
-              .onChange(async (value) => {
-                this.plugin.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep =
-                  value;
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      );
-    }
+    addFilterableSetting(
+      "Max number of history to keep",
+      "If set 0, it will never remove",
+      (setting) => {
+        setting.addSlider((sc) =>
+          sc
+            .setLimits(0, 10000, 1)
+            .setValue(
+              this.plugin.settings.intelligentSuggestionPrioritization
+                .maxNumberOfHistoryToKeep,
+            )
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+              this.plugin.settings.intelligentSuggestionPrioritization.maxNumberOfHistoryToKeep =
+                value;
+              await this.plugin.saveSettings();
+            }),
+        );
+      },
+      { visible: isEnabled },
+    );
   }
 
   private addMobileSettings(containerEl: HTMLElement) {
