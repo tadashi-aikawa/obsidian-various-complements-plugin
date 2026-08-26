@@ -39,8 +39,8 @@
   "dependencies": {
     "chinese-tokenizer": "github:tadashi-aikawa/chinese-tokenizer",
     "emoji-regex": "10.6.0",
-    "minimatch": "10.1.1",
+    "minimatch": "10.2.6",
     "svelte-lucide-icons": "0.6.0",
-    "ts-deepmerge": "7.0.3"
+    "ts-deepmerge": "8.0.0"
   }
 }
