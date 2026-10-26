@@ -1,4 +1,4 @@
 [tools]
 node = "24"
-pnpm = "11.5.2"
+pnpm = "11.28.8"
 betterleaks = "1.5.0"
