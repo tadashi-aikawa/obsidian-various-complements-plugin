@@ -1,5 +1,11 @@
 # obsidian-various-complements-plugin
 
+> [!IMPORTANT]
+> I rarely use Obsidian anymore.
+>
+> - Maintenance is limited to fixes for reported security vulnerabilities.
+> - No new features or non-security bug fixes are planned.
+
 [![release](https://img.shields.io/github/release/tadashi-aikawa/obsidian-various-complements-plugin.svg)](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/releases/latest)
 [![Tests](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/workflows/Tests/badge.svg)](https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/actions)
 ![downloads](https://img.shields.io/github/downloads/tadashi-aikawa/obsidian-various-complements-plugin/total)
